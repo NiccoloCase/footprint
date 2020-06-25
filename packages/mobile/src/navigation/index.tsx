@@ -244,7 +244,7 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
 
 export const Navigation = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [userToken, setUserToken] = useState('');
+  const [userToken, setUserToken] = useState('abc');
 
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 1000);

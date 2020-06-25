@@ -1,10 +1,10 @@
 import { IConfig } from "../config.type";
+import { RecursivePartial } from "@footprint/common";
 
-const productionKeys: Partial<IConfig> = {
+export const productionKeys: RecursivePartial<IConfig> = {
   IS_PRODUCTION: true,
   server: {
     PORT: Number(process.env.PORT!),
-    API_URL: process.env.API_URL!,
   },
   webApp: {
     DOMAIN: process.env.WEB_APP_DOMAIN!,
@@ -13,5 +13,3 @@ const productionKeys: Partial<IConfig> = {
     URI: process.env.MONGO_URI!,
   },
 };
-
-export default productionKeys;

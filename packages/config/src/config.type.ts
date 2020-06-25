@@ -8,8 +8,8 @@ export interface IConfig {
   server: {
     /** Porta del server */
     PORT: number;
-    /** URL dell'API */
-    API_URL: string;
+    /** percorso dell'API Graphql */
+    GRAPHQL_PATH: string;
   };
   database: {
     /** URI di conessione al server */
