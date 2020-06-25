@@ -1,5 +1,5 @@
 {
-  "name": "footprint",
+  "name": "@footprint/mobile",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,6 +10,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@footprint/config": "1.0.0",
+    "@react-native-community/google-signin": "^4.0.3",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-mapbox-gl/maps": "^8.1.0-rc.1",
     "@react-navigation/bottom-tabs": "^5.5.2",
@@ -71,12 +73,14 @@
       "@react-navigation/**",
       "react-native-safe-area-context",
       "react-native-safe-area-context/**",
-      "@react-native-community/masked-view",
-      "@react-native-community/masked-view/**",
       "react-native-vector-icons",
       "react-native-vector-icons/**",
       "react-native-pose",
-      "react-native-pose/**"
+      "react-native-pose/**",
+      "@react-native-community",
+      "@react-native-community/**",
+      "react-native-elements",
+      "react-native-elements/**"
     ]
   }
 }

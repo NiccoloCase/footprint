@@ -19,6 +19,7 @@ import {HomeScreen} from '../screens/HomeScreen';
 import {AddFootprintScreen} from '../screens/AddFootprintScreen';
 import {SearchScreen} from '../screens/SearchScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
+import {WelcomeScreen} from '../screens/Auth/Welcome';
 import {SignInScreen} from '../screens/Auth/SignIn';
 import {SignUpScreen} from '../screens/Auth/SignUp';
 import {ProfileScreen} from '../screens/ProfileScreen';
@@ -32,12 +33,32 @@ const defaultScreenOptions: StackNavigationOptions = {
 
 // AUTH STACK
 export type AuthStackParamList = {
+  Welcome: undefined;
   SignIn: undefined;
   SignUp: undefined;
 };
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
-  <AuthStack.Navigator>
+  <AuthStack.Navigator
+    // initialRouteName="SignIn"
+    screenOptions={{
+      // headerTransparent: true,
+      headerTitleAlign: 'center',
+      headerTintColor: '#FF596E',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize: 23,
+      },
+      headerStyle: {
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+    }}>
+    <AuthStack.Screen
+      name="Welcome"
+      component={WelcomeScreen}
+      options={{title: 'Accedi', headerShown: false}}
+    />
     <AuthStack.Screen
       name="SignIn"
       component={SignInScreen}
@@ -223,7 +244,7 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
 
 export const Navigation = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [userToken, setUserToken] = useState('abc');
+  const [userToken, setUserToken] = useState('');
 
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 1000);

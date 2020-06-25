@@ -23,21 +23,13 @@ export const MapView: React.FC = () => {
     coordinates.map((coordinate, index) => (
       <Mapbox.PointAnnotation
         key={index}
+        id={index + ''}
         // onSelected={() => Alert.alert('iojo')}
-        coordinate={coordinate}
-        id="pt-ann">
-        <Text>See</Text>
+        coordinate={coordinate}>
         <Image
-          style={{flex: 1, width: 30, height: 40}}
+          style={{flex: 1, width: 30, height: 40, backgroundColor: 'black'}}
           source={require('../../assets/images/marker.png')}
         />
-        <Mapbox.Callout
-          containerStyle={{backgroundColor: '#fff'}}
-          contentStyle={{padding: 5}}>
-          <View>
-            <Text>Ciao</Text>
-          </View>
-        </Mapbox.Callout>
       </Mapbox.PointAnnotation>
     ));
 
@@ -45,8 +37,7 @@ export const MapView: React.FC = () => {
     <Mapbox.MapView
       style={{flex: 1}}
       styleURL={Mapbox.StyleURL.Light}
-      compassEnabled={false}
-      logoEnabled={false}>
+      compassEnabled={false}>
       <Mapbox.Camera zoomLevel={16} centerCoordinate={coordinates[0]} />
       {renderMarks()}
     </Mapbox.MapView>
