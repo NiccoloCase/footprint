@@ -6,10 +6,38 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export enum AuthType {
+    LOCAL = "LOCAL",
+    GOOGLE = "GOOGLE"
+}
+
+export interface AuthPayload {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+}
+
+export interface IMutation {
+    signup(username: string, email: string, password: string): ProcessResult | Promise<ProcessResult>;
+    signupWithGoogle(username: string, email: string, googleID: string): ProcessResult | Promise<ProcessResult>;
+    login(email: string, password: string): AuthPayload | Promise<AuthPayload>;
+    loginWithGoogle(access_token: string): AuthPayload | Promise<AuthPayload>;
+}
+
+export interface ProcessResult {
+    success: boolean;
+}
+
 export interface User {
-    name: string;
+    id: string;
+    profileImage: string;
+    username: string;
+    email?: string;
+    authType?: AuthType;
+    googleID?: string;
 }
 
 export interface IQuery {
+    whoami(): User | Promise<User>;
     getUserById(id: string): User | Promise<User>;
 }

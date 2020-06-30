@@ -3,6 +3,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { join } from 'path';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 import config from '@footprint/config';
 
 @Module({
@@ -12,19 +13,24 @@ import config from '@footprint/config';
       useNewUrlParser: true,
       useFindAndModify: false,
       useCreateIndex: true,
+      connectionFactory: connection => {
+        connection.plugin(require('mongoose-unique-validator'));
+        return connection;
+      },
     }),
     // GRAPHQL
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
-      path: config.server.GRAPHQL_PATH,
-      debug: config.IS_PRODUCTION,
-      playground: config.IS_PRODUCTION,
+      path: '/api/graphql',
+      debug: !config.IS_PRODUCTION,
+      playground: !config.IS_PRODUCTION,
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
       },
     }),
     // SERVIZI DELL'APPLICAZIONE
     UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

@@ -1,34 +1,36 @@
-import React, {useState, useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useState, useEffect, useContext} from "react";
+import {NavigationContainer} from "@react-navigation/native";
 import {
   createStackNavigator,
   StackNavigationOptions,
-} from '@react-navigation/stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {MainHeader} from '../components/Header';
-import {DrawerContent} from '../components/DrawerContent';
-import FeatherIcon from 'react-native-vector-icons/Feather';
+} from "@react-navigation/stack";
+import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import {createDrawerNavigator} from "@react-navigation/drawer";
+import {MainHeader} from "../components/Header";
+import {DrawerContent} from "../components/DrawerContent";
+import FeatherIcon from "react-native-vector-icons/Feather";
+import {fetchAccessToken, setAccessToken, setRefreshToken} from "../auth";
+import {AuthContext} from "../context";
 
 // COMPONENTI
-import {TabBar} from '../components/TabBar';
+import {TabBar} from "../components/TabBar";
 
 // SCHERMATE
-import {SplashScreen} from '../screens/SplashScreen';
-import {HomeScreen} from '../screens/HomeScreen';
-import {AddFootprintScreen} from '../screens/AddFootprintScreen';
-import {SearchScreen} from '../screens/SearchScreen';
-import {SettingsScreen} from '../screens/SettingsScreen';
-import {WelcomeScreen} from '../screens/Auth/Welcome';
-import {SignInScreen} from '../screens/Auth/SignIn';
-import {SignUpScreen} from '../screens/Auth/SignUp';
-import {ProfileScreen} from '../screens/ProfileScreen';
+import {SplashScreen} from "../screens/SplashScreen";
+import {HomeScreen} from "../screens/HomeScreen";
+import {AddFootprintScreen} from "../screens/AddFootprintScreen";
+import {SearchScreen} from "../screens/SearchScreen";
+import {SettingsScreen} from "../screens/SettingsScreen";
+import {WelcomeScreen} from "../screens/Auth/Welcome";
+import {SignInScreen} from "../screens/Auth/SignIn";
+import {SignUpScreen} from "../screens/Auth/SignUp";
+import {ProfileScreen} from "../screens/ProfileScreen";
 
 const defaultScreenOptions: StackNavigationOptions = {
-  headerTitleStyle: {alignSelf: 'center'},
-  headerStyle: {backgroundColor: '#FF596E'},
-  headerTintColor: '#fff',
-  headerTitleAlign: 'center',
+  headerTitleStyle: {alignSelf: "center"},
+  headerStyle: {backgroundColor: "#FF596E"},
+  headerTintColor: "#fff",
+  headerTitleAlign: "center",
 };
 
 // AUTH STACK
@@ -43,10 +45,10 @@ const AuthStackScreen = () => (
     // initialRouteName="SignIn"
     screenOptions={{
       // headerTransparent: true,
-      headerTitleAlign: 'center',
-      headerTintColor: '#FF596E',
+      headerTitleAlign: "center",
+      headerTintColor: "#FF596E",
       headerTitleStyle: {
-        fontWeight: 'bold',
+        fontWeight: "bold",
         fontSize: 23,
       },
       headerStyle: {
@@ -57,17 +59,17 @@ const AuthStackScreen = () => (
     <AuthStack.Screen
       name="Welcome"
       component={WelcomeScreen}
-      options={{title: 'Accedi', headerShown: false}}
+      options={{title: "Accedi", headerShown: false}}
     />
     <AuthStack.Screen
       name="SignIn"
       component={SignInScreen}
-      options={{title: 'Accedi'}}
+      options={{title: "Accedi"}}
     />
     <AuthStack.Screen
       name="SignUp"
       component={SignUpScreen}
-      options={{title: 'Registrati'}}
+      options={{title: "Registrati"}}
     />
   </AuthStack.Navigator>
 );
@@ -111,7 +113,7 @@ const SearchStackScreen = () => (
     <SearchStack.Screen
       name="Search"
       component={SearchScreen}
-      options={{title: 'Cerca'}}
+      options={{title: "Cerca"}}
     />
   </SearchStack.Navigator>
 );
@@ -126,7 +128,7 @@ const ProfileStackScreen = () => (
     <ProfileStack.Screen
       name="Profile"
       component={ProfileScreen}
-      options={{title: 'Profilo'}}
+      options={{title: "Profilo"}}
     />
   </ProfileStack.Navigator>
 );
@@ -141,7 +143,7 @@ const SettingsStackScreen = () => (
     <SettingsStack.Screen
       name="Settings"
       component={SettingsScreen}
-      options={{title: 'Impostazioni'}}
+      options={{title: "Impostazioni"}}
     />
   </SettingsStack.Navigator>
 );
@@ -156,10 +158,11 @@ export type BottomTabParamList = {
 const Tabs = createBottomTabNavigator<BottomTabParamList>();
 const TabsScreen = () => (
   <Tabs.Navigator
+    initialRouteName="Profile"
     tabBar={TabBar}
     tabBarOptions={{
-      activeTintColor: '#FF596E',
-      inactiveTintColor: '#606060',
+      activeTintColor: "#FF596E",
+      inactiveTintColor: "#606060",
     }}>
     <Tabs.Screen
       name="Home"
@@ -174,7 +177,7 @@ const TabsScreen = () => (
       name="AddFootprint"
       component={AddFootprintStackScreen}
       options={{
-        title: 'Nuovo',
+        title: "Nuovo",
         tabBarIcon: ({color, size}) => (
           <FeatherIcon name="plus" size={size} color={color} />
         ),
@@ -184,7 +187,7 @@ const TabsScreen = () => (
       name="Search"
       component={SearchStackScreen}
       options={{
-        title: 'Cerca',
+        title: "Cerca",
         tabBarIcon: ({color, size}) => (
           <FeatherIcon name="search" size={size} color={color} />
         ),
@@ -194,7 +197,7 @@ const TabsScreen = () => (
       name="Profile"
       component={ProfileStackScreen}
       options={{
-        title: 'Profilo',
+        title: "Profilo",
         tabBarIcon: ({color, size}) => (
           <FeatherIcon name="user" size={size} color={color} />
         ),
@@ -217,7 +220,7 @@ const DrawerScreen = () => (
     <Drawer.Screen
       name="Settings"
       component={SettingsStackScreen}
-      options={{title: 'Impostazioni'}}
+      options={{title: "Impostazioni"}}
     />
   </Drawer.Navigator>
 );
@@ -243,18 +246,36 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
 );
 
 export const Navigation = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [userToken, setUserToken] = useState('abc');
+  const [isLoading, setIsLoading] = useState(true);
+  const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
 
+  // richieda al server un nuovo token di accesso
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 1000);
+    (async () => {
+      try {
+        const res = await fetchAccessToken();
+        const data = await res.json();
+        console.log({data});
+        if (!data.success || !data.tokens) return setIsAuthenticated(false);
+        // imposta il nuovo token di accesso e quello di aggiornamento
+        const {accessToken, refreshToken} = data.tokens;
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+
+        setIsAuthenticated(true);
+      } catch (err) {
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
   if (isLoading) return <SplashScreen />;
 
   return (
     <NavigationContainer>
-      <RootStackScreen isAutheticated={!!userToken && userToken.length > 0} />
+      <RootStackScreen isAutheticated={isAuthenticated} />
     </NavigationContainer>
   );
 };

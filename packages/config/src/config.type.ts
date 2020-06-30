@@ -8,8 +8,8 @@ export interface IConfig {
   server: {
     /** Porta del server */
     PORT: number;
-    /** percorso dell'API Graphql */
-    GRAPHQL_PATH: string;
+    /** URL dell'API */
+    API_URL: string;
   };
   database: {
     /** URI di conessione al server */
@@ -19,7 +19,19 @@ export interface IConfig {
     /** Dominio della webapp */
     DOMAIN: string;
   };
+  /** Autorizzazione tramite google */
   googleOAuth: {
     WEB_CLIENT_ID: string;
+  };
+  /** Autenticazione locale */
+  auth: {
+    /** Chiave segreta dei JWT di accesso */
+    ACCESS_TOKEN_SECRET: string;
+    /** Durata dei token di accesso  */
+    ACCESS_TOKEN_EXPIRATION: number;
+    /** Chiave segreta dei token di aggiornamento */
+    REFRESH_TOKEN_SECRET: string;
+    /** Durata dei token di aggiornamento */
+    REFRESH_TOKEN_EXPIRATION: number;
   };
 }

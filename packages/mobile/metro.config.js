@@ -1,11 +1,31 @@
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
+const path = require("path");
+const getWorkspaces = require("get-yarn-workspaces");
+const blacklist = require("metro-config/src/defaults/blacklist");
 
-const path = require('path');
+const workspaces = getWorkspaces(__dirname);
+
+module.exports = {
+  projectRoot: path.resolve(__dirname, "."),
+
+  watchFolders: [path.resolve(__dirname, "../../node_modules"), ...workspaces],
+
+  resolver: {
+    blacklistRE: blacklist(
+      workspaces.map(
+        (workspacePath) =>
+          `/${workspacePath.replace(
+            /\//g,
+            "[/\\\\]",
+          )}[/\\\\]node_modules[/\\\\]react-native[/\\\\].*/`,
+      ),
+    ),
+    extraNodeModules: {
+      "react-native": path.resolve(__dirname, "node_modules/react-native"),
+    },
+  },
+};
+
+/* const path = require('path');
 
 module.exports = {
   transformer: {
@@ -21,10 +41,11 @@ module.exports = {
       {},
       {
         get: (target, name) => {
-          return path.join(__dirname, `node_modules/${name}`);
+          return path.resolve(__dirname, `node_modules/${name}`);
         },
       },
     ),
   },
   watchFolders: [path.resolve(__dirname, '../')],
 };
+ */

@@ -77,6 +77,8 @@ target 'Footprint' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
+  pod 'RNSecureKeyStore', :path => '../node_modules/react-native-secure-key-store'
+
   target 'FootprintTests' do
     inherit! :complete
     # Pods for testing

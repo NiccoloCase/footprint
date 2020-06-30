@@ -9,7 +9,4 @@ export const defaultKeys: RecursivePartial<IConfig> = {
     WEB_CLIENT_ID:
       "205105474204-qtc50kv97tri6ca3cel9elprd1g2gn4s.apps.googleusercontent.com",
   },
-  server: {
-    GRAPHQL_PATH: "/api/graphql",
-  },
 };
