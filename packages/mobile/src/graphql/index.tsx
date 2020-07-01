@@ -7,21 +7,17 @@ import {HttpLink} from "apollo-link-http";
 import {onError} from "apollo-link-error";
 import {InMemoryCache} from "apollo-cache-inmemory";
 import {TokenRefreshLink} from "apollo-link-token-refresh";
-import jwtDecode from "jwt-decode";
-import config from "@footprint/config";
 import {ApolloLink} from "apollo-link";
+import jwtDecode from "jwt-decode";
+import Snackbar from "react-native-snackbar";
+import config from "@footprint/config";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
+import {API_URL} from "../utils/api";
 import {store} from "../store";
-
-const graphqlURI = config.IS_PRODUCTION
-  ? config.server.API_URL + "/graphql"
-  : `http://${
-      Platform.OS === "android" ? "10.0.2.2" : "localhost"
-    }:5000/api/graphql`;
 
 const cache = new InMemoryCache();
 
-const httpLink = new HttpLink({uri: graphqlURI});
+const httpLink = new HttpLink({uri: API_URL + "/graphql"});
 
 const authLink = setContext((_, {headers}) => {
   const {accessToken} = store.getState().auth;
@@ -57,21 +53,33 @@ const tokenRefreshLink = new TokenRefreshLink<{
     store.getActions().auth.singin({accessToken, refreshToken});
   },
   handleError: (err) => {
-    // TODO
-    console.warn("Your refresh token is invalid. Try to relogin");
     console.error(err);
+    store.getActions().auth.setIsAuthenticated(false);
   },
 });
 
-// TODO
 const errorLink = onError(({graphQLErrors, networkError}) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({message, locations, path}) =>
-      console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-      ),
-    );
-  if (networkError) console.log(`[Network error]: ${networkError}`);
+  // riporta l'utente alla schermata di autenticazione se l'errore
+  // ha come stato 401 unauthorized
+  if (graphQLErrors) {
+    for (let err of graphQLErrors) {
+      if (
+        err.extensions &&
+        err.extensions.exception &&
+        err.extensions.exception.status === 401
+      )
+        store.getActions().auth.setIsAuthenticated(false);
+    }
+  }
+  // se è avvenuto un errore di connessione al server mostra
+  // all'utente un messaggio
+  if (networkError) {
+    Snackbar.show({
+      text: "Non è possibile connetteri al server. Prova più tardi",
+      duration: Snackbar.LENGTH_LONG,
+      backgroundColor: "#FF596E",
+    });
+  }
 });
 
 export const client = new ApolloClient({
