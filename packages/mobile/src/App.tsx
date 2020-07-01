@@ -2,10 +2,11 @@ import React from "react";
 import {View} from "react-native";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import {GoogleSignin} from "@react-native-community/google-signin";
+import {StoreProvider} from "easy-peasy";
 import {Navigation} from "./navigation";
 import {ApolloProvider} from "./graphql";
-import {AuthProvider} from "./context";
 import config from "@footprint/config";
+import {store} from "./store";
 
 MapboxGL.setAccessToken(config.MAPBOX_ACCESS_TOKEN);
 GoogleSignin.configure({
@@ -16,11 +17,11 @@ GoogleSignin.configure({
 const App = () => {
   return (
     <View style={{flex: 1}}>
-      <ApolloProvider>
-        <AuthProvider>
+      <StoreProvider store={store}>
+        <ApolloProvider>
           <Navigation />
-        </AuthProvider>
-      </ApolloProvider>
+        </ApolloProvider>
+      </StoreProvider>
     </View>
   );
 };

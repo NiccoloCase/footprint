@@ -1,5 +1,5 @@
 import React from "react";
-import {Platform, AsyncStorage} from "react-native";
+import {Platform} from "react-native";
 import {ApolloProvider as ApolloHooksProvider} from "@apollo/react-hooks";
 import {ApolloClient} from "apollo-client";
 import {setContext} from "apollo-link-context";
@@ -10,12 +10,8 @@ import {TokenRefreshLink} from "apollo-link-token-refresh";
 import jwtDecode from "jwt-decode";
 import config from "@footprint/config";
 import {ApolloLink} from "apollo-link";
-import {
-  getAccessToken,
-  fetchAccessToken,
-  setAccessToken,
-  setRefreshToken,
-} from "../auth";
+import {fetchAccessToken} from "../utils/fetchAccessToken";
+import {store} from "../store";
 
 const graphqlURI = config.IS_PRODUCTION
   ? config.server.API_URL + "/graphql"
@@ -28,7 +24,7 @@ const cache = new InMemoryCache();
 const httpLink = new HttpLink({uri: graphqlURI});
 
 const authLink = setContext((_, {headers}) => {
-  const accessToken = getAccessToken();
+  const {accessToken} = store.getState().auth;
   return {
     headers: {
       ...headers,
@@ -43,7 +39,7 @@ const tokenRefreshLink = new TokenRefreshLink<{
 }>({
   accessTokenField: "tokens",
   isTokenValidOrUndefined: () => {
-    const token = getAccessToken();
+    const token = store.getState().auth.accessToken;
     if (!token) return true;
 
     try {
@@ -57,10 +53,8 @@ const tokenRefreshLink = new TokenRefreshLink<{
   fetchAccessToken,
   handleFetch: (tokens) => {
     const {accessToken, refreshToken} = tokens;
-    // aggriona il token di accesso
-    setAccessToken(accessToken);
-    // aggiorna il token di aggiornamento
-    setRefreshToken(refreshToken);
+    // aggiorna il token di accesso e il token di aggiornamento
+    store.getActions().auth.singin({accessToken, refreshToken});
   },
   handleError: (err) => {
     // TODO

@@ -14,7 +14,7 @@ import {useLoginMutation} from "../../../generated/graphql";
 import {AuthStackParamList} from "../../../navigation";
 import {InputText} from "../../../components/InputText";
 import {GoogleSigninButton} from "../../../components/GoogleSigninButton";
-import {AuthContext} from "../../../context";
+import {store} from "../../../store";
 
 type SignInScreenProps = StackScreenProps<AuthStackParamList, "SignIn">;
 
@@ -22,7 +22,7 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const {signin} = useContext(AuthContext);
+
   // GRAPHQL
   const [login] = useLoginMutation();
 
@@ -39,7 +39,7 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
 
       if (data) {
         const {accessToken, refreshToken} = data.login;
-        signin(accessToken, refreshToken);
+        store.getActions().auth.singin({accessToken, refreshToken});
       }
     } catch (err) {
       if (err.graphQLErrors && err.graphQLErrors.message)

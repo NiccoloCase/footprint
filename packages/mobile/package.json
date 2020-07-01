@@ -27,6 +27,7 @@
     "apollo-link-error": "^1.1.13",
     "apollo-link-http": "^1.5.17",
     "apollo-link-token-refresh": "^0.3.1",
+    "easy-peasy": "^3.3.1",
     "graphql": "^15.1.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",

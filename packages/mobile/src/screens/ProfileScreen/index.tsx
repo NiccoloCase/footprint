@@ -1,15 +1,24 @@
-import React, {useContext} from "react";
+import React from "react";
 import {View, Text, Button} from "react-native";
 import {StackScreenProps} from "@react-navigation/stack";
 import {ProfileStackParamList} from "../../navigation";
 import {useMeQuery} from "../../generated/graphql";
-import {AuthContext} from "../../context";
+import {useStoreActions} from "../../store";
+import {client} from "../../graphql";
+import {TouchableHighlight} from "react-native-gesture-handler";
 
 type SearchScreenProps = StackScreenProps<ProfileStackParamList, "Profile">;
 
 export const ProfileScreen: React.FC<SearchScreenProps> = ({navigation}) => {
   const {data, error} = useMeQuery();
-  const {logout} = useContext(AuthContext);
+  const logout = useStoreActions((actions) => actions.auth.logout);
+
+  const handleLogout = () => {
+    // ripristina la cache di apollo
+    client.resetStore();
+    // elimina le credenziali di accesso
+    logout();
+  };
 
   const renderContent = () => {
     if (error) {
@@ -25,10 +34,12 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({navigation}) => {
             {data.whoami.username}
           </Text>
           <Text>
-            EMAIL:
+            DIO EMAIL:
             {data.whoami.email}
           </Text>
-          <Button title="Logout" onPress={logout}></Button>
+          <TouchableHighlight onPress={handleLogout}>
+            <Text>Working logout</Text>
+          </TouchableHighlight>
         </View>
       );
     else return <Text>loading...</Text>;

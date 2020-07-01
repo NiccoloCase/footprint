@@ -9,8 +9,8 @@ import {createDrawerNavigator} from "@react-navigation/drawer";
 import {MainHeader} from "../components/Header";
 import {DrawerContent} from "../components/DrawerContent";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import {fetchAccessToken, setAccessToken, setRefreshToken} from "../auth";
-import {AuthContext} from "../context";
+import {fetchAccessToken} from "../utils/fetchAccessToken";
+import {useStoreActions, useStoreState} from "../store";
 
 // COMPONENTI
 import {TabBar} from "../components/TabBar";
@@ -21,10 +21,11 @@ import {HomeScreen} from "../screens/HomeScreen";
 import {AddFootprintScreen} from "../screens/AddFootprintScreen";
 import {SearchScreen} from "../screens/SearchScreen";
 import {SettingsScreen} from "../screens/SettingsScreen";
-import {WelcomeScreen} from "../screens/Auth/Welcome";
-import {SignInScreen} from "../screens/Auth/SignIn";
-import {SignUpScreen} from "../screens/Auth/SignUp";
+import {WelcomeScreen} from "../screens/authScreens/Welcome";
+import {SignInScreen} from "../screens/authScreens/SignIn";
+import {SignUpScreen} from "../screens/authScreens/SignUp";
 import {ProfileScreen} from "../screens/ProfileScreen";
+import {action} from "easy-peasy";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center"},
@@ -247,7 +248,9 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
 
 export const Navigation = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
+
+  const isAuth = useStoreState((state) => state.auth.isAuthenticated);
+  const singin = useStoreActions((actions) => actions.auth.singin);
 
   // richieda al server un nuovo token di accesso
   useEffect(() => {
@@ -255,16 +258,11 @@ export const Navigation = () => {
       try {
         const res = await fetchAccessToken();
         const data = await res.json();
-        console.log({data});
-        if (!data.success || !data.tokens) return setIsAuthenticated(false);
-        // imposta il nuovo token di accesso e quello di aggiornamento
-        const {accessToken, refreshToken} = data.tokens;
-        setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
-
-        setIsAuthenticated(true);
-      } catch (err) {
-        setIsAuthenticated(false);
+        if (data && data.success && data.tokens) {
+          // imposta il nuovo token di accesso e quello di aggiornamento
+          const {accessToken, refreshToken} = data.tokens;
+          singin({accessToken, refreshToken});
+        }
       } finally {
         setIsLoading(false);
       }
@@ -275,7 +273,7 @@ export const Navigation = () => {
 
   return (
     <NavigationContainer>
-      <RootStackScreen isAutheticated={isAuthenticated} />
+      <RootStackScreen isAutheticated={isAuth} />
     </NavigationContainer>
   );
 };
