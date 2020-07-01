@@ -159,7 +159,7 @@ export type BottomTabParamList = {
 const Tabs = createBottomTabNavigator<BottomTabParamList>();
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="Profile"
+    initialRouteName="Search"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: "#FF596E",

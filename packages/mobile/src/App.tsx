@@ -8,6 +8,13 @@ import {ApolloProvider} from "./graphql";
 import config from "@footprint/config";
 import {store} from "./store";
 
+import Snackbar from "react-native-snackbar";
+
+Snackbar.show({
+  text: "Hello world",
+  duration: Snackbar.LENGTH_SHORT,
+});
+
 MapboxGL.setAccessToken(config.MAPBOX_ACCESS_TOKEN);
 GoogleSignin.configure({
   offlineAccess: true,

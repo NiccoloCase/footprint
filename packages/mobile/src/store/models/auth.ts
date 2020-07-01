@@ -1,5 +1,5 @@
 import {Action, action, thunk, Thunk} from "easy-peasy";
-import {AsyncStorage} from "react-native";
+import RNSecureKeyStore, {ACCESSIBLE} from "react-native-secure-key-store";
 
 /** Chiave con la quale è salvato il refresh token nello storage */
 const REFRESH_TOKEN_KEY = "refresh-token";
@@ -94,12 +94,14 @@ const authModel: AuthModel = {
  * Restituisce il token di aggiornamento salvato nella memoria del dispositivo
  */
 export const getRefreshTokenFromStorge = (): Promise<string | null> =>
-  AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+  RNSecureKeyStore.get(REFRESH_TOKEN_KEY);
 
 /**
  * Modifica il token di aggiornamento salvato nella memoria del dispositivo
  */
 export const setRefreshTokenInStorage = (newToken: string): Promise<void> =>
-  AsyncStorage.setItem(REFRESH_TOKEN_KEY, newToken);
+  RNSecureKeyStore.set(REFRESH_TOKEN_KEY, newToken, {
+    accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+  });
 
 export default authModel;
