@@ -1,44 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { LoginDTO } from './auth.dto';
-import { IUser } from 'src/users/users.schema';
-import { AuthPayload, AuthType } from 'src/graphql';
+import { IUser } from '../users/users.schema';
+import { AuthPayload, AuthType, GoogleAuthResult } from '../graphql';
 import { AccessTokenPayload, RefreshTokenPayload } from './auth.types';
 import config from '@footprint/config';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly usersService: UsersService) {}
-
-  /**
-   * Esegue la'accesso di un utente secondo i dati passati
-   * @param payload
-   */
-  async loginUserLocally(payload: LoginDTO): Promise<AuthPayload> {
-    const { email, password } = payload;
-
-    // Controlla che l'email passata appartenga a un utente registrto
-    const user = await this.usersService.getUserByEmail(email);
-
-    if (!user || user.authType !== AuthType.LOCAL)
-      throw new UnauthorizedException('User does not exist');
-
-    // Controlla che la password passata corrisponda a quella dell'utente
-    const passwordMatch = await user.comparePassword(password);
-    if (!passwordMatch) throw new UnauthorizedException('Wrong password');
-
-    // Controlla che l'utente abbia verificato l'email
-    // TODO
-
-    // Genera il token di accesso
-    const { accessToken, expiresIn } = this.generateAccessToken(user);
-
-    // Genera il token di aggiornamento
-    const refreshToken = this.generateRefreshToken(user);
-
-    return { accessToken, refreshToken, expiresIn };
-  }
 
   /**
    * Genera un Json Web Token di accesso
@@ -86,5 +57,50 @@ export class AuthService {
     });
 
     return refrehToken;
+  }
+
+  /**
+   * Esegue la'accesso di un utente secondo i dati passati
+   * @param payload
+   */
+  async loginUserLocally(payload: LoginDTO): Promise<AuthPayload> {
+    const { email, password } = payload;
+
+    // Controlla che l'email passata appartenga a un utente registrto
+    const user = await this.usersService.getUserByEmail(email);
+
+    if (!user || user.authType !== AuthType.LOCAL)
+      throw new UnauthorizedException('User does not exist');
+
+    // Controlla che la password passata corrisponda a quella dell'utente
+    const passwordMatch = await user.comparePassword(password);
+    if (!passwordMatch) throw new UnauthorizedException('Wrong password');
+
+    // Controlla che l'utente abbia verificato l'email
+    // TODO
+
+    // Genera il token di accesso
+    const { accessToken, expiresIn } = this.generateAccessToken(user);
+
+    // Genera il token di aggiornamento
+    const refreshToken = this.generateRefreshToken(user);
+
+    return { accessToken, refreshToken, expiresIn };
+  }
+
+  /**
+   * Esegue l'accesso di un utete tramite google
+   */
+  async loginWithGoogle(user: any): Promise<GoogleAuthResult> {
+    // Genera il token di accesso
+    const { accessToken, expiresIn } = this.generateAccessToken(user);
+
+    // Genera il token di aggiornamento
+    const refreshToken = this.generateRefreshToken(user);
+
+    return {
+      isRegistrationRequired: false,
+      tokens: { accessToken, refreshToken, expiresIn },
+    };
   }
 }

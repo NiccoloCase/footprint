@@ -22,6 +22,7 @@ export interface IConfig {
   /** Autorizzazione tramite google */
   googleOAuth: {
     WEB_CLIENT_ID: string;
+    WEB_CLIENT_SECRET: string;
   };
   /** Autenticazione locale */
   auth: {

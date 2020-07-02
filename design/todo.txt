@@ -1,2 +1,2 @@
 - nascondere la password in mongoose
-- index email
+- index email, google id

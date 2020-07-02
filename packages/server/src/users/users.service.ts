@@ -37,6 +37,14 @@ export class UsersService {
   }
 
   /**
+   * Restituisce l'utente associato all'ID di Google
+   * @param id
+   */
+  async getUserByGoogleID(googleID: string): Promise<IUser | null> {
+    return await this.userModel.findOne({ googleID });
+  }
+
+  /**
    * Salva un nuovo utente nel database
    * @param userPayload
    */

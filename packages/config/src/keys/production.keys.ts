@@ -13,6 +13,9 @@ export const productionKeys: RecursivePartial<IConfig> = {
   database: {
     URI: process.env.MONGO_URI!,
   },
+  googleOAuth: {
+    WEB_CLIENT_SECRET: process.env.GOOGLE_WEB_CLIENT_SECRET!,
+  },
   auth: {
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET!,
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET!,

@@ -17,11 +17,24 @@ export interface AuthPayload {
     expiresIn: number;
 }
 
+export interface GoogleProfile {
+    id: string;
+    name: string;
+    email: string;
+    picture: string;
+}
+
+export interface GoogleAuthResult {
+    isRegistrationRequired: boolean;
+    tokens?: AuthPayload;
+    googleProfile?: GoogleProfile;
+}
+
 export interface IMutation {
     signup(username: string, email: string, password: string): ProcessResult | Promise<ProcessResult>;
-    signupWithGoogle(username: string, email: string, googleID: string): ProcessResult | Promise<ProcessResult>;
+    signupWithGoogle(username: string): GoogleAuthResult | Promise<GoogleAuthResult>;
     login(email: string, password: string): AuthPayload | Promise<AuthPayload>;
-    loginWithGoogle(access_token: string): AuthPayload | Promise<AuthPayload>;
+    loginWithGoogle(): GoogleAuthResult | Promise<GoogleAuthResult>;
 }
 
 export interface ProcessResult {

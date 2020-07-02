@@ -79,7 +79,7 @@ UserSchema.pre('save', async function(
   next: HookNextFunction,
 ) {
   // genera l'hash della password solo se è stata modificata o è nuova
-  if (this.localPassword && !this.isModified('localPassword')) return next();
+  if (!this.localPassword && !this.isModified('localPassword')) return next();
 
   try {
     const salt = await bcrypt.genSalt(15);

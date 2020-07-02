@@ -4,19 +4,28 @@ type AuthPayload {
   expiresIn: Int!
 }
 
+type GoogleProfile {
+  id: String!
+  name: String!
+  email: String!
+  picture: String!
+}
+
+type GoogleAuthResult {
+  isRegistrationRequired: Boolean!
+  tokens: AuthPayload
+  googleProfile: GoogleProfile
+}
+
 type Mutation {
   # REGISTRAZIONE
   # registra un utente in locale
   signup(username: String!, email: String!, password: String!): ProcessResult!
   # registra un utente con un account google
-  signupWithGoogle(
-    username: String!
-    email: String!
-    googleID: String!
-  ): ProcessResult!
-  # ACCESSO
-  # accedi in locale
+  signupWithGoogle(username: String!): GoogleAuthResult!
+  # LOGIN
+  # accesso in locale
   login(email: String!, password: String!): AuthPayload!
-  # accedi con un account google
-  loginWithGoogle(access_token: String!): AuthPayload!
+  # accesso con un account google
+  loginWithGoogle: GoogleAuthResult!
 }

@@ -21,8 +21,38 @@ export function Private() {
   return applyDecorators(UseGuards(AuthGuard));
 }
 
+/**
+ * Auth Guard per tramite jwt
+ */
 @Injectable()
 export class AuthGuard extends PassportAuthGuard('jwt') {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    let executionContext: ExecutionContext;
+
+    // Controlla se la richiesta è stata effettuata tramite Graphql o HTTP
+    switch (getExecutionContextType(context)) {
+      // GRAPHQL
+      case ExecutionContextType.GRAPHQL:
+        const ctx = GqlExecutionContext.create(context);
+        const { req } = ctx.getContext();
+        executionContext = new ExecutionContextHost([req]);
+        break;
+      // HTTP
+      default:
+        executionContext = context;
+    }
+
+    return super.canActivate(executionContext);
+  }
+}
+
+/**
+ * Auth Guard per l'accesso con Google
+ */
+@Injectable()
+export class GoogleStrategyGuard extends PassportAuthGuard('google') {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {

@@ -4,6 +4,10 @@ export class SignupDTO {
   password: string;
 }
 
+export class SignupWithGoogleDTO {
+  username: string;
+}
+
 export class LoginDTO {
   email: string;
   password: string;
