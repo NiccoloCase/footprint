@@ -1,10 +1,3 @@
-query Me {
-  whoami {
-    username
-    email
-  }
-}
-
 mutation Register($username: String!, $email: String!, $password: String!) {
   signup(username: $username, email: $email, password: $password) {
     success
@@ -15,5 +8,39 @@ mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     accessToken
     refreshToken
+  }
+}
+
+mutation SignupWithGoogle($username: String!) {
+  signupWithGoogle(username: $username) {
+    isRegistrationRequired
+    googleProfile {
+      name
+      id
+      email
+      picture
+    }
+    tokens {
+      accessToken
+      refreshToken
+      expiresIn
+    }
+  }
+}
+
+mutation LoginWithGoogle {
+  loginWithGoogle {
+    isRegistrationRequired
+    googleProfile {
+      name
+      id
+      email
+      picture
+    }
+    tokens {
+      accessToken
+      refreshToken
+      expiresIn
+    }
   }
 }

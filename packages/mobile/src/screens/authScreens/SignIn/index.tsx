@@ -22,7 +22,6 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-
   // GRAPHQL
   const [login] = useLoginMutation();
 
@@ -45,11 +44,6 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
       if (err.graphQLErrors && err.graphQLErrors.message)
         console.log(err.graphQLErrors.message.statusCode);
     }
-  };
-
-  const onLoggedWithGoogle = (user: User) => {
-    // LOGIN LOGIC
-    // ....
   };
 
   return (
@@ -99,7 +93,7 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
 
         <Text style={[styles.text, styles.or]}>Oppure</Text>
 
-        <GoogleSigninButton onLoginSuccess={onLoggedWithGoogle} />
+        <GoogleSigninButton />
 
         <Text style={[styles.text, styles.registerText]}>
           Non hai un account?{" "}

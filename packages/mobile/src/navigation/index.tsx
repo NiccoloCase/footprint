@@ -25,7 +25,6 @@ import {WelcomeScreen} from "../screens/authScreens/Welcome";
 import {SignInScreen} from "../screens/authScreens/SignIn";
 import {SignUpScreen} from "../screens/authScreens/SignUp";
 import {ProfileScreen} from "../screens/ProfileScreen";
-import {action} from "easy-peasy";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center"},
@@ -38,12 +37,17 @@ const defaultScreenOptions: StackNavigationOptions = {
 export type AuthStackParamList = {
   Welcome: undefined;
   SignIn: undefined;
-  SignUp: undefined;
+  SignUp: {
+    email?: string;
+    picture?: string;
+    withGoogle?: boolean;
+    googleAccessToken?: string;
+  };
 };
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
   <AuthStack.Navigator
-    // initialRouteName="SignIn"
+    initialRouteName="SignIn"
     screenOptions={{
       // headerTransparent: true,
       headerTitleAlign: "center",
