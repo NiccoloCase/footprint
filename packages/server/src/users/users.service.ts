@@ -11,8 +11,21 @@ export class UsersService {
   ) {}
 
   /**
-   * Restituisce l'utente associato all'email passato
+   * Restituisce l'utente associato all'ID passato
    * @param id
+   */
+  async getUserById(id: string): Promise<IUser> {
+    try {
+      const user = await this.userModel.findById(id);
+      return user;
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
+  }
+
+  /**
+   * Restituisce l'utente associato all'email passato
+   * @param email
    */
   async getUserByEmail(email: string): Promise<IUser> {
     try {
@@ -24,12 +37,12 @@ export class UsersService {
   }
 
   /**
-   * Restituisce l'utente associato all'ID passato
-   * @param id
+   * Restituisce l'utente associato all'username passato
+   * @param username
    */
-  async getUserById(id: string): Promise<IUser> {
+  async getUserByUsername(username: string): Promise<IUser> {
     try {
-      const user = await this.userModel.findById(id);
+      const user = await this.userModel.findOne({ username });
       return user;
     } catch (err) {
       throw new BadRequestException(err);

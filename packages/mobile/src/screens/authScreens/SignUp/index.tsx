@@ -1,28 +1,29 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  Alert,
 } from "react-native";
 import {StackScreenProps} from "@react-navigation/stack";
 import Swiper from "react-native-swiper";
 import {includes} from "lodash";
 import {FormikProps, useFormik} from "formik";
-import * as Yup from "yup";
 import {AuthStackParamList} from "../../../navigation";
-import {EmailAndPasswordForm} from "./EmailAndPasswordForm";
-import {UsernameAndPictureForm} from "./UsernameAndPictureForm";
+import {EmailAndPasswordForm} from "./steps/EmailAndPasswordForm";
+import {UsernameAndPictureForm} from "./steps/UsernameAndPictureForm";
+import {useSubmitSignUp} from "./submit";
+import {SignupValidationSchema} from "../../../utils/validation";
 
 /** valori del form di registrazione */
 export interface SingUpFormValues {
   email: string;
   password: string;
   password2: string;
-  googleID: string;
   username: string;
+  pictureURL: string;
+  googleAccessToken: string;
 }
 
 /** Propietà della scheramata di registrazione */
@@ -31,52 +32,57 @@ type SignUpScreenProps = StackScreenProps<AuthStackParamList, "SignUp">;
 /** Propietà di ogni schermata del form*/
 export interface SignUpFormProps {
   formikProps: FormikProps<SingUpFormValues>;
+  withGoogle?: boolean;
 }
 
-/** Passaggi del form */
-const steps = [EmailAndPasswordForm, UsernameAndPictureForm];
-/** Nomi chiave dei campi di ogni passaggio del form */
-const stepsValuesKeys = [["email", "password", "password2"], ["username"]];
-
-/** Schema di validazione del form */
-const SignupSchema = Yup.object().shape({
-  // email
-  email: Yup.string()
-    .email("Email non valida")
-    .required("Questo campo è richiesto"),
-  // password
-  password: Yup.string()
-    .min(2, "La password è troppo corta")
-    .max(30, "La password è troppo lunga")
-    .required("Questo campo è richiesto"),
-  // conferma della password
-  password2: Yup.string()
-    .oneOf([Yup.ref("password")], "Le password non corrispondono")
-    .required("Questo campo è richiesto"),
-  // username
-  username: Yup.string()
-    .min(2, "L'username è troppo corto")
-    .max(15, "L'username è troppo lungo")
-    .required("Questo campo è richiesto"),
-});
-
-export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
-  // index della schermata corrente
+export const SignUpScreen: React.FC<SignUpScreenProps> = ({
+  route,
+  navigation,
+}) => {
+  // Index della schermata corrente
   const [currentStep, setCurrentStep] = useState(0);
-  // form
+
+  // Funzione di submit
+  const [onSubmit, {loading}] = useSubmitSignUp(
+    route.params && !!route.params.withGoogle,
+    navigation,
+  );
+
+  // Form
   const formik = useFormik<SingUpFormValues>({
     initialValues: {
       email: "",
       password: "",
       password2: "",
-      googleID: "",
       username: "",
+      pictureURL: "",
+      googleAccessToken: "",
     },
-    validationSchema: SignupSchema,
-    onSubmit: (values) => {
-      Alert.alert(JSON.stringify(values, null, 2));
-    },
+    validationSchema: SignupValidationSchema,
+    onSubmit,
   });
+
+  /** Passaggi del form */
+  const steps = [EmailAndPasswordForm, UsernameAndPictureForm];
+  // Se la registrazione avviene tramite google, la prima schermata non
+  // è necessaria quidni viene rimossa
+  if (route.params && route.params.withGoogle) steps.shift();
+
+  /** Nomi chiave dei campi di ogni passaggio del form */
+  const stepsValuesKeys = [["email", "password", "password2"], ["username"]];
+
+  useEffect(() => {
+    // Se la registrazione avviene con google:
+    if (route.params && route.params.withGoogle) {
+      // 1) Rimuove la prima schermata del form
+      steps.shift();
+      // 2) Imposta l'immagine profilo e il token di accesso passati da Google
+      formik.setFieldValue("pictureURL", route.params.picture);
+      formik.setFieldValue("googleAccessToken", route.params.googleAccessToken);
+      // 3) Cambia il titolo della schermata
+      navigation.setOptions({title: "Completa la registrazione"});
+    }
+  }, [route]);
 
   /**
    * Va avanti di una schermata
@@ -116,19 +122,60 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
   };
 
   /**
+   * Renderizza il bottone per procedere / di submit
+   * @param isDisabled
+   * @param isLastStep
+   * @param swiper
+   */
+  const renderNextButon = (
+    isDisabled: boolean,
+    isLastStep: boolean,
+    swiper: Swiper,
+  ) => {
+    const content = loading ? (
+      <Text style={styles.navigationNextButtonText}>Caricamento...</Text>
+    ) : (
+      <Text style={styles.navigationNextButtonText}>
+        {isLastStep ? "Crea account" : "Avanti"}
+      </Text>
+    );
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.navigationButton,
+          {
+            backgroundColor: "#FF596E",
+            opacity: isDisabled ? 0.4 : 1,
+          },
+        ]}
+        onPress={() =>
+          isLastStep ? formik.handleSubmit() : goNextStep(swiper)
+        }
+        disabled={isDisabled}>
+        {content}
+      </TouchableOpacity>
+    );
+  };
+
+  /**
    * Renderizza i bottoni di navoigazione
    * @param index
    * @param total
    * @param swiper
    */
   const renderPagination = (index: number, total: number, swiper: Swiper) => {
-    const {errors, handleSubmit, isValid, isSubmitting} = formik;
+    const {errors, isValid, isSubmitting, values} = formik;
 
-    // Controlla se il form del passaggio corrente
-    // è valido
+    // Controlla se il form del passaggio corrente è valido:
+    // Controlla che i campi contenuti nella schermata mostrata non abbiano erorri
+    // e non siano vuoti
     let isCurrentStepValid = true;
-    for (let key in errors) {
-      if (includes(stepsValuesKeys[index], key)) {
+    for (let field of stepsValuesKeys[index]) {
+      if (
+        (values as any)[field] === "" ||
+        includes(Object.keys(errors), field)
+      ) {
         isCurrentStepValid = false;
         break;
       }
@@ -154,6 +201,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
                 styles.navigationButton,
                 {backgroundColor: "transparent"},
               ]}
+              disabled={isSubmitting}
               onPress={() => goPrevStep(swiper)}>
               <Text style={styles.navigationPrevButtonText}>Indietro</Text>
             </TouchableOpacity>
@@ -167,25 +215,12 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
             justifyContent: "center",
             alignItems: "center",
           }}>
-          {new Array(total).fill(null).map((_, i) => renderDot(i))}
+          {total > 1 && new Array(total).fill(null).map((_, i) => renderDot(i))}
         </View>
         {/** PULSANTE PER ANDARE ALLA SCHEMTATA SUCCESSIVA - SUBMIT */}
         <View style={{flex: 1}}>
           <View style={{flexDirection: "row-reverse"}}>
-            <TouchableOpacity
-              style={[
-                styles.navigationButton,
-                {
-                  backgroundColor: "#FF596E",
-                  opacity: isNextButtonDisabled ? 0.4 : 1,
-                },
-              ]}
-              onPress={() => (isLastStep ? handleSubmit() : goNextStep(swiper))}
-              disabled={isNextButtonDisabled}>
-              <Text style={styles.navigationNextButtonText}>
-                {isLastStep ? "Crea account" : "Avanti"}
-              </Text>
-            </TouchableOpacity>
+            {renderNextButon(isNextButtonDisabled, isLastStep, swiper)}
           </View>
         </View>
       </View>
@@ -196,7 +231,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
    * Renderizza le schermate
    */
   const renderSteps = (formikProps: FormikProps<SingUpFormValues>) =>
-    steps.map((Step, key) => <Step key={key} formikProps={formikProps} />);
+    steps.map((Step, key) => (
+      <Step
+        key={key}
+        formikProps={formikProps}
+        withGoogle={route.params && route.params.withGoogle}
+      />
+    ));
 
   return (
     <SafeAreaView style={styles.container}>
@@ -209,6 +250,14 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({navigation}) => {
         renderPagination={renderPagination}>
         {renderSteps(formik)}
       </Swiper>
+      <Text style={[styles.text, styles.loginText]}>
+        Hai già un account?{" "}
+        <Text
+          style={[styles.text, styles.link]}
+          onPress={() => navigation.push("SignIn")}>
+          Accedi ora
+        </Text>
+      </Text>
     </SafeAreaView>
   );
 };
@@ -236,5 +285,19 @@ const styles = StyleSheet.create({
     color: "#606060",
     borderBottomColor: "#606060",
     borderBottomWidth: 3,
+  },
+  text: {
+    color: "#404040",
+  },
+  link: {
+    color: "#FF1654",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  loginText: {
+    fontSize: 14,
+    color: "#ABB4BD",
+    textAlign: "center",
+    marginTop: 40,
   },
 });

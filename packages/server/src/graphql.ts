@@ -52,5 +52,7 @@ export interface User {
 
 export interface IQuery {
     whoami(): User | Promise<User>;
+    isEmailAlreadyUsed(email: string): boolean | Promise<boolean>;
+    isUsernameAlreadyUsed(username: string): boolean | Promise<boolean>;
     getUserById(id: string): User | Promise<User>;
 }

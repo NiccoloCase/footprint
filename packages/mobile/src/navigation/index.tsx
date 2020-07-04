@@ -17,14 +17,15 @@ import {TabBar} from "../components/TabBar";
 
 // SCHERMATE
 import {SplashScreen} from "../screens/SplashScreen";
-import {HomeScreen} from "../screens/HomeScreen";
-import {AddFootprintScreen} from "../screens/AddFootprintScreen";
-import {SearchScreen} from "../screens/SearchScreen";
-import {SettingsScreen} from "../screens/SettingsScreen";
 import {WelcomeScreen} from "../screens/authScreens/Welcome";
 import {SignInScreen} from "../screens/authScreens/SignIn";
 import {SignUpScreen} from "../screens/authScreens/SignUp";
+import {VerifyEmail} from "../screens/authScreens/VerifyEmail";
+import {HomeScreen} from "../screens/HomeScreen";
+import {AddFootprintScreen} from "../screens/AddFootprintScreen";
+import {SearchScreen} from "../screens/SearchScreen";
 import {ProfileScreen} from "../screens/ProfileScreen";
+import {SettingsScreen} from "../screens/SettingsScreen";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center"},
@@ -43,13 +44,16 @@ export type AuthStackParamList = {
     withGoogle?: boolean;
     googleAccessToken?: string;
   };
+  VerifyEmail: {
+    email: string;
+    username: string;
+  };
 };
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
   <AuthStack.Navigator
-    initialRouteName="SignIn"
+    initialRouteName="SignUp"
     screenOptions={{
-      // headerTransparent: true,
       headerTitleAlign: "center",
       headerTintColor: "#FF596E",
       headerTitleStyle: {
@@ -75,6 +79,11 @@ const AuthStackScreen = () => (
       name="SignUp"
       component={SignUpScreen}
       options={{title: "Registrati"}}
+    />
+    <AuthStack.Screen
+      name="VerifyEmail"
+      component={VerifyEmail}
+      options={{title: "Verifica l'email"}}
     />
   </AuthStack.Navigator>
 );

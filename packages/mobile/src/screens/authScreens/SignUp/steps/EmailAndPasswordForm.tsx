@@ -1,8 +1,8 @@
 import React from "react";
-import {View, Text} from "react-native";
-import {SignUpFormProps} from "./";
-import {InputText} from "../../../components/InputText";
-import {GoogleSigninButton} from "../../../components/GoogleSigninButton";
+import {View, Text, StyleSheet} from "react-native";
+import {SignUpFormProps} from "../";
+import {InputText} from "../../../../components/InputText";
+import {GoogleSigninButton} from "../../../../components/GoogleSigninButton";
 
 export const EmailAndPasswordForm: React.FC<SignUpFormProps> = (props) => {
   const {handleChange, handleBlur, values, errors, touched} = props.formikProps;
@@ -35,8 +35,17 @@ export const EmailAndPasswordForm: React.FC<SignUpFormProps> = (props) => {
           secureTextEntry
         />
       </View>
-      <Text> Oppure </Text>
+      <Text style={styles.or}>Oppure</Text>
       <GoogleSigninButton label="Continua con google" />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  or: {
+    color: "#ABB4BD",
+    fontSize: 15,
+    textAlign: "center",
+    marginVertical: 35,
+  },
+});

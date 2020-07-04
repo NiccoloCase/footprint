@@ -83,7 +83,19 @@ export type User = {
 export type Query = {
   __typename?: 'Query';
   whoami: User;
+  isEmailAlreadyUsed: Scalars['Boolean'];
+  isUsernameAlreadyUsed: Scalars['Boolean'];
   getUserById: User;
+};
+
+
+export type QueryIsEmailAlreadyUsedArgs = {
+  email: Scalars['String'];
+};
+
+
+export type QueryIsUsernameAlreadyUsedArgs = {
+  username: Scalars['String'];
 };
 
 
@@ -167,6 +179,26 @@ export type MeQuery = (
     { __typename?: 'User' }
     & Pick<User, 'username' | 'email'>
   ) }
+);
+
+export type IsEmailAlreadyUsedQueryVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type IsEmailAlreadyUsedQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'isEmailAlreadyUsed'>
+);
+
+export type IsUsernameAlreadyUsedQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type IsUsernameAlreadyUsedQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'isUsernameAlreadyUsed'>
 );
 
 
@@ -356,3 +388,65 @@ export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptio
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
+export const IsEmailAlreadyUsedDocument = gql`
+    query IsEmailAlreadyUsed($email: String!) {
+  isEmailAlreadyUsed(email: $email)
+}
+    `;
+
+/**
+ * __useIsEmailAlreadyUsedQuery__
+ *
+ * To run a query within a React component, call `useIsEmailAlreadyUsedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useIsEmailAlreadyUsedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useIsEmailAlreadyUsedQuery({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useIsEmailAlreadyUsedQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<IsEmailAlreadyUsedQuery, IsEmailAlreadyUsedQueryVariables>) {
+        return ApolloReactHooks.useQuery<IsEmailAlreadyUsedQuery, IsEmailAlreadyUsedQueryVariables>(IsEmailAlreadyUsedDocument, baseOptions);
+      }
+export function useIsEmailAlreadyUsedLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<IsEmailAlreadyUsedQuery, IsEmailAlreadyUsedQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<IsEmailAlreadyUsedQuery, IsEmailAlreadyUsedQueryVariables>(IsEmailAlreadyUsedDocument, baseOptions);
+        }
+export type IsEmailAlreadyUsedQueryHookResult = ReturnType<typeof useIsEmailAlreadyUsedQuery>;
+export type IsEmailAlreadyUsedLazyQueryHookResult = ReturnType<typeof useIsEmailAlreadyUsedLazyQuery>;
+export type IsEmailAlreadyUsedQueryResult = ApolloReactCommon.QueryResult<IsEmailAlreadyUsedQuery, IsEmailAlreadyUsedQueryVariables>;
+export const IsUsernameAlreadyUsedDocument = gql`
+    query IsUsernameAlreadyUsed($username: String!) {
+  isUsernameAlreadyUsed(username: $username)
+}
+    `;
+
+/**
+ * __useIsUsernameAlreadyUsedQuery__
+ *
+ * To run a query within a React component, call `useIsUsernameAlreadyUsedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useIsUsernameAlreadyUsedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useIsUsernameAlreadyUsedQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useIsUsernameAlreadyUsedQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<IsUsernameAlreadyUsedQuery, IsUsernameAlreadyUsedQueryVariables>) {
+        return ApolloReactHooks.useQuery<IsUsernameAlreadyUsedQuery, IsUsernameAlreadyUsedQueryVariables>(IsUsernameAlreadyUsedDocument, baseOptions);
+      }
+export function useIsUsernameAlreadyUsedLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<IsUsernameAlreadyUsedQuery, IsUsernameAlreadyUsedQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<IsUsernameAlreadyUsedQuery, IsUsernameAlreadyUsedQueryVariables>(IsUsernameAlreadyUsedDocument, baseOptions);
+        }
+export type IsUsernameAlreadyUsedQueryHookResult = ReturnType<typeof useIsUsernameAlreadyUsedQuery>;
+export type IsUsernameAlreadyUsedLazyQueryHookResult = ReturnType<typeof useIsUsernameAlreadyUsedLazyQuery>;
+export type IsUsernameAlreadyUsedQueryResult = ApolloReactCommon.QueryResult<IsUsernameAlreadyUsedQuery, IsUsernameAlreadyUsedQueryVariables>;

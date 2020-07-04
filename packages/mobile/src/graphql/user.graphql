@@ -4,3 +4,11 @@ query Me {
     email
   }
 }
+
+query IsEmailAlreadyUsed($email: String!) {
+  isEmailAlreadyUsed(email: $email)
+}
+
+query IsUsernameAlreadyUsed($username: String!) {
+  isUsernameAlreadyUsed(username: $username)
+}

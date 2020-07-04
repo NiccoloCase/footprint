@@ -1,5 +1,6 @@
 import React from "react";
-import {View, Text} from "react-native";
+import {View} from "react-native";
+import {PulseIndicator} from "react-native-indicators";
 
 export const SplashScreen = () => {
   return (
@@ -10,7 +11,7 @@ export const SplashScreen = () => {
         alignItems: "center",
         backgroundColor: "#FF596E",
       }}>
-      <Text style={{color: "#fff"}}>Caricamento...</Text>
+      <PulseIndicator color="#fff" size={80} />
     </View>
   );
 };

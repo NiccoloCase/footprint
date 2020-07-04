@@ -16,6 +16,10 @@ type User {
 type Query {
   # Restituisce l'utente autenticato
   whoami: User!
+  # Controlla se un email è già utilizzata
+  isEmailAlreadyUsed(email: String!): Boolean!
+  # Controlla se un username è già utilizzata
+  isUsernameAlreadyUsed(username: String!): Boolean!
   # Restituisce il profilo di un utente dao il suo ID
   getUserById(id: String!): User!
 }
