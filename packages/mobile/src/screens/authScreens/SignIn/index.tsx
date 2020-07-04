@@ -1,50 +1,85 @@
-import React, {useState, useContext} from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TouchableNativeFeedback,
 } from "react-native";
-import {User} from "@react-native-community/google-signin";
-import FeatherIcon from "react-native-vector-icons/Feather";
+import {useFormik} from "formik";
 import {StackScreenProps} from "@react-navigation/stack";
 import {useLoginMutation} from "../../../generated/graphql";
 import {AuthStackParamList} from "../../../navigation";
 import {InputText} from "../../../components/InputText";
 import {GoogleSigninButton} from "../../../components/GoogleSigninButton";
 import {store} from "../../../store";
+import {SignInValidationSchema} from "../../../utils/validation";
+import Snackbar from "react-native-snackbar";
+
+interface SingInFormValues {
+  email: string;
+  password: string;
+}
 
 type SignInScreenProps = StackScreenProps<AuthStackParamList, "SignIn">;
 
 export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  // FORM
+  const formik = useFormik<SingInFormValues>({
+    initialValues: {email: "", password: ""},
+    onSubmit,
+    validationSchema: SignInValidationSchema,
+    validateOnBlur: false,
+    validateOnChange: false,
+  });
   // GRAPHQL
   const [login] = useLoginMutation();
-
-  const _hasErrors = () => {
-    return email.includes("a");
-  };
 
   /**
    * Esegue il login locale (con email e password)
    */
-  const handleSubmit = async () => {
+  async function onSubmit() {
+    const {email, password} = formik.values;
     try {
       const {data} = await login({variables: {email, password}});
-
       if (data) {
+        console.log({data});
         const {accessToken, refreshToken} = data.login;
         store.getActions().auth.singin({accessToken, refreshToken});
       }
     } catch (err) {
-      if (err.graphQLErrors && err.graphQLErrors.message)
-        console.log(err.graphQLErrors.message.statusCode);
+      if (
+        err.graphQLErrors &&
+        err.graphQLErrors[0].extensions &&
+        err.graphQLErrors[0].extensions.exception &&
+        err.graphQLErrors[0].extensions.exception.response &&
+        typeof err.graphQLErrors[0].extensions.exception.response.message ===
+          "string"
+      ) {
+        const msg = err.graphQLErrors[0].extensions.exception.response.message.toLowerCase();
+        console.log(msg);
+        if (msg.includes("user"))
+          formik.setFieldError("email", "L'utente non esiste");
+        else if (msg.includes("password"))
+          formik.setFieldError("password", "Password sbagliata");
+      } else {
+        Snackbar.show({
+          text: "Si è verificato un errore. Riprova più tardi",
+          duration: Snackbar.LENGTH_LONG,
+          backgroundColor: "#FF596E",
+        });
+      }
     }
-  };
+  }
+
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+  } = formik;
 
   return (
     <ScrollView
@@ -54,40 +89,38 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
       <View style={styles.wrapper}>
         <InputText
           label="Email"
-          value={email}
-          onChangeText={setEmail}
-          errorMessage={_hasErrors() ? "Email address is invalid!" : undefined}
-          textContentType="emailAddress"
-          autoCompleteType="email"
+          value={values.email}
+          errorMessage={touched.email ? errors.email : undefined}
           keyboardType="email-address"
+          // @ts-ignore
+          onChangeText={handleChange("email")}
+          // @ts-ignore
+          onBlur={handleBlur("email")}
         />
+
         <InputText
           label="Password"
-          value={password}
-          onChangeText={setPassword}
-          errorMessage={_hasErrors() ? "Email address is invalid!" : undefined}
-          textContentType="password"
-          secureTextEntry={!isPasswordVisible}
-          rightIcon={
-            <TouchableNativeFeedback
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-              <FeatherIcon
-                name={isPasswordVisible ? "eye-off" : "eye"}
-                size={25}
-                color="#ABB4BD"
-              />
-            </TouchableNativeFeedback>
-          }
+          value={values.password}
+          errorMessage={touched.password ? errors.password : undefined}
+          secureTextEntry
+          // @ts-ignore
+          onChangeText={handleChange("password")}
+          // @ts-ignore
+          onBlur={handleBlur("password")}
         />
+
         <Text
           style={[
             styles.text,
             styles.link,
             {textAlign: "right", marginBottom: 20},
-          ]}>
+          ]}
+          onPress={() => navigation.push("ForgotPassword")}>
           Password dimenticata?
         </Text>
-        <TouchableOpacity style={styles.submitWrapper} onPress={handleSubmit}>
+        <TouchableOpacity
+          style={styles.submitWrapper}
+          onPress={handleSubmit as any}>
           <Text style={styles.submitText}>Accedi</Text>
         </TouchableOpacity>
 

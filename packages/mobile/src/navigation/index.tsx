@@ -21,6 +21,7 @@ import {WelcomeScreen} from "../screens/authScreens/Welcome";
 import {SignInScreen} from "../screens/authScreens/SignIn";
 import {SignUpScreen} from "../screens/authScreens/SignUp";
 import {VerifyEmail} from "../screens/authScreens/VerifyEmail";
+import {ForgotPasswordScreen} from "../screens/authScreens/ForgotPassword";
 import {HomeScreen} from "../screens/HomeScreen";
 import {AddFootprintScreen} from "../screens/AddFootprintScreen";
 import {SearchScreen} from "../screens/SearchScreen";
@@ -48,11 +49,12 @@ export type AuthStackParamList = {
     email: string;
     username: string;
   };
+  ForgotPassword: undefined;
 };
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
   <AuthStack.Navigator
-    initialRouteName="SignUp"
+    initialRouteName="SignIn"
     screenOptions={{
       headerTitleAlign: "center",
       headerTintColor: "#FF596E",
@@ -84,6 +86,11 @@ const AuthStackScreen = () => (
       name="VerifyEmail"
       component={VerifyEmail}
       options={{title: "Verifica l'email"}}
+    />
+    <AuthStack.Screen
+      name="ForgotPassword"
+      component={ForgotPasswordScreen}
+      options={{title: "Password dimenticata"}}
     />
   </AuthStack.Navigator>
 );
