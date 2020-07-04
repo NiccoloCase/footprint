@@ -71,6 +71,10 @@ export const UserSchema = new Schema({
   },
 });
 
+// Index
+UserSchema.index({ email: 1, username: 1, googleID: 1 });
+
+// Plugin
 UserSchema.plugin(mongooseHidden);
 
 // Salva l'hash della password al posto del semplice testo
