@@ -3,8 +3,8 @@ import { SignupDTO, LoginDTO, SignupWithGoogleDTO } from './auth.dto';
 import {
   AuthPayload,
   AuthType,
-  ProcessResult,
-  User,
+  EmailResponse,
+  VerfyUserResponse,
   GoogleAuthResult,
 } from '../graphql';
 import { UsersService } from '../users/users.service';
@@ -33,7 +33,7 @@ export class AuthResolver {
 
   // REGISTRA UN NUOVO UTENTE IN LOCALE
   @Mutation()
-  async signup(@Args() args: SignupDTO): Promise<ProcessResult> {
+  async signup(@Args() args: SignupDTO): Promise<EmailResponse> {
     const payload: CreateNewUserDTO = {
       username: args.username,
       email: args.email,
@@ -42,8 +42,13 @@ export class AuthResolver {
     };
 
     try {
-      await this.usersService.createNewUser(payload);
-      return { success: true };
+      // crea un nuovo utente
+      const user = await this.usersService.createNewUser(payload);
+
+      // Invia l'email di conferma
+      this.usersService.sendConfirmationEmail(user);
+
+      return { success: true, recipient: user.email };
     } catch (err) {
       throw new BadRequestException(err);
     }
@@ -71,7 +76,7 @@ export class AuthResolver {
     };
 
     try {
-      // crea un nuivo utente
+      // crea un nuovo utente
       const user = await this.usersService.createNewUser(userData);
       // genera i token di accesso e di aggiornamento per il nuovo utente
       return this.authService.loginWithGoogle(user);
@@ -102,5 +107,24 @@ export class AuthResolver {
       };
 
     return this.authService.loginWithGoogle(user);
+  }
+
+  // VERIFICA L'EMAIL DI UN UTENTE
+  @Mutation()
+  async verfyUser(@Args('token') token: string): Promise<VerfyUserResponse> {
+    try {
+      // verifica l'email tramite il token
+      const user = await this.usersService.verfyEmail(token);
+      // Genera le credenziali di accesso:
+      const { accessToken, expiresIn } = this.authService.generateAccessToken(
+        user,
+      );
+      const refreshToken = this.authService.generateRefreshToken(user);
+      const tokens = { accessToken, refreshToken, expiresIn };
+
+      return { success: true, tokens };
+    } catch (err) {
+      return { success: false };
+    }
   }
 }

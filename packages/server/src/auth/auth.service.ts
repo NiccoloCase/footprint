@@ -3,7 +3,12 @@ import * as jwt from 'jsonwebtoken';
 import { UsersService } from '../users/users.service';
 import { LoginDTO } from './auth.dto';
 import { IUser } from '../users/users.schema';
-import { AuthPayload, AuthType, GoogleAuthResult } from '../graphql';
+import {
+  AuthPayload,
+  AuthType,
+  GoogleAuthResult,
+  TokenScope,
+} from '../graphql';
 import { AccessTokenPayload, RefreshTokenPayload } from './auth.types';
 import config from '@footprint/config';
 
@@ -66,18 +71,21 @@ export class AuthService {
   async loginUserLocally(payload: LoginDTO): Promise<AuthPayload> {
     const { email, password } = payload;
 
-    // Controlla che l'email passata appartenga a un utente registrto
     const user = await this.usersService.getUserByEmail(email);
 
+    // Controlla che l'email passata appartenga a un utente registrto
     if (!user || user.authType !== AuthType.LOCAL)
       throw new UnauthorizedException('User does not exist');
+    // Controlla che l'utente abbia confermato
+    // la propria email
+    else if (!user.isVerified)
+      throw new UnauthorizedException(
+        'Unauthorized access: you must verify the account first',
+      );
 
     // Controlla che la password passata corrisponda a quella dell'utente
     const passwordMatch = await user.comparePassword(password);
     if (!passwordMatch) throw new UnauthorizedException('Wrong password');
-
-    // Controlla che l'utente abbia verificato l'email
-    // TODO
 
     // Genera il token di accesso
     const { accessToken, expiresIn } = this.generateAccessToken(user);

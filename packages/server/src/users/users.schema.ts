@@ -10,11 +10,10 @@ export interface IUser {
   authType: AuthType;
   refreshTokenVersion?: number;
   localPassword?: string;
+  isVerified?: boolean;
   googleID?: string;
   profileImage?: string;
   created_at?: string;
-
-  // Metodi dello schema mongoose:
 
   /** Compara la password dell'utente con la password passata */
   comparePassword: (password: string) => Promise<boolean>;
@@ -53,8 +52,16 @@ export const UserSchema = new Schema({
   localPassword: {
     type: String,
     hide: true,
-    required: function(this: any) {
-      return this.accountMethod === 'local';
+    required: function(this: IUser) {
+      return this.authType === AuthType.LOCAL;
+    },
+  },
+  // Se è stata verificata l'email
+  // Campo richiesto solo se l'utente si registrato in locale
+  isVerified: {
+    type: Boolean,
+    required: function(this: IUser) {
+      return this.authType === AuthType.LOCAL;
     },
   },
   // ID Google (richiesto solo se l'utente ha eseguito l'acesso con google)
@@ -72,7 +79,9 @@ export const UserSchema = new Schema({
 });
 
 // Index
-UserSchema.index({ email: 1, username: 1, googleID: 1 });
+UserSchema.index({ email: 1 });
+UserSchema.index({ username: 1 });
+UserSchema.index({ googleID: 1 });
 
 // Plugin
 UserSchema.plugin(mongooseHidden);

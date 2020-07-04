@@ -35,4 +35,11 @@ export interface IConfig {
     /** Durata dei token di aggiornamento */
     REFRESH_TOKEN_EXPIRATION: number;
   };
+  emailService: {
+    HOST: string;
+    PORT: number;
+    USER: string;
+    PASSWORD: string;
+    SENDER: string;
+  };
 }

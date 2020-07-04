@@ -22,4 +22,9 @@ export const productionKeys: RecursivePartial<IConfig> = {
     ACCESS_TOKEN_EXPIRATION: 900, // 15 min
     REFRESH_TOKEN_EXPIRATION: 604800, // 7 giorni
   },
+  emailService: {
+    SENDER: process.env.EMAIL_SENDER!,
+    USER: process.env.EMAIL_USER!,
+    PASSWORD: process.env.EMAIL_PASSWORD!,
+  },
 };

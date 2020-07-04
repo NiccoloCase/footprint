@@ -23,3 +23,8 @@ type Query {
   # Restituisce il profilo di un utente dao il suo ID
   getUserById(id: String!): User!
 }
+
+type Mutation {
+  # Invia per il email il token per la verifica dell'email
+  sendConfirmationEmail(email: String!): EmailResponse!
+}

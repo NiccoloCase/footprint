@@ -8,6 +8,7 @@ import {
 import { UsersService } from '../users/users.service';
 import { AccessTokenPayload, GoogleStrategyResult } from './auth.types';
 import config from '@footprint/config';
+import { AuthType } from '../graphql';
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
 
 /**
@@ -26,10 +27,11 @@ export class JwtStrategy extends PassportStrategy(passportJwtStrategy, 'jwt') {
     try {
       // cerca l'utente tramite l'id salvato nel payload
       const user = await this.userService.getUserById(payload.userId);
-      // se non è stato trovato nessun utente lancia un errore
+      //Se non è stato trovato nessun utente lancia un errore
       if (!user)
         return done(new UnauthorizedException('Unauthorized access'), false);
-      // se invece è stato trovato lo passa a passport
+
+      // Passa a passport il documento dell'utente
       done(null, user);
     } catch (err) {
       return done(new UnauthorizedException('Unauthorized access'), false);

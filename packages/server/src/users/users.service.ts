@@ -1,13 +1,22 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateNewUserDTO } from './users.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IUser, IUserModel } from './users.schema';
+import { AuthType, TokenScope } from '../graphql';
+import { TokenService } from '../token/token.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<IUserModel>,
+    private readonly tokenService: TokenService,
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -27,7 +36,7 @@ export class UsersService {
    * Restituisce l'utente associato all'email passato
    * @param email
    */
-  async getUserByEmail(email: string): Promise<IUser> {
+  async getUserByEmail(email: string): Promise<IUser | null> {
     try {
       const user = await this.userModel.findOne({ email });
       return user;
@@ -62,8 +71,11 @@ export class UsersService {
    * @param userPayload
    */
   async createNewUser(userPayload: CreateNewUserDTO): Promise<IUser> {
+    const data: any = { ...userPayload };
+    if (userPayload.authType === AuthType.LOCAL) data.isVerified = false;
+
     try {
-      return await this.userModel.create(userPayload);
+      return await this.userModel.create(data);
     } catch (err) {
       throw new BadRequestException(err);
     }
@@ -77,5 +89,53 @@ export class UsersService {
       { _id: userId },
       { $inc: { refreshTokenVersion: 1 } },
     );
+  }
+
+  /**
+   * Invia l'email contente il token per la verifica dell'account
+   * @param userId
+   */
+  async sendConfirmationEmail(user: IUser): Promise<void> {
+    try {
+      // genera un nuovo token (o utilizza uno ancora valido)
+      const token = await this.tokenService.generateNewToken(
+        user.id,
+        TokenScope.USER_CONFIRMATION,
+      );
+
+      await this.emailService.sendConfirmationEmailToken(
+        user.email,
+        token._id,
+        user.username,
+      );
+    } catch (err) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  /**
+   * Verifica un l'email di utente
+   * @param token Token
+   * @param userId Id dell'utente da confermare
+   * @returns Restituisce il documento dell'utente associato al token passato
+   */
+  async verfyEmail(token: string): Promise<IUser> {
+    // controlla la validità del token
+    const tokenDocument = await this.tokenService.verifyAndDestroyToken(
+      token,
+      TokenScope.USER_CONFIRMATION,
+    );
+
+    // Verifica l'utente
+    try {
+      const user = await this.userModel.findByIdAndUpdate(
+        tokenDocument.userId,
+        { isVerified: true },
+        { new: true },
+      );
+      return user;
+    } catch (err) {
+      throw new BadRequestException();
+    }
   }
 }

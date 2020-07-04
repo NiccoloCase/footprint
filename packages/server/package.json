@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@footprint/config": "1.0.0",
+    "@nestjs-modules/mailer": "^1.5.1",
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/graphql": "^7.4.6",
@@ -42,7 +43,8 @@
     "passport-jwt": "^4.0.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.3.3",
+    "shortid": "^2.2.15"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",
@@ -55,6 +57,7 @@
     "@types/node": "^10.12.18",
     "@types/passport": "^1.0.3",
     "@types/passport-jwt": "^3.0.3",
+    "@types/shortid": "^0.0.29",
     "@types/supertest": "^2.0.7",
     "jest": "^23.6.0",
     "nodemon": "^1.18.9",

@@ -6,6 +6,11 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export enum TokenScope {
+    USER_CONFIRMATION = "USER_CONFIRMATION",
+    FORGOT_PASSWORD = "FORGOT_PASSWORD"
+}
+
 export enum AuthType {
     LOCAL = "LOCAL",
     GOOGLE = "GOOGLE"
@@ -30,15 +35,38 @@ export interface GoogleAuthResult {
     googleProfile?: GoogleProfile;
 }
 
+export interface VerfyUserResponse {
+    success: boolean;
+    tokens?: AuthPayload;
+}
+
 export interface IMutation {
-    signup(username: string, email: string, password: string): ProcessResult | Promise<ProcessResult>;
+    signup(username: string, email: string, password: string): EmailResponse | Promise<EmailResponse>;
     signupWithGoogle(username: string): GoogleAuthResult | Promise<GoogleAuthResult>;
     login(email: string, password: string): AuthPayload | Promise<AuthPayload>;
     loginWithGoogle(): GoogleAuthResult | Promise<GoogleAuthResult>;
+    verfyUser(token?: string): VerfyUserResponse | Promise<VerfyUserResponse>;
+    sendConfirmationEmail(email: string): EmailResponse | Promise<EmailResponse>;
+}
+
+export interface EmailResponse {
+    recipient?: string;
+    success: boolean;
 }
 
 export interface ProcessResult {
     success: boolean;
+}
+
+export interface Token {
+    id: string;
+    userId: string;
+    scope: TokenScope;
+}
+
+export interface TokenGenerationResult {
+    email: string;
+    tokenDigits: number;
 }
 
 export interface User {

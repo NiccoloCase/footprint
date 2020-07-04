@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { join } from 'path';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { TokenModule } from './token/token.module';
+import { EmailModule } from './email/email.module';
 import config from '@footprint/config';
 
 @Module({
@@ -31,6 +33,8 @@ import config from '@footprint/config';
     // SERVIZI DELL'APPLICAZIONE
     UsersModule,
     AuthModule,
+    TokenModule,
+    EmailModule,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,18 @@
+# Ambito del token
+enum TokenScope {
+  USER_CONFIRMATION
+  FORGOT_PASSWORD
+}
+
+# Modello di un token
+type Token {
+  id: ID!
+  userId: String!
+  scope: TokenScope!
+}
+
+# Risultato del processo di generazione di un token
+type TokenGenerationResult {
+  email: String!
+  tokenDigits: Int!
+}

@@ -9,4 +9,8 @@ export const defaultKeys: RecursivePartial<IConfig> = {
     WEB_CLIENT_ID:
       "205105474204-qtc50kv97tri6ca3cel9elprd1g2gn4s.apps.googleusercontent.com",
   },
+  emailService: {
+    HOST: "in-v3.mailjet.com",
+    PORT: 587,
+  },
 };
