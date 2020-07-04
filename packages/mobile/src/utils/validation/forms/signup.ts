@@ -5,6 +5,7 @@ import {
   IsEmailAlreadyUsedDocument,
   IsUsernameAlreadyUsedDocument,
 } from "../../../generated/graphql";
+import {ValidationConfig} from "@footprint/common";
 
 /**
  * Schema di validazione del form di registrazione
@@ -15,6 +16,7 @@ export const SignupValidationSchema = Yup.object().shape({
   // EMAIL
   email: Yup.string()
     .email("Email non valida")
+    .max(ValidationConfig.user.email.length.max, "L'email è troppo lunga")
     // Il campo è richiesto solo quando la registrazione non avviene con google
     .when("googleAccessToken", {
       is: (val) => isEmpty(val),
@@ -34,8 +36,14 @@ export const SignupValidationSchema = Yup.object().shape({
     }),
   // PASSWORD
   password: Yup.string()
-    .min(2, "La password è troppo corta")
-    .max(30, "La password è troppo lunga")
+    .min(
+      ValidationConfig.user.password.length.min,
+      "La password è troppo corta",
+    )
+    .max(
+      ValidationConfig.user.password.length.max,
+      "La password è troppo lunga",
+    )
     // Il campo è richiesto solo quando la registrazione non avviene con google
     .when("googleAccessToken", {
       is: (val) => isEmpty(val),
@@ -51,8 +59,9 @@ export const SignupValidationSchema = Yup.object().shape({
     }),
   // USERNAME
   username: Yup.string()
-    .min(2, "L'username è troppo corto")
-    .max(15, "L'username è troppo lungo")
+    .min(ValidationConfig.user.username.length.min, "L'username è troppo corto")
+    .max(ValidationConfig.user.username.length.max, "L'username è troppo lungo")
+    .matches(ValidationConfig.user.username.regex, "Formarto non consentito")
     .required("Questo campo è richiesto")
     // Controlla che non sia già utilizzato
     .test("unique-username", "L'username non è disponibile", function (

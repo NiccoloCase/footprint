@@ -13,6 +13,7 @@
   "dependencies": {
     "@apollo/react-hooks": "^3.1.5",
     "@footprint/config": "1.0.0",
+    "@footprint/common": "1.0.0",
     "@react-native-community/google-signin": "^4.0.3",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-mapbox-gl/maps": "^8.1.0-rc.1",
