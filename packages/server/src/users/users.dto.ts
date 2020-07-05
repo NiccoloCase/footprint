@@ -16,3 +16,8 @@ export interface CreateNewUserDTO {
   googleID?: string;
   profileImage?: string;
 }
+
+export interface ChangePasswordWithTokenDTO {
+  token: string;
+  newPassword: string;
+}

@@ -47,6 +47,8 @@ export interface IMutation {
     loginWithGoogle(): GoogleAuthResult | Promise<GoogleAuthResult>;
     verfyUser(token?: string): VerfyUserResponse | Promise<VerfyUserResponse>;
     sendConfirmationEmail(email: string): EmailResponse | Promise<EmailResponse>;
+    forgotPassword(email: string): EmailResponse | Promise<EmailResponse>;
+    changePasswordWithToken(token: string, newPassword: string): ProcessResult | Promise<ProcessResult>;
 }
 
 export interface EmailResponse {

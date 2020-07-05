@@ -93,7 +93,7 @@ export class UsersService {
 
   /**
    * Invia l'email contente il token per la verifica dell'account
-   * @param userId
+   * @param user
    */
   async sendConfirmationEmail(user: IUser): Promise<void> {
     try {
@@ -103,7 +103,7 @@ export class UsersService {
         TokenScope.USER_CONFIRMATION,
       );
 
-      await this.emailService.sendConfirmationEmailToken(
+      await this.emailService.sendConfirmationEmail(
         user.email,
         token._id,
         user.username,
@@ -136,6 +136,43 @@ export class UsersService {
       return user;
     } catch (err) {
       throw new BadRequestException();
+    }
+  }
+
+  /**
+   * Invia l'email contente il token per cambiare password
+   * @param user
+   */
+  async sendForgotPasswordEmail(user: IUser): Promise<void> {
+    try {
+      // Genera un nuovo token (o utilizza uno ancora valido)
+      const token = await this.tokenService.generateNewToken(
+        user.id,
+        TokenScope.FORGOT_PASSWORD,
+      );
+
+      await this.emailService.sendForgotPasswordEmail(
+        user.email,
+        token._id,
+        user.username,
+      );
+    } catch (err) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  /**
+   * Cambia la password dell'utente con l'ID passato
+   * @param userId Id dell'utente
+   * @param newPassword Nuova password
+   */
+  async changePassword(userId: string, newPassword: string): Promise<void> {
+    try {
+      const user = await this.userModel.findById(userId);
+      user.localPassword = newPassword;
+      await user.save();
+    } catch (err) {
+      throw new InternalServerErrorException();
     }
   }
 }

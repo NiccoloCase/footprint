@@ -8,9 +8,9 @@ export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
   /**
-   *  Spedisce via emial il token per confermare l'email
+   *  Invia per email il token per attivare un account
    */
-  async sendConfirmationEmailToken(
+  async sendConfirmationEmail(
     to: string,
     token: string,
     username: string,
@@ -21,6 +21,29 @@ export class EmailService {
         subject: `${config.APP_NAME} - Attiva il tuo account`,
         text: `Dobbiamo solo verificare il tuo indirizzo email per attivare il tuo account. Riporta il codice sottostante nell'applicazione per procedere: ${token}`,
         template: 'confirmationEmail',
+        context: { token, username },
+      });
+      return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false };
+    }
+  }
+
+  /**
+   *  Invia per email il token per cambiare pasword
+   */
+  async sendForgotPasswordEmail(
+    to: string,
+    token: string,
+    username: string,
+  ): Promise<ProcessResult> {
+    try {
+      await this.mailerService.sendMail({
+        to,
+        subject: `${config.APP_NAME} - Password dimenticata`,
+        text: `Ciao ${username}! Ci risulta che stai cercando di cambiare la password del tuo account. Ti basterà riportare questo codice nell'applicazione nell'applicazione: ${token}`,
+        template: 'forgotPasswordEmail',
         context: { token, username },
       });
       return { success: true };

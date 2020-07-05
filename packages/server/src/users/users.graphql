@@ -27,4 +27,8 @@ type Query {
 type Mutation {
   # Invia per il email il token per la verifica dell'email
   sendConfirmationEmail(email: String!): EmailResponse!
+  # Invia per il email un token per cambiare password
+  forgotPassword(email: String!): EmailResponse!
+  # Cambia password con il token inviato per email
+  changePasswordWithToken(token: String!, newPassword: String!): ProcessResult!
 }
