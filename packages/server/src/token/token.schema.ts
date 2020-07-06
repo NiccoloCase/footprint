@@ -1,11 +1,10 @@
 import { Schema, Document } from 'mongoose';
-import { generate } from 'shortid';
 import { Token } from '../graphql';
 
 export type ITokenModel = Document & Token;
 
 export const TokenSchema = new Schema({
-  _id: { type: String, default: generate },
+  _id: { type: Number },
   userId: { type: Schema.Types.ObjectId, required: true },
   scope: {
     type: String,

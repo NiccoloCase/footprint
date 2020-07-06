@@ -47,7 +47,6 @@ export type AuthStackParamList = {
   };
   VerifyEmail: {
     email: string;
-    username: string;
   };
   ForgotPassword: undefined;
 };

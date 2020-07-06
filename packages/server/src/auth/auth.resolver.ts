@@ -81,7 +81,6 @@ export class AuthResolver {
       // genera i token di accesso e di aggiornamento per il nuovo utente
       return this.authService.loginWithGoogle(user);
     } catch (err) {
-      console.log({ err });
       throw new BadRequestException(err);
     }
   }

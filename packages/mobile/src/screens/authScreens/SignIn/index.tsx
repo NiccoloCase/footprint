@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import {useFormik} from "formik";
 import {StackScreenProps} from "@react-navigation/stack";
@@ -15,6 +16,7 @@ import {GoogleSigninButton} from "../../../components/GoogleSigninButton";
 import {store} from "../../../store";
 import {SignInValidationSchema} from "../../../utils/validation";
 import Snackbar from "react-native-snackbar";
+import {Spinner} from "../../../components/Spinner";
 
 interface SingInFormValues {
   email: string;
@@ -43,7 +45,6 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
     try {
       const {data} = await login({variables: {email, password}});
       if (data) {
-        console.log({data});
         const {accessToken, refreshToken} = data.login;
         store.getActions().auth.singin({accessToken, refreshToken});
       }
@@ -56,12 +57,16 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
         typeof err.graphQLErrors[0].extensions.exception.response.message ===
           "string"
       ) {
-        const msg = err.graphQLErrors[0].extensions.exception.response.message.toLowerCase();
-        console.log(msg);
+        const msg: string = err.graphQLErrors[0].extensions.exception.response.message.toLowerCase();
         if (msg.includes("user"))
+          // L'email è sbagliata
           formik.setFieldError("email", "L'utente non esiste");
         else if (msg.includes("password"))
+          // La password è sbagliata
           formik.setFieldError("password", "Password sbagliata");
+        else if (msg.includes("verify"))
+          // L'utente deve prima verificare il proprio account
+          navigation.navigate("VerifyEmail", {email});
       } else {
         Snackbar.show({
           text: "Si è verificato un errore. Riprova più tardi",
@@ -119,9 +124,17 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
           Password dimenticata?
         </Text>
         <TouchableOpacity
-          style={styles.submitWrapper}
-          onPress={handleSubmit as any}>
-          <Text style={styles.submitText}>Accedi</Text>
+          style={[
+            styles.submitWrapper,
+            {opacity: formik.isSubmitting ? 0.6 : 1},
+          ]}
+          onPress={handleSubmit as any}
+          disabled={formik.isSubmitting}>
+          {formik.isSubmitting ? (
+            <ActivityIndicator color="#fff" style={{marginLeft: 10}} />
+          ) : (
+            <Text style={styles.submitText}>Accedi</Text>
+          )}
         </TouchableOpacity>
 
         <Text style={[styles.text, styles.or]}>Oppure</Text>
@@ -167,6 +180,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     elevation: 3,
     shadowRadius: 20,
+    flexDirection: "row",
   },
   submitText: {
     color: "#fff",

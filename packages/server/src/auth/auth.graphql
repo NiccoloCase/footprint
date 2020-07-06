@@ -37,5 +37,5 @@ type Mutation {
 
   # VERIFICHE:
   # Verifica l'email dell'utente
-  verfyUser(token: String): VerfyUserResponse!
+  verfyUser(token: String!): VerfyUserResponse!
 }

@@ -76,16 +76,15 @@ export class AuthService {
     // Controlla che l'email passata appartenga a un utente registrto
     if (!user || user.authType !== AuthType.LOCAL)
       throw new UnauthorizedException('User does not exist');
+    // Controlla che la password passata corrisponda a quella dell'utente
+    const passwordMatch = await user.comparePassword(password);
+    if (!passwordMatch) throw new UnauthorizedException('Wrong password');
     // Controlla che l'utente abbia confermato
     // la propria email
     else if (!user.isVerified)
       throw new UnauthorizedException(
         'Unauthorized access: you must verify the account first',
       );
-
-    // Controlla che la password passata corrisponda a quella dell'utente
-    const passwordMatch = await user.comparePassword(password);
-    if (!passwordMatch) throw new UnauthorizedException('Wrong password');
 
     // Genera il token di accesso
     const { accessToken, expiresIn } = this.generateAccessToken(user);

@@ -12,3 +12,33 @@ query IsEmailAlreadyUsed($email: String!) {
 query IsUsernameAlreadyUsed($username: String!) {
   isUsernameAlreadyUsed(username: $username)
 }
+mutation SendConfirmationEmail($email: String!) {
+  sendConfirmationEmail(email: $email) {
+    success
+    recipient
+  }
+}
+
+mutation VerfyUser($token: String!) {
+  verfyUser(token: $token) {
+    success
+    tokens {
+      accessToken
+      refreshToken
+      expiresIn
+    }
+  }
+}
+
+mutation ForgotPassword($email: String!) {
+  forgotPassword(email: $email) {
+    recipient
+    success
+  }
+}
+
+mutation ChangePasswordWithToken($token: String!, $newPassword: String!) {
+  changePasswordWithToken(token: $token, newPassword: $newPassword) {
+    success
+  }
+}
