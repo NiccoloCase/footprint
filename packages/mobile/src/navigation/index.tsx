@@ -53,7 +53,7 @@ export type AuthStackParamList = {
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
   <AuthStack.Navigator
-    initialRouteName="SignIn"
+    initialRouteName="Welcome"
     screenOptions={{
       headerTitleAlign: "center",
       headerTintColor: "#FF596E",

@@ -2,7 +2,7 @@
     credito: https://github.com/retyui/react-native-confirmation-code-field/tree/master/examples/DemoCodeField/src/AnimatedExample
 */
 
-import {Animated, View, Text, ViewProps} from "react-native";
+import {Animated, View, Text, ViewProps, ViewStyle} from "react-native";
 import React, {useState, useEffect} from "react";
 
 import {
@@ -19,6 +19,7 @@ import styles, {
   DEFAULT_CELL_BG_COLOR,
   NOT_EMPTY_CELL_BG_COLOR,
 } from "./styles";
+import {InputProps} from "react-native-elements";
 
 const CELL_COUNT = 6;
 
@@ -41,11 +42,19 @@ const animateCell = ({hasValue, index, isFocused}: any) => {
   ]).start();
 };
 
-interface CodeInputProps extends ViewProps {
+interface CodeInputProps {
+  containerStyle?: ViewStyle;
   onFill?: (code: string) => Promise<{errorMessage?: string}>;
+  onCodeChange?: (code: string) => void;
+  errorMessage?: string;
 }
 
-export const CodeInput: React.FC<CodeInputProps> = ({onFill, ...viewProps}) => {
+export const CodeInput: React.FC<CodeInputProps> = ({
+  onFill,
+  containerStyle,
+  onCodeChange,
+  errorMessage,
+}) => {
   // valore dell'input
   const [value, setValue] = useState("");
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
@@ -67,6 +76,10 @@ export const CodeInput: React.FC<CodeInputProps> = ({onFill, ...viewProps}) => {
         })
         .catch((err) => console.log(err));
   }, [value]);
+
+  useEffect(() => {
+    if (errorMessage) setErrorMsg(errorMessage);
+  }, [errorMessage]);
 
   /**
    * Renderizza una cella
@@ -118,16 +131,19 @@ export const CodeInput: React.FC<CodeInputProps> = ({onFill, ...viewProps}) => {
     );
   };
 
+  const onChangeText = (text: string) => {
+    if (typeof onCodeChange === "function") onCodeChange(text);
+    setValue(text);
+    setErrorMsg("");
+  };
+
   return (
-    <View {...viewProps}>
+    <View style={containerStyle}>
       <CodeField
         ref={ref}
         {...props}
         value={value}
-        onChangeText={(t) => {
-          setValue(t);
-          setErrorMsg("");
-        }}
+        onChangeText={onChangeText}
         cellCount={CELL_COUNT}
         rootStyle={styles.codeFieldRoot}
         keyboardType="number-pad"

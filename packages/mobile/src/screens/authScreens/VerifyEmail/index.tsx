@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {Text, StyleSheet, TouchableOpacity, View} from "react-native";
 import {StackScreenProps} from "@react-navigation/stack";
 import {AuthStackParamList} from "../../../navigation";
 import {CodeInput} from "../../../components/inputs";
@@ -16,6 +10,7 @@ import {
 import {store} from "../../../store";
 import Snackbar from "react-native-snackbar";
 import {useEmailTimer} from "../../../utils/useEmailTimer";
+import {SafeAreaView} from "react-native-safe-area-context";
 
 /** Propietà della scheramata di registrazione */
 type VerifyEmailScreenProps = StackScreenProps<
@@ -82,7 +77,7 @@ export const VerifyEmail: React.FC<VerifyEmailScreenProps> = ({route}) => {
   };
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Abbiamo quasi finito!</Text>
       <Text style={styles.text}>
         Devi solo confermare l'email inserita in fase di registrazione.
@@ -114,12 +109,12 @@ export const VerifyEmail: React.FC<VerifyEmailScreenProps> = ({route}) => {
         <Text style={styles.inputCodeTitle}>Inserisci il codice:</Text>
         <CodeInput onFill={handleSubmit} />
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
+  container: {
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 30,
@@ -162,29 +157,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-/**
- * 
- *       <View style={styles.nextButton}>
-        <Text style={styles.nextButtonText}>Verify</Text>
-      </View>
-
-  nextButton: {
-    marginTop: 30,
-    borderRadius: 60,
-    height: 60,
-    backgroundColor: "#3557b7",
-    justifyContent: "center",
-    minWidth: 300,
-    marginBottom: 100,
-  },
-  nextButtonText: {
-    textAlign: "center",
-    fontSize: 20,
-    color: "#fff",
-    fontWeight: "700",
-  },
- * 
- * 
- * 
- */

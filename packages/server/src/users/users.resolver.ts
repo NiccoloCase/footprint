@@ -7,7 +7,7 @@ import {
   ChangePasswordWithTokenDTO,
 } from './users.dto';
 import { BadRequestException } from '@nestjs/common';
-import { EmailResponse, ProcessResult, TokenScope } from '../graphql';
+import { EmailResponse, ProcessResult, TokenScope, AuthType } from '../graphql';
 import { TokenService } from '../token/token.service';
 
 @Resolver('Users')
@@ -60,7 +60,8 @@ export class UsersResolver {
   async forgotPassword(@Args('email') email: string): Promise<EmailResponse> {
     // cerca l'utente tramite l'email e controlla che esista
     const user = await this.usersService.getUserByEmail(email);
-    if (!user) throw new BadRequestException('User does not exist');
+    if (!user || user.authType !== AuthType.LOCAL)
+      throw new BadRequestException('User does not exist');
 
     // Invia l'email
     this.usersService.sendForgotPasswordEmail(user);
@@ -83,7 +84,7 @@ export class UsersResolver {
 
       return { success: true };
     } catch (err) {
-      throw new BadRequestException(err);
+      return { success: false };
     }
   }
 }
