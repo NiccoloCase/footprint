@@ -11,6 +11,7 @@ import Snackbar from "react-native-snackbar";
 import {useFormik} from "formik";
 import {InputText} from "../../../../components/InputText";
 import {ForgotPasswordForm1ValidationSchema} from "../../../../utils/validation";
+import {Colors} from "../../../../styles";
 
 interface ForgotPasswordStep1Props {
   nextPage: (email: string) => void;
@@ -55,7 +56,7 @@ export const ForgotPasswordStep1: React.FC<ForgotPasswordStep1Props> = ({
           Snackbar.show({
             text: "Non è possibile inviare l'email. Riprova più tardi",
             duration: Snackbar.LENGTH_LONG,
-            backgroundColor: "#FF596E",
+            backgroundColor: Colors.primary,
           });
       }
     }
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     flex: 1,
-    backgroundColor: "#FF596E",
+    backgroundColor: Colors.primary,
     padding: 16,
     borderRadius: 4,
     marginTop: 15,

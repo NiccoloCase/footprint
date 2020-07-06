@@ -11,6 +11,7 @@ import {store} from "../../../store";
 import Snackbar from "react-native-snackbar";
 import {useEmailTimer} from "../../../utils/useEmailTimer";
 import {SafeAreaView} from "react-native-safe-area-context";
+import {Colors} from "../../../styles";
 
 /** Propietà della scheramata di registrazione */
 type VerifyEmailScreenProps = StackScreenProps<
@@ -38,14 +39,14 @@ export const VerifyEmail: React.FC<VerifyEmailScreenProps> = ({route}) => {
         Snackbar.show({
           text: "Non è possibile inviare l'email. Riprova più tardi",
           duration: Snackbar.LENGTH_LONG,
-          backgroundColor: "#FF596E",
+          backgroundColor: Colors.primary,
         });
       }
     } catch (err) {
       Snackbar.show({
         text: "Non è possibile inviare l'email. Riprova più tardi",
         duration: Snackbar.LENGTH_LONG,
-        backgroundColor: "#FF596E",
+        backgroundColor: Colors.primary,
       });
     } finally {
       startTimer();
@@ -130,11 +131,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   email: {
-    color: "#FF596E",
+    color: Colors.primary,
     fontStyle: "italic",
   },
   sendButton: {
-    backgroundColor: "#FF596E",
+    backgroundColor: Colors.primary,
     padding: 10,
     borderRadius: 4,
     marginTop: 15,
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
   },
   inputCodeTitle: {
     fontWeight: "bold",
-    color: "#FF596E",
+    color: Colors.primary,
     textAlign: "center",
     fontSize: 18,
   },

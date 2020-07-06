@@ -14,6 +14,7 @@ import config from "@footprint/config";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
 import {API_URL} from "../utils/api";
 import {store} from "../store";
+import {Colors} from "../styles";
 
 const cache = new InMemoryCache();
 
@@ -77,7 +78,7 @@ const errorLink = onError(({graphQLErrors, networkError}) => {
     Snackbar.show({
       text: "Non è possibile connetteri al server. Prova più tardi",
       duration: Snackbar.LENGTH_LONG,
-      backgroundColor: "#FF596E",
+      backgroundColor: Colors.primary,
     });
   }
 });

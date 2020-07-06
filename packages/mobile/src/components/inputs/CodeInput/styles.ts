@@ -1,9 +1,10 @@
 import {StyleSheet, Platform} from "react-native";
+import {Colors} from "../../../styles";
 
 export const CELL_SIZE = 45;
 export const CELL_BORDER_RADIUS = 8;
 export const DEFAULT_CELL_BG_COLOR = "#fff";
-export const NOT_EMPTY_CELL_BG_COLOR = "#FF596E";
+export const NOT_EMPTY_CELL_BG_COLOR = Colors.primary;
 export const ACTIVE_CELL_BG_COLOR = "#f7fafe";
 
 const styles = StyleSheet.create({
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: "center",
     borderRadius: CELL_BORDER_RADIUS,
-    color: "#FF596E",
+    color: Colors.primary,
     backgroundColor: "#fff",
     shadowColor: "#000",
     shadowOffset: {
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
   errorMsg: {
     textAlign: "center",
     marginTop: 20,
-    color: "#FF596E",
+    color: Colors.primary,
     fontWeight: "bold",
   },
 });

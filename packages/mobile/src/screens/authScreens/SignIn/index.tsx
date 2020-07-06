@@ -17,6 +17,7 @@ import {store} from "../../../store";
 import {SignInValidationSchema} from "../../../utils/validation";
 import Snackbar from "react-native-snackbar";
 import {Spinner} from "../../../components/Spinner";
+import {Colors} from "../../../styles";
 
 interface SingInFormValues {
   email: string;
@@ -71,7 +72,7 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
         Snackbar.show({
           text: "Si è verificato un errore. Riprova più tardi",
           duration: Snackbar.LENGTH_LONG,
-          backgroundColor: "#FF596E",
+          backgroundColor: Colors.primary,
         });
       }
     }
@@ -169,14 +170,14 @@ const styles = StyleSheet.create({
     color: "#404040",
   },
   submitWrapper: {
-    backgroundColor: "#FF596E",
+    backgroundColor: Colors.primary,
     borderRadius: 4,
     paddingVertical: 12,
     marginTop: 32,
     alignItems: "center",
     justifyContent: "center",
     shadowOffset: {width: 0, height: 9},
-    shadowColor: "#FF596E",
+    shadowColor: Colors.primary,
     shadowOpacity: 1,
     elevation: 3,
     shadowRadius: 20,

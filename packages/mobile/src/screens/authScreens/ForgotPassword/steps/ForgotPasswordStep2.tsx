@@ -18,6 +18,7 @@ import {useFormik} from "formik";
 import {InputText} from "../../../../components/InputText";
 import {ForgotPasswordForm2ValidationSchema} from "../../../../utils/validation";
 import {useNavigation} from "@react-navigation/native";
+import {Colors} from "../../../../styles";
 
 interface ForgotPasswordStep2Props {
   email: string;
@@ -79,7 +80,7 @@ export const ForgotPasswordStep2: React.FC<ForgotPasswordStep2Props> = ({
       Snackbar.show({
         text: "Si è verificato un errore. Riprova più tardi",
         duration: Snackbar.LENGTH_LONG,
-        backgroundColor: "#FF596E",
+        backgroundColor: Colors.primary,
       });
     }
   }
@@ -93,7 +94,7 @@ export const ForgotPasswordStep2: React.FC<ForgotPasswordStep2Props> = ({
       Snackbar.show({
         text: "Non è possibile inviare l'email. Riprova più tardi",
         duration: Snackbar.LENGTH_LONG,
-        backgroundColor: "#FF596E",
+        backgroundColor: Colors.primary,
       });
     } finally {
       startTimer();
@@ -196,12 +197,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   email: {
-    color: "#FF596E",
+    color: Colors.primary,
     fontStyle: "italic",
   },
   button: {
     flex: 1,
-    backgroundColor: "#FF596E",
+    backgroundColor: Colors.primary,
     padding: 10,
     borderRadius: 4,
     marginTop: 15,
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontWeight: "bold",
     fontSize: 15,
-    color: "#FF596E",
+    color: Colors.primary,
   },
   buttonText: {
     color: "#fff",
@@ -220,12 +221,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   outlineButton: {
-    borderColor: "#FF596E",
+    borderColor: Colors.primary,
     borderWidth: 2,
     backgroundColor: "transparent",
   },
   underlinedButton: {
-    borderBottomColor: "#FF596E",
+    borderBottomColor: Colors.primary,
     borderBottomWidth: 2,
     backgroundColor: "transparent",
   },

@@ -9,6 +9,7 @@ import Snackbar from "react-native-snackbar";
 import {NavigationProp, CommonActions} from "@react-navigation/native";
 import {AuthStackParamList} from "../../../navigation";
 import {store} from "../../../store";
+import {Colors} from "../../../styles";
 
 export function useSubmitSignUp(
   withGoogle: boolean,
@@ -64,7 +65,7 @@ export function useSubmitSignUp(
       Snackbar.show({
         text: "Ops...semba che ci sia stato un errore ",
         duration: Snackbar.LENGTH_LONG,
-        backgroundColor: "#FF596E",
+        backgroundColor: Colors.primary,
       });
     }
   };

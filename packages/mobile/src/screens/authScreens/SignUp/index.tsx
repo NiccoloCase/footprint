@@ -15,6 +15,7 @@ import {EmailAndPasswordForm} from "./steps/EmailAndPasswordForm";
 import {UsernameAndPictureForm} from "./steps/UsernameAndPictureForm";
 import {useSubmitSignUp} from "./submit";
 import {SignupValidationSchema} from "../../../utils/validation";
+import {Colors} from "../../../styles";
 
 /** valori del form di registrazione */
 export interface SingUpFormValues {
@@ -111,7 +112,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       <View
         key={index}
         style={{
-          backgroundColor: isActive ? "#FF596E" : "#707070",
+          backgroundColor: isActive ? Colors.primary : "#707070",
           width: r * 2,
           height: r * 2,
           borderRadius: r,
@@ -145,7 +146,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         style={[
           styles.navigationButton,
           {
-            backgroundColor: "#FF596E",
+            backgroundColor: Colors.primary,
             opacity: isDisabled ? 0.4 : 1,
           },
         ]}

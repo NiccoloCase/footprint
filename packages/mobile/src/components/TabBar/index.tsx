@@ -1,15 +1,16 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-} from 'react-native';
-import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
-import posed from 'react-native-pose';
+} from "react-native";
+import {BottomTabBarProps} from "@react-navigation/bottom-tabs";
+import posed from "react-native-pose";
+import {Colors} from "../../styles";
 
-const windowWidth = Dimensions.get('window').width;
+const windowWidth = Dimensions.get("window").width;
 const paddingHorizontal = 15;
 const tabWidth = (windowWidth - paddingHorizontal * 2) / 4;
 
@@ -59,7 +60,7 @@ export const TabBar: React.FC<BottomTabBarProps> = (props) => {
             testID={options.tabBarTestID}
             onPress={() => {
               const event = navigation.emit({
-                type: 'tabPress',
+                type: "tabPress",
                 target: route.key,
                 canPreventDefault: true,
               });
@@ -70,7 +71,7 @@ export const TabBar: React.FC<BottomTabBarProps> = (props) => {
             }}
             onLongPress={() =>
               navigation.emit({
-                type: 'tabLongPress',
+                type: "tabLongPress",
                 target: route.key,
               })
             }>
@@ -78,7 +79,7 @@ export const TabBar: React.FC<BottomTabBarProps> = (props) => {
               <View style={styles.iconWrapper}>
                 {renderIcon({
                   focused: isRouteActive,
-                  color: tintColor || '#000',
+                  color: tintColor || "#000",
                   size: 28,
                 })}
                 {isRouteActive && (
@@ -97,32 +98,32 @@ export const TabBar: React.FC<BottomTabBarProps> = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 60,
     elevation: 2,
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    alignItems: "center",
+    backgroundColor: "#fff",
     paddingHorizontal,
   },
   tabButton: {flex: 1},
   spotLight: {
     width: tabWidth,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   spotLightInner: {
     width: 110,
     height: 45,
-    backgroundColor: '#FF596E',
+    backgroundColor: Colors.primary,
     opacity: 0.4,
     borderRadius: 24,
   },
   iconWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     flex: 1,
   },
-  label: {marginLeft: 10, fontWeight: 'bold'},
+  label: {marginLeft: 10, fontWeight: "bold"},
 });

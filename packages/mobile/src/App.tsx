@@ -10,7 +10,7 @@ import {store} from "./store";
 
 MapboxGL.setAccessToken(config.MAPBOX_ACCESS_TOKEN);
 GoogleSignin.configure({
-  offlineAccess: true,
+  offlineAccess: false,
   webClientId: config.googleOAuth.WEB_CLIENT_ID,
 });
 

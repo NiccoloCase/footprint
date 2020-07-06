@@ -18,6 +18,7 @@ import {
 } from "../../generated/graphql";
 import {client} from "../../graphql";
 import {useStoreActions} from "../../store";
+import {Colors} from "../../styles";
 
 interface GoogleSigninButtonProps {
   /** Testo del bottone */
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#FF596E",
+    color: Colors.primary,
   },
   modal: {
     fontSize: 17,
@@ -255,11 +256,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderWidth: 2,
     borderRadius: 2,
-    borderColor: "#FF596E",
+    borderColor: Colors.primary,
     marginLeft: 10,
   },
   modalButtonText: {
-    color: "#FF596E",
+    color: Colors.primary,
     fontSize: 16,
     fontWeight: "bold",
   },

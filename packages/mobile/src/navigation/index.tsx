@@ -11,6 +11,7 @@ import {DrawerContent} from "../components/DrawerContent";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
 import {useStoreActions, useStoreState} from "../store";
+import {Colors} from "../styles";
 
 // COMPONENTI
 import {TabBar} from "../components/TabBar";
@@ -30,7 +31,7 @@ import {SettingsScreen} from "../screens/SettingsScreen";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center"},
-  headerStyle: {backgroundColor: "#FF596E"},
+  headerStyle: {backgroundColor: Colors.primary},
   headerTintColor: "#fff",
   headerTitleAlign: "center",
 };
@@ -53,10 +54,10 @@ export type AuthStackParamList = {
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
   <AuthStack.Navigator
-    initialRouteName="Welcome"
+    initialRouteName="SignIn"
     screenOptions={{
       headerTitleAlign: "center",
-      headerTintColor: "#FF596E",
+      headerTintColor: Colors.primary,
       headerTitleStyle: {
         fontWeight: "bold",
         fontSize: 23,
@@ -181,7 +182,7 @@ const TabsScreen = () => (
     initialRouteName="Search"
     tabBar={TabBar}
     tabBarOptions={{
-      activeTintColor: "#FF596E",
+      activeTintColor: Colors.primary,
       inactiveTintColor: "#606060",
     }}>
     <Tabs.Screen
