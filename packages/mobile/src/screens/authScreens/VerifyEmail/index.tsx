@@ -1,5 +1,11 @@
 import React from "react";
-import {Text, StyleSheet, TouchableOpacity, View} from "react-native";
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ScrollView,
+} from "react-native";
 import {StackScreenProps} from "@react-navigation/stack";
 import {AuthStackParamList} from "../../../navigation";
 import {CodeInput} from "../../../components/inputs";
@@ -11,7 +17,8 @@ import {store} from "../../../store";
 import Snackbar from "react-native-snackbar";
 import {useEmailTimer} from "../../../utils/useEmailTimer";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {Colors} from "../../../styles";
+import {Colors, Spacing} from "../../../styles";
+import {AuthHeader} from "../../../components/Header/AuthHeader";
 
 /** Propietà della scheramata di registrazione */
 type VerifyEmailScreenProps = StackScreenProps<
@@ -79,37 +86,42 @@ export const VerifyEmail: React.FC<VerifyEmailScreenProps> = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Abbiamo quasi finito!</Text>
-      <Text style={styles.text}>
-        Devi solo confermare l'email inserita in fase di registrazione.
-      </Text>
-      <Text style={styles.text}>
-        Inserisci perfavore il codice che è stato inviato all'email{" "}
-        <Text style={styles.email}> {email}</Text> nella casella sottostante
-      </Text>
+      <ScrollView contentContainerStyle={styles.card}>
+        <AuthHeader
+          subtitle="Abbiamo quasi finito!"
+          title="Verifica l'account,"
+        />
+        <Text style={styles.text}>
+          Devi solo confermare l'email inserita in fase di registrazione.
+        </Text>
+        <Text style={styles.text}>
+          Inserisci perfavore il codice che è stato inviato all'email{" "}
+          <Text style={styles.email}> {email}</Text> nella casella sottostante
+        </Text>
 
-      <View style={{flexDirection: "row"}}>
-        <TouchableOpacity
-          onPress={sendEmail}
-          style={[
-            styles.sendButton,
-            {opacity: canEmailBeSent && !sendEmailLoading ? 1 : 0.7},
-          ]}
-          disabled={!canEmailBeSent}>
-          <Text style={styles.sendButtonText}>
-            {canEmailBeSent
-              ? sendEmailData
-                ? "Rinvia"
-                : "Email non arrivata?"
-              : `Rinvia tra ${timeLeft}`}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <View style={{flexDirection: "row"}}>
+          <TouchableOpacity
+            onPress={sendEmail}
+            style={[
+              styles.sendButton,
+              {opacity: canEmailBeSent && !sendEmailLoading ? 1 : 0.7},
+            ]}
+            disabled={!canEmailBeSent}>
+            <Text style={styles.sendButtonText}>
+              {canEmailBeSent
+                ? sendEmailData
+                  ? "Rinvia"
+                  : "Email non arrivata?"
+                : `Rinvia tra ${timeLeft}`}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.inputCodeWrapper}>
-        <Text style={styles.inputCodeTitle}>Inserisci il codice:</Text>
-        <CodeInput onFill={handleSubmit} />
-      </View>
+        <View style={styles.inputCodeWrapper}>
+          <Text style={styles.inputCodeTitle}>Inserisci il codice:</Text>
+          <CodeInput onFill={handleSubmit} />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -118,17 +130,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 30,
-    paddingTop: 30,
+    paddingHorizontal: Spacing.screenHorizontalPadding,
+  },
+  card: {
+    flexGrow: 1,
+    maxWidth: Spacing.maxScreenWidth,
+    alignSelf: "center",
+    width: "100%",
   },
   text: {
     color: "#404040",
     fontSize: 18,
-  },
-  title: {
-    marginBottom: 20,
-    fontSize: 22,
-    fontWeight: "bold",
   },
   email: {
     color: Colors.primary,

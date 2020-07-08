@@ -1,14 +1,14 @@
 import React from "react";
-import {View} from "react-native";
+import {ScrollView} from "react-native";
 import {Avatar} from "react-native-elements";
-import {InputText} from "../../../../components/InputText";
+import {OutlinedTextInput as InputText} from "../../../../components/inputs";
 import {SignUpFormProps} from "../";
 
 export const UsernameAndPictureForm: React.FC<SignUpFormProps> = (props) => {
   const {handleChange, handleBlur, values, errors, touched} = props.formikProps;
 
   return (
-    <View>
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <InputText
         label="Username"
         onChangeText={handleChange("username")}
@@ -20,6 +20,6 @@ export const UsernameAndPictureForm: React.FC<SignUpFormProps> = (props) => {
       {values.pictureURL ? (
         <Avatar rounded source={{uri: values.pictureURL}} activeOpacity={0.7} />
       ) : null}
-    </View>
+    </ScrollView>
   );
 };

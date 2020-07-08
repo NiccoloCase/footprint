@@ -2,16 +2,18 @@ import React from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import {useForgotPasswordMutation} from "../../../../generated/graphql";
 import Snackbar from "react-native-snackbar";
 import {useFormik} from "formik";
-import {InputText} from "../../../../components/InputText";
+import {OutlinedTextInput as InputText} from "../../../../components/inputs";
 import {ForgotPasswordForm1ValidationSchema} from "../../../../utils/validation";
 import {Colors} from "../../../../styles";
+import {SubmitButton} from "../../../../components/buttons";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 
 interface ForgotPasswordStep1Props {
   nextPage: (email: string) => void;
@@ -63,41 +65,34 @@ export const ForgotPasswordStep1: React.FC<ForgotPasswordStep1Props> = ({
   }
 
   return (
-    <ScrollView contentContainerStyle={{flex: 1}}>
-      <Text style={styles.title}>Hai perso la password?</Text>
-      <Text style={styles.subtitle}>Nessun probelma!</Text>
-      <View style={{flex: 1}}>
-        <Text style={styles.text}>
-          Ti manderemo per email un codice con il quale potrai modificare la
-          password del tuo account. Inserisci pefavore nella casella sottostante
-          l'email utilizzata in fase di registrazione.
-        </Text>
-        <View style={{marginTop: 40}}>
-          <InputText
-            label="Email"
-            onChangeText={formik.handleChange("email") as any}
-            onBlur={formik.handleBlur("email") as any}
-            value={formik.values.email}
-            errorMessage={
-              formik.touched.email ? formik.errors.email : undefined
-            }
-            keyboardType="email-address"
-          />
-        </View>
-      </View>
-      <View style={{flexDirection: "row"}}>
-        <TouchableOpacity
-          onPress={formik.handleSubmit as any}
-          style={[
-            styles.sendButton,
-            {opacity: !formik.isValid || formik.isSubmitting ? 0.6 : 1},
-          ]}
-          disabled={!formik.isValid || formik.isSubmitting}>
-          <Text style={[styles.text, styles.sendButtonText]}>
-            Invia l'email
+    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <KeyboardAwareScrollView contentContainerStyle={{flex: 1}}>
+        <View style={{flex: 1}}>
+          <Text style={styles.text}>
+            Ti manderemo per email un codice con il quale potrai modificare la
+            password del tuo account. Inserisci pefavore nella casella
+            sottostante l'email utilizzata in fase di registrazione.
           </Text>
-        </TouchableOpacity>
-      </View>
+          <View style={{marginTop: 40}}>
+            <InputText
+              label="Email"
+              email
+              onChangeText={formik.handleChange("email") as any}
+              onBlur={formik.handleBlur("email") as any}
+              value={formik.values.email}
+              errorMessage={formik.errors.email}
+            />
+          </View>
+        </View>
+
+        <SubmitButton
+          title="Invia l'email"
+          containerStyle={{marginBottom: 30}}
+          onPress={formik.handleSubmit as any}
+          isLoading={formik.isSubmitting}
+          disabled={!formik.isValid}
+        />
+      </KeyboardAwareScrollView>
     </ScrollView>
   );
 };
@@ -105,32 +100,6 @@ export const ForgotPasswordStep1: React.FC<ForgotPasswordStep1Props> = ({
 const styles = StyleSheet.create({
   text: {
     color: "#404040",
-    fontSize: 18,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 5,
-    color: "#404040",
-  },
-  subtitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 40,
-    color: "#A9ADB2",
-  },
-  sendButton: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-    padding: 16,
-    borderRadius: 4,
-    marginTop: 15,
-    marginBottom: 30,
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
     fontSize: 18,
   },
 });

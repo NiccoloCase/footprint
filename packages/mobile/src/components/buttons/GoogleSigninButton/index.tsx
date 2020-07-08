@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useRef} from "react";
 import {GoogleSignin, statusCodes} from "@react-native-community/google-signin";
 import {
   TouchableOpacity,
@@ -11,14 +11,14 @@ import {
 import RBSheet from "react-native-raw-bottom-sheet";
 import {useNavigation} from "@react-navigation/native";
 import {StackNavigationProp} from "@react-navigation/stack";
-import {AuthStackParamList} from "../../navigation";
+import {AuthStackParamList} from "../../../navigation";
 import {
   useLoginWithGoogleMutation,
   IsEmailAlreadyUsedDocument,
-} from "../../generated/graphql";
-import {client} from "../../graphql";
-import {useStoreActions} from "../../store";
-import {Colors} from "../../styles";
+} from "../../../generated/graphql";
+import {client} from "../../../graphql";
+import {useStoreActions} from "../../../store";
+import {Colors} from "../../../styles";
 
 interface GoogleSigninButtonProps {
   /** Testo del bottone */
@@ -63,7 +63,7 @@ export const GoogleSigninButton: React.FC<GoogleSigninButtonProps> = (
 
       // In caso di errore:
     } catch (error) {
-      let msg = {title: "", body: ""};
+      let msg: null | {title: string; body: string} = null;
 
       // renderizza un messaggio di errore
       if (error.code === statusCodes.IN_PROGRESS)
@@ -82,6 +82,8 @@ export const GoogleSigninButton: React.FC<GoogleSigninButtonProps> = (
           title: "Non è possibile continuare",
           body: "È stato riscontrato un errore. Riprova più tardi.",
         };
+
+      if (!msg) return null;
 
       // Mostra il messaggio di errore
       if (refModal.current) {
@@ -180,7 +182,7 @@ export const GoogleSigninButton: React.FC<GoogleSigninButtonProps> = (
       <View>
         <TouchableOpacity style={styles.googleButton} onPress={handleSubmit}>
           <Image
-            source={require("../../assets/images/google-logo.png")}
+            source={require("../../../assets/images/google-logo.png")}
             style={styles.googleLogo}
           />
           <Text style={styles.text}>{props.label || "Accedi con Google"}</Text>
@@ -209,19 +211,21 @@ export const GoogleSigninButton: React.FC<GoogleSigninButtonProps> = (
 
 const styles = StyleSheet.create({
   googleButton: {
+    maxWidth: 500,
+    width: "100%",
+    height: 55,
+    alignSelf: "center",
     flexDirection: "row",
     justifyContent: "center",
-    paddingVertical: 12,
+    alignItems: "center",
     paddingHorizontal: 30,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(171, 180, 189, 0.65)",
-    borderRadius: 4,
-    backgroundColor: "#fff",
-    shadowColor: "rgba(171, 180, 189, 0.35)",
+    borderRadius: 10,
+    backgroundColor: "#EAEEF4",
+    /*hadowColor: "rgba(171, 180, 189, 0.35)",
     shadowOffset: {width: 0, height: 10},
     shadowOpacity: 1,
     shadowRadius: 40,
-    elevation: 3,
+    elevation: 3,*/
   },
   googleLogo: {
     width: 16,
@@ -230,7 +234,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: "bold",
-    color: "#606060",
+    color: "#707070",
   },
   // MODAL:
   modalContainer: {

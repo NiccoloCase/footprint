@@ -1,23 +1,28 @@
+/*
+  Ispirazione: https://dribbble.com/shots/6774711-Onboarding-Login-Sign-Up
+*/
+
 import React from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
+  SafeAreaView,
+  KeyboardAvoidingView,
 } from "react-native";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {useFormik} from "formik";
 import {StackScreenProps} from "@react-navigation/stack";
 import {useLoginMutation} from "../../../generated/graphql";
 import {AuthStackParamList} from "../../../navigation";
-import {InputText} from "../../../components/InputText";
-import {GoogleSigninButton} from "../../../components/GoogleSigninButton";
+import {OutlinedTextInput as InputText} from "../../../components/inputs";
 import {store} from "../../../store";
 import {SignInValidationSchema} from "../../../utils/validation";
 import Snackbar from "react-native-snackbar";
-import {Spinner} from "../../../components/Spinner";
-import {Colors} from "../../../styles";
+import {Colors, Spacing} from "../../../styles";
+import {SubmitButton, GoogleSigninButton} from "../../../components/buttons";
+import {AuthHeader} from "../../../components/Header/AuthHeader";
 
 interface SingInFormValues {
   email: string;
@@ -32,7 +37,7 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
     initialValues: {email: "", password: ""},
     onSubmit,
     validationSchema: SignInValidationSchema,
-    validateOnBlur: false,
+    // validateOnBlur: false,
     validateOnChange: false,
   });
   // GRAPHQL
@@ -88,60 +93,59 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
   } = formik;
 
   return (
-    <ScrollView
-      keyboardShouldPersistTaps="always"
-      contentContainerStyle={{flex: 1}}
-      style={styles.scrollView}>
-      <View style={styles.wrapper}>
-        <InputText
-          label="Email"
-          value={values.email}
-          errorMessage={touched.email ? errors.email : undefined}
-          keyboardType="email-address"
-          // @ts-ignore
-          onChangeText={handleChange("email")}
-          // @ts-ignore
-          onBlur={handleBlur("email")}
-        />
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        {/** HEADER */}
+        <AuthHeader title="Benevenuto," subtitle="Accedi per continuare!" />
+        {/** INPUT */}
+        <View style={{zIndex: 100}}>
+          <InputText
+            label="Email"
+            email
+            value={values.email}
+            errorMessage={touched.email ? errors.email : undefined}
+            onChangeText={handleChange("email") as any}
+            onBlur={handleBlur("email") as any}
+            containerStyle={{marginBottom: 30}}
+          />
+          <InputText
+            label="Password"
+            password
+            value={values.password}
+            errorMessage={touched.password ? errors.password : undefined}
+            onChangeText={handleChange("password") as any}
+            onBlur={handleBlur("password") as any}
+          />
+          {/** PASSOWORD DIMENTICATA */}
+          <View style={{flexDirection: "row-reverse"}}>
+            <Text
+              style={[styles.text, styles.forgotPassword]}
+              onPress={() => navigation.push("ForgotPassword")}>
+              Password dimenticata?
+            </Text>
+          </View>
 
-        <InputText
-          label="Password"
-          value={values.password}
-          errorMessage={touched.password ? errors.password : undefined}
-          secureTextEntry
-          // @ts-ignore
-          onChangeText={handleChange("password")}
-          // @ts-ignore
-          onBlur={handleBlur("password")}
-        />
+          {/** BOTTONI */}
+          <View style={{marginTop: 30}}>
+            {/** SUBMIT */}
+            <SubmitButton
+              title="Accedi"
+              onPress={handleSubmit as any}
+              isLoading={formik.isSubmitting}
+            />
 
-        <Text
-          style={[
-            styles.text,
-            styles.link,
-            {textAlign: "right", marginBottom: 20},
-          ]}
-          onPress={() => navigation.push("ForgotPassword")}>
-          Password dimenticata?
-        </Text>
-        <TouchableOpacity
-          style={[
-            styles.submitWrapper,
-            {opacity: formik.isSubmitting ? 0.6 : 1},
-          ]}
-          onPress={handleSubmit as any}
-          disabled={formik.isSubmitting}>
-          {formik.isSubmitting ? (
-            <ActivityIndicator color="#fff" style={{marginLeft: 10}} />
-          ) : (
-            <Text style={styles.submitText}>Accedi</Text>
-          )}
-        </TouchableOpacity>
+            {/** OPPURE */}
+            <View style={styles.orWrapper}>
+              <View style={styles.orLine} />
+              <Text style={[styles.text, styles.orText]}>Oppure</Text>
+            </View>
 
-        <Text style={[styles.text, styles.or]}>Oppure</Text>
+            {/** GOOGLE */}
+            <GoogleSigninButton />
+          </View>
+        </View>
 
-        <GoogleSigninButton />
-
+        {/** LINK PER LA SCHERMATA DI REGISTRAZIONE  */}
         <Text style={[styles.text, styles.registerText]}>
           Non hai un account?{" "}
           <Text
@@ -150,59 +154,63 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({navigation}) => {
             Registrati ora
           </Text>
         </Text>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
+  container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 30,
+    paddingHorizontal: Spacing.screenHorizontalPadding,
   },
-  wrapper: {
+  scrollView: {
     flex: 1,
-    justifyContent: "center",
+    maxWidth: Spacing.maxScreenWidth,
+    alignSelf: "center",
+    width: "100%",
+    justifyContent: "space-between",
   },
   text: {
     // fontFamily: "Avenir Next",
-    color: "#404040",
-  },
-  submitWrapper: {
-    backgroundColor: Colors.primary,
-    borderRadius: 4,
-    paddingVertical: 12,
-    marginTop: 32,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowOffset: {width: 0, height: 9},
-    shadowColor: Colors.primary,
-    shadowOpacity: 1,
-    elevation: 3,
-    shadowRadius: 20,
-    flexDirection: "row",
-  },
-  submitText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 14,
+    color: Colors.darkGrey,
   },
   link: {
     color: "#FF1654",
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "bold",
   },
-  or: {
-    color: "#ABB4BD",
-    fontSize: 15,
-    textAlign: "center",
+  forgotPassword: {
+    textAlign: "right",
+    marginBottom: 20,
+    fontWeight: "bold",
+  },
+  orWrapper: {
     marginVertical: 35,
+    position: "relative",
+    overflow: "visible",
+    alignItems: "center",
+  },
+  orLine: {
+    backgroundColor: Colors.lightGrey,
+    position: "absolute",
+    top: "50%",
+    left: 0,
+    width: "100%",
+    height: 1.2,
+    borderRadius: 5,
+  },
+  orText: {
+    paddingHorizontal: 20,
+    fontSize: 15,
+    color: "#ABB4BD",
+    backgroundColor: "#fff",
   },
   registerText: {
-    fontSize: 14,
-    color: "#ABB4BD",
+    color: Colors.mediumGrey,
     textAlign: "center",
-    marginTop: 26,
+    marginBottom: 15,
   },
 });

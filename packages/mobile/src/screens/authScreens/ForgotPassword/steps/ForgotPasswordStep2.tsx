@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
 import {CodeInput} from "../../../../components/inputs";
 import {useEmailTimer} from "../../../../utils/useEmailTimer";
@@ -15,10 +14,11 @@ import {
 } from "../../../../generated/graphql";
 import Snackbar from "react-native-snackbar";
 import {useFormik} from "formik";
-import {InputText} from "../../../../components/InputText";
+import {OutlinedTextInput as InputText} from "../../../../components/inputs";
 import {ForgotPasswordForm2ValidationSchema} from "../../../../utils/validation";
 import {useNavigation} from "@react-navigation/native";
 import {Colors} from "../../../../styles";
+import {SubmitButton} from "../../../../components/buttons";
 
 interface ForgotPasswordStep2Props {
   email: string;
@@ -104,26 +104,26 @@ export const ForgotPasswordStep2: React.FC<ForgotPasswordStep2Props> = ({
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <View style={{flex: 1}}>
-        <Text style={styles.title}>Abbiamo quasi finito!</Text>
         <InputText
           label="Nuova password"
+          password
           onChangeText={formik.handleChange("password") as any}
           onBlur={formik.handleBlur("password") as any}
           value={formik.values.password}
           errorMessage={
             formik.touched.password ? formik.errors.password : undefined
           }
-          secureTextEntry
+          containerStyle={{marginBottom: 20}}
         />
         <InputText
           label="Conferma la password"
+          password
           onChangeText={formik.handleChange("password2") as any}
           onBlur={formik.handleBlur("password2") as any}
           value={formik.values.password2}
           errorMessage={
             formik.touched.password2 ? formik.errors.password2 : undefined
           }
-          secureTextEntry
         />
         <Text style={[styles.text, {marginTop: 20, marginBottom: 10}]}>
           Inserisci perfavore il codice che è stato inviato all'email{" "}
@@ -164,34 +164,19 @@ export const ForgotPasswordStep2: React.FC<ForgotPasswordStep2Props> = ({
         />
       </View>
       <View>
-        <TouchableOpacity
+        <SubmitButton
+          title="Cambia password"
+          containerStyle={{marginBottom: 30}}
           onPress={formik.handleSubmit as any}
-          style={[
-            styles.button,
-            styles.submitButton,
-            {opacity: !formik.isValid || formik.isSubmitting ? 0.6 : 1},
-          ]}
-          disabled={!formik.isValid || formik.isSubmitting}>
-          {formik.isSubmitting ? (
-            <ActivityIndicator color="#fff" size={24} />
-          ) : (
-            <Text style={[styles.text, styles.buttonText]}>
-              Cambia password
-            </Text>
-          )}
-        </TouchableOpacity>
+          isLoading={formik.isSubmitting}
+          disabled={!formik.isValid}
+        />
       </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 30,
-    color: "#404040",
-  },
   text: {
     color: "#404040",
     fontSize: 18,

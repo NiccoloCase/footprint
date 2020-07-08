@@ -53,45 +53,12 @@ export type AuthStackParamList = {
 };
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
-  <AuthStack.Navigator
-    initialRouteName="SignIn"
-    screenOptions={{
-      headerTitleAlign: "center",
-      headerTintColor: Colors.primary,
-      headerTitleStyle: {
-        fontWeight: "bold",
-        fontSize: 23,
-      },
-      headerStyle: {
-        elevation: 0,
-        shadowOpacity: 0,
-      },
-    }}>
-    <AuthStack.Screen
-      name="Welcome"
-      component={WelcomeScreen}
-      options={{title: "Accedi", headerShown: false}}
-    />
-    <AuthStack.Screen
-      name="SignIn"
-      component={SignInScreen}
-      options={{title: "Accedi"}}
-    />
-    <AuthStack.Screen
-      name="SignUp"
-      component={SignUpScreen}
-      options={{title: "Registrati"}}
-    />
-    <AuthStack.Screen
-      name="VerifyEmail"
-      component={VerifyEmail}
-      options={{title: "Verifica l'email"}}
-    />
-    <AuthStack.Screen
-      name="ForgotPassword"
-      component={ForgotPasswordScreen}
-      options={{title: "Password dimenticata"}}
-    />
+  <AuthStack.Navigator initialRouteName="Welcome" headerMode="none">
+    <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
+    <AuthStack.Screen name="SignIn" component={SignInScreen} />
+    <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+    <AuthStack.Screen name="VerifyEmail" component={VerifyEmail} />
+    <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
   </AuthStack.Navigator>
 );
 

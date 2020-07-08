@@ -15,7 +15,9 @@ import {EmailAndPasswordForm} from "./steps/EmailAndPasswordForm";
 import {UsernameAndPictureForm} from "./steps/UsernameAndPictureForm";
 import {useSubmitSignUp} from "./submit";
 import {SignupValidationSchema} from "../../../utils/validation";
-import {Colors} from "../../../styles";
+import {Colors, Spacing} from "../../../styles";
+import {AuthHeader} from "../../../components/Header/AuthHeader";
+import {ScrollView} from "react-native-gesture-handler";
 
 /** valori del form di registrazione */
 export interface SingUpFormValues {
@@ -189,7 +191,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       isSubmitting || !(isLastStep ? isValid : isCurrentStepValid);
 
     return (
-      <View style={styles.pagination}>
+      <View style={[styles.pagination]}>
         <View style={{flex: 1}}>
           {/** PULSANTE PER TORNARE INDIETRO */}
           <View
@@ -242,23 +244,30 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* SCHERMATE DEL FORM */}
-      <Swiper
-        loop={false}
-        scrollEnabled={false}
-        index={currentStep}
-        onIndexChanged={setCurrentStep}
-        renderPagination={renderPagination}>
-        {renderSteps(formik)}
-      </Swiper>
-      <Text style={[styles.text, styles.loginText]}>
-        Hai già un account?{" "}
-        <Text
-          style={[styles.text, styles.link]}
-          onPress={() => navigation.push("SignIn")}>
-          Accedi ora
+      <View style={styles.card}>
+        {/** HEADER */}
+        <AuthHeader
+          title="Crea un account,"
+          subtitle="Registrati per iniziare!"
+        />
+        {/* SCHERMATE DEL FORM */}
+        <Swiper
+          loop={false}
+          scrollEnabled={false}
+          index={currentStep}
+          onIndexChanged={setCurrentStep}
+          renderPagination={renderPagination}>
+          {renderSteps(formik)}
+        </Swiper>
+        <Text style={[styles.text, styles.loginText]}>
+          Hai già un account?{" "}
+          <Text
+            style={[styles.text, styles.link]}
+            onPress={() => navigation.push("SignIn")}>
+            Accedi ora
+          </Text>
         </Text>
-      </Text>
+      </View>
     </SafeAreaView>
   );
 };
@@ -266,12 +275,19 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: Spacing.screenHorizontalPadding,
     backgroundColor: "#fff",
-    paddingVertical: 35,
-    paddingHorizontal: 15,
+  },
+  card: {
+    flex: 1,
+    maxWidth: Spacing.maxScreenWidth,
+    alignSelf: "center",
+    width: "100%",
+    justifyContent: "space-between",
   },
   pagination: {
     flexDirection: "row",
+    height: 40,
   },
   navigationButton: {
     paddingVertical: 10,
@@ -288,7 +304,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
   },
   text: {
-    color: "#404040",
+    color: Colors.darkGrey,
   },
   link: {
     color: "#FF1654",
@@ -297,8 +313,8 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 14,
-    color: "#ABB4BD",
+    color: Colors.mediumGrey,
     textAlign: "center",
-    marginTop: 40,
+    marginVertical: 15,
   },
 });
