@@ -1,0 +1,18 @@
+type Friendship {
+  id: ID!
+  target: String!
+  user: String!
+}
+
+type Query {
+  # Restituisce i followers dell'utente passato
+  getFollowers(userId: ID!, pagination: PaginationOptions): [User!]!
+  # Restituisce le persone seguite dall'utente passato
+  getFollowing(userId: ID!, pagination: PaginationOptions): [User!]!
+}
+type Mutation {
+  # Segue un utente
+  followUser(target: ID!): ProcessResult!
+  # Smette di seguire un utente
+  unfollowUser(target: ID!): ProcessResult!
+}

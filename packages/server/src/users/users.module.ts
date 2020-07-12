@@ -13,6 +13,6 @@ import { EmailModule } from '../email/email.module';
     EmailModule,
   ],
   providers: [UsersResolver, UsersService],
-  exports: [UsersService],
+  exports: [UsersService, MongooseModule],
 })
 export class UsersModule {}

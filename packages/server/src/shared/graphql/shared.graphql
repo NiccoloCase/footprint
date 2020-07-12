@@ -1,0 +1,18 @@
+# Risultato per un generico processo
+type ProcessResult {
+  success: Boolean!
+}
+
+# Tipologia di posizioni
+enum LocationType {
+  Point
+}
+
+# Posizione
+type Location {
+  type: LocationType!
+  coordinates: [Float!]!
+}
+
+# Tipo data
+scalar Date

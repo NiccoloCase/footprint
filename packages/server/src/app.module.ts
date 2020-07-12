@@ -6,6 +6,9 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { TokenModule } from './token/token.module';
 import { EmailModule } from './email/email.module';
+import { FootprintsModule } from './footprints/footprints.module';
+import { SharedModule } from './shared/shared.module';
+import { FriendshipModule } from './friendship/friendship.module';
 import config from '@footprint/config';
 
 @Module({
@@ -15,6 +18,7 @@ import config from '@footprint/config';
       useNewUrlParser: true,
       useFindAndModify: false,
       useCreateIndex: true,
+      autoIndex: !config.IS_PRODUCTION,
       connectionFactory: connection => {
         connection.plugin(require('mongoose-unique-validator'));
         return connection;
@@ -35,6 +39,9 @@ import config from '@footprint/config';
     AuthModule,
     TokenModule,
     EmailModule,
+    FootprintsModule,
+    SharedModule,
+    FriendshipModule,
   ],
 })
 export class AppModule {}

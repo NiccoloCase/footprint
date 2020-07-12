@@ -1,3 +1,8 @@
+enum AuthType {
+  LOCAL
+  GOOGLE
+}
+
 type AuthPayload {
   accessToken: String!
   refreshToken: String!

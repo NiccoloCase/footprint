@@ -39,6 +39,7 @@
     "react-native-elements": "^2.0.2",
     "react-native-floating-label-text-input": "^0.1.5",
     "react-native-gesture-handler": "^1.6.1",
+    "react-native-image-crop-picker": "^0.32.2",
     "react-native-indicators": "^0.17.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-measure-text": "^1.0.0-alpha.2",
@@ -123,7 +124,9 @@
       "react-native-raw-bottom-sheet",
       "react-native-raw-bottom-sheet/**",
       "react-native-keyboard-aware-scroll-view",
-      "react-native-keyboard-aware-scroll-view/**"
+      "react-native-keyboard-aware-scroll-view/**",
+      "react-native-image-crop-picker",
+      "react-native-image-crop-picker/**"
     ]
   }
 }

@@ -14,6 +14,8 @@ export interface IUser {
   googleID?: string;
   profileImage?: string;
   created_at?: string;
+  followersCount: number;
+  followingCount: number;
 
   /** Compara la password dell'utente con la password passata */
   comparePassword: (password: string) => Promise<boolean>;
@@ -44,10 +46,7 @@ export const UserSchema = new Schema({
   },
   // Versione dei token di aggiornamento
   // Cambia ogni volta che i token sono revocati
-  refreshTokenVersion: {
-    type: Number,
-    default: 0,
-  },
+  refreshTokenVersion: { type: Number, default: 0 },
   // Password dell'account (se locale)
   localPassword: {
     type: String,
@@ -67,15 +66,13 @@ export const UserSchema = new Schema({
   // ID Google (richiesto solo se l'utente ha eseguito l'acesso con google)
   googleID: { type: String },
   // URL dell'immagine del profilo
-  profileImage: {
-    type: String,
-    required: false,
-  },
+  profileImage: { type: String, required: false },
   // Data di apertura del profilo
-  created_at: {
-    type: Date,
-    default: Date.now,
-  },
+  created_at: { type: Date, default: Date.now },
+  // Numero di followers
+  followersCount: { type: Number, default: 0 },
+  // Numero di utenti seguiti
+  followingCount: { type: Number, default: 0 },
 });
 
 // Index

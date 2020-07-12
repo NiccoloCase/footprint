@@ -1,13 +1,11 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, {useState, useEffect, useContext, useRef} from "react";
 import {NavigationContainer} from "@react-navigation/native";
 import {
   createStackNavigator,
   StackNavigationOptions,
 } from "@react-navigation/stack";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import {createDrawerNavigator} from "@react-navigation/drawer";
 import {MainHeader} from "../components/Header";
-import {DrawerContent} from "../components/DrawerContent";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
 import {useStoreActions, useStoreState} from "../store";
@@ -87,6 +85,7 @@ const AddFootprintStackScreen = () => (
     <AddFootprintStack.Screen
       name="AddFootprint"
       component={AddFootprintScreen}
+      options={{title: "Aggiungi un footprint"}}
     />
   </AddFootprintStack.Navigator>
 );
@@ -144,9 +143,10 @@ export type BottomTabParamList = {
   Profile: undefined;
 };
 const Tabs = createBottomTabNavigator<BottomTabParamList>();
+
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="Search"
+    initialRouteName="AddFootprint"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,
@@ -194,12 +194,14 @@ const TabsScreen = () => (
   </Tabs.Navigator>
 );
 
+/*
 // DRAWER
 export type DrawerParamList = {
   Home: undefined;
   Profile: undefined;
   Settings: undefined;
 };
+
 const Drawer = createDrawerNavigator<DrawerParamList>();
 const DrawerScreen = () => (
   <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} />}>
@@ -211,6 +213,24 @@ const DrawerScreen = () => (
       options={{title: "Impostazioni"}}
     />
   </Drawer.Navigator>
+); */
+
+// APP
+export type AppStackParamList = {
+  Home: undefined;
+  Settings: undefined;
+};
+
+const AppStack = createStackNavigator();
+const AppStackScreen = () => (
+  <AppStack.Navigator headerMode="none">
+    <AppStack.Screen name="Home" component={TabsScreen} />
+    <AppStack.Screen
+      name="Settings"
+      component={SettingsStackScreen}
+      options={{title: "Impostazioni"}}
+    />
+  </AppStack.Navigator>
 );
 
 // ROOT STACK
@@ -226,7 +246,7 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
     headerMode="none"
     screenOptions={{animationEnabled: false}}>
     {isAutheticated ? (
-      <RootStack.Screen name="App" component={DrawerScreen} />
+      <RootStack.Screen name="App" component={AppStackScreen} />
     ) : (
       <RootStack.Screen name="Auth" component={AuthStackScreen} />
     )}

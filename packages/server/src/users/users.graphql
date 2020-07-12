@@ -1,12 +1,9 @@
-enum AuthType {
-  LOCAL
-  GOOGLE
-}
-
 type User {
   id: ID!
   profileImage: String!
   username: String!
+  followersCount: Int!
+  followingCount: Int!
   # informazioni private:
   email: String
   authType: AuthType

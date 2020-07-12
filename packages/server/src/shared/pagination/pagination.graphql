@@ -1,0 +1,5 @@
+# Opzioni per l'impaginazione
+input PaginationOptions {
+  offset: Int
+  limit: Int
+}

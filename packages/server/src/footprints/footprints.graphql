@@ -1,0 +1,32 @@
+type Footprint {
+  id: ID!
+  authorId: ID!
+  author: User!
+  title: String!
+  body: String
+  media: String
+  location: Location!
+  created_at: Date!
+}
+
+type Query {
+  # Restituisce il footprint associato all'id passato
+  getFootprintById(id: ID!): Footprint!
+
+  getNearFootprints(
+    lng: Float!
+    lat: Float!
+    minDistance: Float
+    maxDistance: Float
+  ): [Footprint!]!
+}
+
+type Mutation {
+  # Crea un nuovo footprint
+  addFootprint(
+    title: String!
+    coordinates: [Float!]!
+    body: String
+    media: String
+  ): Footprint!
+}
