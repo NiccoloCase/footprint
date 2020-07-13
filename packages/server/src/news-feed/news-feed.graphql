@@ -1,0 +1,17 @@
+type NewsFeedItem {
+  id: ID!
+  ownerId: ID!
+  footprint: Footprint!
+  createdAt: Date!
+  isSeen: Boolean!
+}
+
+type Query {
+  # Restituise il feed dell'utente loggato
+  getNewsFeed(pagination: PaginationOptions): [NewsFeedItem!]!
+}
+
+type Mutation {
+  # Segna come visualizzato un elemento del feed dell'utente registarto
+  markFeedItemAsSeen(id: ID!): ProcessResult!
+}

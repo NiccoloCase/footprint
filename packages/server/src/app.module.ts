@@ -9,6 +9,7 @@ import { EmailModule } from './email/email.module';
 import { FootprintsModule } from './footprints/footprints.module';
 import { SharedModule } from './shared/shared.module';
 import { FriendshipModule } from './friendship/friendship.module';
+import { NewsFeedModule } from './news-feed/news-feed.module';
 import config from '@footprint/config';
 
 @Module({
@@ -42,6 +43,7 @@ import config from '@footprint/config';
     FootprintsModule,
     SharedModule,
     FriendshipModule,
+    NewsFeedModule,
   ],
 })
 export class AppModule {}

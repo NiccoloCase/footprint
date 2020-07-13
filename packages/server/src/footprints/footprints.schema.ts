@@ -45,4 +45,5 @@ export const FootprintSchema = new Schema({
   },
 });
 
+FootprintSchema.index({ authorId: 1 });
 FootprintSchema.index({ location: '2dsphere' });

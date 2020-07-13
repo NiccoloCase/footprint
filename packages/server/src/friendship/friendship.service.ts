@@ -3,13 +3,16 @@ import {
   BadRequestException,
   UnauthorizedException,
   InternalServerErrorException,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IFriendshipModel } from './friendship.schema';
 import { IUserModel, IUser } from '../users/users.schema';
-import { PaginationOptions } from '../graphql';
+import { PaginationOptions, Friendship } from '../graphql';
 import { normalizePaginationOptions } from '../shared/pagination';
+import { NewsFeedService } from '../news-feed/news-feed.service';
 
 @Injectable()
 export class FriendshipService {
@@ -18,6 +21,8 @@ export class FriendshipService {
     private readonly friendshipModel: Model<IFriendshipModel>,
     @InjectModel('User')
     private readonly userModel: Model<IUserModel>,
+    @Inject(forwardRef(() => NewsFeedService))
+    private readonly newsFeedService: NewsFeedService,
   ) {}
 
   /**
@@ -40,6 +45,15 @@ export class FriendshipService {
 
     const followers: IUser[] = docs.map(doc => doc.target) as any;
     return followers;
+  }
+
+  /**
+   * Restituisce gli id di tutti followers di un utente
+   * @param userId
+   */
+  async getAllFollowersId(userId: string): Promise<Friendship[]> {
+    const docs = await this.friendshipModel.find({ target: userId });
+    return docs;
   }
 
   /**
@@ -81,6 +95,10 @@ export class FriendshipService {
       throw new BadRequestException(err);
     }
 
+    // Controlla che il client non stia cercando di segure se stesso
+    if (targetUserId === userId)
+      throw new BadRequestException('You are not allowed follow yourself');
+
     // Controlla se l'utente target esiste e in caso
     // affermativo aggiorna il suo numero di followers
     const target = await this.userModel.findOneAndUpdate(
@@ -100,10 +118,12 @@ export class FriendshipService {
     // Genera il documento della nuova amicizia
     try {
       friendship = await this.friendshipModel.create(payload);
-      return;
     } catch (err) {
       throw new InternalServerErrorException();
     }
+
+    // Aggiunge al feed dell'utente le attività più recenti dell'utente appena seguto (target)
+    this.newsFeedService.mergeUsersContentsIntoFeed(userId, targetUserId);
   }
 
   /**
@@ -121,6 +141,10 @@ export class FriendshipService {
     } catch (err) {
       throw new BadRequestException(err);
     }
+
+    // Controlla che il client non stia cercando di smettere di seguire se stesso
+    if (targetUserId === userId)
+      throw new BadRequestException('You are not allowed unfollow yourself');
 
     // Controlla se l'utente target esiste e in caso
     // affermativo aggiorna il suo numero di followers
@@ -142,9 +166,11 @@ export class FriendshipService {
     try {
       const { ok } = await this.friendshipModel.deleteOne(query);
       if (!ok) throw new Error();
-      return;
     } catch (err) {
       throw new InternalServerErrorException();
     }
+
+    // Rimuove dal feed dell'utente le attività più recenti dell'utente "target"
+    this.newsFeedService.removeUsersContentsFromFeed(userId, targetUserId);
   }
 }
