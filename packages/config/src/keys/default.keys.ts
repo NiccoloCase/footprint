@@ -13,4 +13,9 @@ export const defaultKeys: RecursivePartial<IConfig> = {
     HOST: "in-v3.mailjet.com",
     PORT: 587,
   },
+  cloudinary: {
+    API_KEY: "791637865497942",
+    UPLOAD_PRESENT: "footprint",
+    CLOUD_NAME: "dgjcj7htv",
+  },
 };

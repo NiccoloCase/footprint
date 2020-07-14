@@ -35,11 +35,19 @@ export interface IConfig {
     /** Durata dei token di aggiornamento */
     REFRESH_TOKEN_EXPIRATION: number;
   };
+  /** Servizio per spedire email */
   emailService: {
     HOST: string;
     PORT: number;
     USER: string;
     PASSWORD: string;
     SENDER: string;
+  };
+  /** Storge di immagini e video */
+  cloudinary: {
+    API_KEY: string;
+    API_SECRET: string;
+    UPLOAD_PRESENT: string;
+    CLOUD_NAME: string;
   };
 }

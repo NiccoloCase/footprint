@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 import config from '@footprint/config';
 import { RefreshTokenDTO } from './auth.dto';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(
     private readonly authservice: AuthService,

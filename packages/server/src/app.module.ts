@@ -10,6 +10,7 @@ import { FootprintsModule } from './footprints/footprints.module';
 import { SharedModule } from './shared/shared.module';
 import { FriendshipModule } from './friendship/friendship.module';
 import { NewsFeedModule } from './news-feed/news-feed.module';
+import { UploaderModule } from './uploader/uploader.module';
 import config from '@footprint/config';
 
 @Module({
@@ -44,6 +45,7 @@ import config from '@footprint/config';
     SharedModule,
     FriendshipModule,
     NewsFeedModule,
+    UploaderModule,
   ],
 })
 export class AppModule {}

@@ -5,6 +5,7 @@ import config from '@footprint/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.use(cookieParser());
   await app.listen(config.server.PORT);
 }

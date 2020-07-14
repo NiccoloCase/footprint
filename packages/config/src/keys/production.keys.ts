@@ -27,4 +27,7 @@ export const productionKeys: RecursivePartial<IConfig> = {
     USER: process.env.EMAIL_USER!,
     PASSWORD: process.env.EMAIL_PASSWORD!,
   },
+  cloudinary: {
+    API_SECRET: process.env.CLOUDINARY_API_SECRET!,
+  },
 };

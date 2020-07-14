@@ -36,16 +36,18 @@ export const AddFootprintScreen: React.FC = () => {
   // MODAL per selezionare una foto
   const [isPickerModalOpen, setIsPickerModalOpen] = useState(false);
 
-  const handleSubmit = async () => {
-    /*     if (!selectedImage) return;
+  const uploadMedia = async () => {
+    const {media} = formik.values;
+
+    if (!media) return;
 
     try {
       // carica l'immagine
-      const {url} = await uploadImage(selectedImage);
+      const {url} = await uploadImage(media);
       console.log(url);
     } catch (err) {
       console.log(err);
-    } */
+    }
   };
 
   function onSubmit() {}
@@ -89,6 +91,8 @@ export const AddFootprintScreen: React.FC = () => {
         </TouchableOpacity>
         <Text style={styles.addButtonText}>Carica immagine</Text>
       </View>
+
+      <Button title="uploadMedia" onPress={uploadMedia} />
 
       <Button title="SUBMIT" onPress={formik.handleSubmit as any} />
     </SafeAreaView>
