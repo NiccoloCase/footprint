@@ -10,7 +10,14 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** Date custom scalar type */
+  Date: any;
 };
+
+export enum AuthType {
+  Local = 'LOCAL',
+  Google = 'GOOGLE'
+}
 
 export type AuthPayload = {
   __typename?: 'AuthPayload';
@@ -47,6 +54,10 @@ export type Mutation = {
   login: AuthPayload;
   loginWithGoogle: GoogleAuthResult;
   verfyUser: VerfyUserResponse;
+  addFootprint: Footprint;
+  followUser: ProcessResult;
+  unfollowUser: ProcessResult;
+  markFeedItemAsSeen: ProcessResult;
   sendConfirmationEmail: EmailResponse;
   forgotPassword: EmailResponse;
   changePasswordWithToken: ProcessResult;
@@ -76,6 +87,29 @@ export type MutationVerfyUserArgs = {
 };
 
 
+export type MutationAddFootprintArgs = {
+  title: Scalars['String'];
+  coordinates: Array<Scalars['Float']>;
+  body?: Maybe<Scalars['String']>;
+  media?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationFollowUserArgs = {
+  target: Scalars['ID'];
+};
+
+
+export type MutationUnfollowUserArgs = {
+  target: Scalars['ID'];
+};
+
+
+export type MutationMarkFeedItemAsSeenArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationSendConfirmationEmailArgs = {
   email: Scalars['String'];
 };
@@ -97,9 +131,111 @@ export type EmailResponse = {
   success: Scalars['Boolean'];
 };
 
+export type Footprint = {
+  __typename?: 'Footprint';
+  id: Scalars['ID'];
+  authorId: Scalars['ID'];
+  author: User;
+  title: Scalars['String'];
+  body?: Maybe<Scalars['String']>;
+  media?: Maybe<Scalars['String']>;
+  location: Location;
+  created_at: Scalars['Date'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  getFootprintById: Footprint;
+  getNearFootprints: Array<Footprint>;
+  getFollowers: Array<User>;
+  getFollowing: Array<User>;
+  getNewsFeed: Array<NewsFeedItem>;
+  whoami: User;
+  isEmailAlreadyUsed: Scalars['Boolean'];
+  isUsernameAlreadyUsed: Scalars['Boolean'];
+  getUserById: User;
+};
+
+
+export type QueryGetFootprintByIdArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryGetNearFootprintsArgs = {
+  lng: Scalars['Float'];
+  lat: Scalars['Float'];
+  minDistance?: Maybe<Scalars['Float']>;
+  maxDistance?: Maybe<Scalars['Float']>;
+};
+
+
+export type QueryGetFollowersArgs = {
+  userId: Scalars['ID'];
+  pagination?: Maybe<PaginationOptions>;
+};
+
+
+export type QueryGetFollowingArgs = {
+  userId: Scalars['ID'];
+  pagination?: Maybe<PaginationOptions>;
+};
+
+
+export type QueryGetNewsFeedArgs = {
+  pagination?: Maybe<PaginationOptions>;
+};
+
+
+export type QueryIsEmailAlreadyUsedArgs = {
+  email: Scalars['String'];
+};
+
+
+export type QueryIsUsernameAlreadyUsedArgs = {
+  username: Scalars['String'];
+};
+
+
+export type QueryGetUserByIdArgs = {
+  id: Scalars['String'];
+};
+
+export type Friendship = {
+  __typename?: 'Friendship';
+  id: Scalars['ID'];
+  target: Scalars['String'];
+  user: Scalars['String'];
+};
+
+export type NewsFeedItem = {
+  __typename?: 'NewsFeedItem';
+  id: Scalars['ID'];
+  ownerId: Scalars['ID'];
+  footprint: Footprint;
+  createdAt: Scalars['Date'];
+  isSeen: Scalars['Boolean'];
+};
+
 export type ProcessResult = {
   __typename?: 'ProcessResult';
   success: Scalars['Boolean'];
+};
+
+export enum LocationType {
+  Point = 'Point'
+}
+
+export type Location = {
+  __typename?: 'Location';
+  type: LocationType;
+  coordinates: Array<Scalars['Float']>;
+};
+
+
+export type PaginationOptions = {
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
 };
 
 export enum TokenScope {
@@ -120,42 +256,16 @@ export type TokenGenerationResult = {
   tokenDigits: Scalars['Int'];
 };
 
-export enum AuthType {
-  Local = 'LOCAL',
-  Google = 'GOOGLE'
-}
-
 export type User = {
   __typename?: 'User';
   id: Scalars['ID'];
   profileImage: Scalars['String'];
   username: Scalars['String'];
+  followersCount: Scalars['Int'];
+  followingCount: Scalars['Int'];
   email?: Maybe<Scalars['String']>;
   authType?: Maybe<AuthType>;
   googleID?: Maybe<Scalars['String']>;
-};
-
-export type Query = {
-  __typename?: 'Query';
-  whoami: User;
-  isEmailAlreadyUsed: Scalars['Boolean'];
-  isUsernameAlreadyUsed: Scalars['Boolean'];
-  getUserById: User;
-};
-
-
-export type QueryIsEmailAlreadyUsedArgs = {
-  email: Scalars['String'];
-};
-
-
-export type QueryIsUsernameAlreadyUsedArgs = {
-  username: Scalars['String'];
-};
-
-
-export type QueryGetUserByIdArgs = {
-  id: Scalars['String'];
 };
 
 export type RegisterMutationVariables = Exact<{
@@ -222,6 +332,43 @@ export type LoginWithGoogleMutation = (
       { __typename?: 'AuthPayload' }
       & Pick<AuthPayload, 'accessToken' | 'refreshToken' | 'expiresIn'>
     )> }
+  ) }
+);
+
+export type GetNewsFeedQueryVariables = Exact<{
+  pagination?: Maybe<PaginationOptions>;
+}>;
+
+
+export type GetNewsFeedQuery = (
+  { __typename?: 'Query' }
+  & { getNewsFeed: Array<(
+    { __typename?: 'NewsFeedItem' }
+    & Pick<NewsFeedItem, 'id' | 'isSeen'>
+    & { footprint: (
+      { __typename?: 'Footprint' }
+      & Pick<Footprint, 'id' | 'title' | 'media'>
+      & { location: (
+        { __typename?: 'Location' }
+        & Pick<Location, 'coordinates'>
+      ), author: (
+        { __typename?: 'User' }
+        & Pick<User, 'username'>
+      ) }
+    ) }
+  )> }
+);
+
+export type MarkFeedItemAsSeenMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type MarkFeedItemAsSeenMutation = (
+  { __typename?: 'Mutation' }
+  & { markFeedItemAsSeen: (
+    { __typename?: 'ProcessResult' }
+    & Pick<ProcessResult, 'success'>
   ) }
 );
 
@@ -467,6 +614,83 @@ export function useLoginWithGoogleMutation(baseOptions?: ApolloReactHooks.Mutati
 export type LoginWithGoogleMutationHookResult = ReturnType<typeof useLoginWithGoogleMutation>;
 export type LoginWithGoogleMutationResult = ApolloReactCommon.MutationResult<LoginWithGoogleMutation>;
 export type LoginWithGoogleMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginWithGoogleMutation, LoginWithGoogleMutationVariables>;
+export const GetNewsFeedDocument = gql`
+    query GetNewsFeed($pagination: PaginationOptions) {
+  getNewsFeed(pagination: $pagination) {
+    id
+    isSeen
+    footprint {
+      id
+      title
+      media
+      location {
+        coordinates
+      }
+      author {
+        username
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetNewsFeedQuery__
+ *
+ * To run a query within a React component, call `useGetNewsFeedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetNewsFeedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetNewsFeedQuery({
+ *   variables: {
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useGetNewsFeedQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetNewsFeedQuery, GetNewsFeedQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetNewsFeedQuery, GetNewsFeedQueryVariables>(GetNewsFeedDocument, baseOptions);
+      }
+export function useGetNewsFeedLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetNewsFeedQuery, GetNewsFeedQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetNewsFeedQuery, GetNewsFeedQueryVariables>(GetNewsFeedDocument, baseOptions);
+        }
+export type GetNewsFeedQueryHookResult = ReturnType<typeof useGetNewsFeedQuery>;
+export type GetNewsFeedLazyQueryHookResult = ReturnType<typeof useGetNewsFeedLazyQuery>;
+export type GetNewsFeedQueryResult = ApolloReactCommon.QueryResult<GetNewsFeedQuery, GetNewsFeedQueryVariables>;
+export const MarkFeedItemAsSeenDocument = gql`
+    mutation MarkFeedItemAsSeen($id: ID!) {
+  markFeedItemAsSeen(id: $id) {
+    success
+  }
+}
+    `;
+export type MarkFeedItemAsSeenMutationFn = ApolloReactCommon.MutationFunction<MarkFeedItemAsSeenMutation, MarkFeedItemAsSeenMutationVariables>;
+
+/**
+ * __useMarkFeedItemAsSeenMutation__
+ *
+ * To run a mutation, you first call `useMarkFeedItemAsSeenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkFeedItemAsSeenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markFeedItemAsSeenMutation, { data, loading, error }] = useMarkFeedItemAsSeenMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useMarkFeedItemAsSeenMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<MarkFeedItemAsSeenMutation, MarkFeedItemAsSeenMutationVariables>) {
+        return ApolloReactHooks.useMutation<MarkFeedItemAsSeenMutation, MarkFeedItemAsSeenMutationVariables>(MarkFeedItemAsSeenDocument, baseOptions);
+      }
+export type MarkFeedItemAsSeenMutationHookResult = ReturnType<typeof useMarkFeedItemAsSeenMutation>;
+export type MarkFeedItemAsSeenMutationResult = ApolloReactCommon.MutationResult<MarkFeedItemAsSeenMutation>;
+export type MarkFeedItemAsSeenMutationOptions = ApolloReactCommon.BaseMutationOptions<MarkFeedItemAsSeenMutation, MarkFeedItemAsSeenMutationVariables>;
 export const MeDocument = gql`
     query Me {
   whoami {

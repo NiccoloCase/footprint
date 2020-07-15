@@ -26,6 +26,7 @@ import {AddFootprintScreen} from "../screens/AddFootprintScreen";
 import {SearchScreen} from "../screens/SearchScreen";
 import {ProfileScreen} from "../screens/ProfileScreen";
 import {SettingsScreen} from "../screens/SettingsScreen";
+import {FootprintScreen} from "../screens/FootprintScreen";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center"},
@@ -63,6 +64,11 @@ const AuthStackScreen = () => (
 // HOME STACK
 export type HomeStackParamList = {
   Home: undefined;
+  Footprint: {
+    id: string;
+    title: string;
+    authorUsername: string;
+  };
 };
 const HomeStack = createStackNavigator<HomeStackParamList>();
 const HomeStackScreen = () => (
@@ -70,8 +76,9 @@ const HomeStackScreen = () => (
     <HomeStack.Screen
       name="Home"
       component={HomeScreen}
-      options={{headerTitle: () => <MainHeader />}}
+      options={{header: () => <MainHeader />}}
     />
+    <HomeStack.Screen name="Footprint" component={FootprintScreen} />
   </HomeStack.Navigator>
 );
 
@@ -146,7 +153,7 @@ const Tabs = createBottomTabNavigator<BottomTabParamList>();
 
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="AddFootprint"
+    //  initialRouteName="AddFootprint"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,
