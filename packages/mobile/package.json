@@ -14,6 +14,7 @@
     "@apollo/react-hooks": "^3.1.5",
     "@footprint/common": "1.0.0",
     "@footprint/config": "1.0.0",
+    "@react-native-community/blur": "^3.6.0",
     "@react-native-community/google-signin": "^4.0.3",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-mapbox-gl/maps": "^8.1.0-rc.1",
@@ -42,10 +43,11 @@
     "react-native-image-crop-picker": "^0.32.2",
     "react-native-indicators": "^0.17.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
-    "react-native-measure-text": "^1.0.0-alpha.2",
     "react-native-paper": "^3.10.1",
     "react-native-pose": "^0.9.1",
     "react-native-raw-bottom-sheet": "^2.2.0",
+    "react-native-reanimated": "^1.9.0",
+    "react-native-redash": "^14.2.2",
     "react-native-safe-area-context": "^3.0.5",
     "react-native-screens": "^2.9.0",
     "react-native-secure-key-store": "^2.0.7",
@@ -125,7 +127,9 @@
       "react-native-keyboard-aware-scroll-view",
       "react-native-keyboard-aware-scroll-view/**",
       "react-native-image-crop-picker",
-      "react-native-image-crop-picker/**"
+      "react-native-image-crop-picker/**",
+      "react-native-reanimated",
+      "react-native-reanimated/**"
     ]
   }
 }

@@ -1,7 +1,22 @@
 query Me {
   whoami {
-    username
+    id
     email
+    username
+    #profileImage
+    followersCount
+    followingCount
+    email
+  }
+}
+
+query getUserById($id: ID!) {
+  getUserById(id: $id) {
+    id
+    username
+    #profileImage
+    followersCount
+    followingCount
   }
 }
 

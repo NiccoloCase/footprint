@@ -15,7 +15,7 @@ export class FootprintsService {
     private readonly newsFeedService: NewsFeedService,
   ) {}
 
-  async findFootprintById(id: string): Promise<IFootprint> {
+  async findFootprintById(id: string): Promise<IFootprint | null> {
     try {
       const footprint = await this.footprintModel.findById(id);
       return footprint;

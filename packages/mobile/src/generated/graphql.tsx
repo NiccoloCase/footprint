@@ -198,7 +198,7 @@ export type QueryIsUsernameAlreadyUsedArgs = {
 
 
 export type QueryGetUserByIdArgs = {
-  id: Scalars['String'];
+  id: Scalars['ID'];
 };
 
 export type Friendship = {
@@ -347,7 +347,7 @@ export type GetNewsFeedQuery = (
     & Pick<NewsFeedItem, 'id' | 'isSeen'>
     & { footprint: (
       { __typename?: 'Footprint' }
-      & Pick<Footprint, 'id' | 'title' | 'media'>
+      & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId'>
       & { location: (
         { __typename?: 'Location' }
         & Pick<Location, 'coordinates'>
@@ -379,7 +379,20 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { whoami: (
     { __typename?: 'User' }
-    & Pick<User, 'username' | 'email'>
+    & Pick<User, 'id' | 'email' | 'username' | 'followersCount' | 'followingCount'>
+  ) }
+);
+
+export type GetUserByIdQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetUserByIdQuery = (
+  { __typename?: 'Query' }
+  & { getUserById: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username' | 'followersCount' | 'followingCount'>
   ) }
 );
 
@@ -626,6 +639,7 @@ export const GetNewsFeedDocument = gql`
       location {
         coordinates
       }
+      authorId
       author {
         username
       }
@@ -694,7 +708,11 @@ export type MarkFeedItemAsSeenMutationOptions = ApolloReactCommon.BaseMutationOp
 export const MeDocument = gql`
     query Me {
   whoami {
+    id
+    email
     username
+    followersCount
+    followingCount
     email
   }
 }
@@ -724,6 +742,42 @@ export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptio
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
+export const GetUserByIdDocument = gql`
+    query getUserById($id: ID!) {
+  getUserById(id: $id) {
+    id
+    username
+    followersCount
+    followingCount
+  }
+}
+    `;
+
+/**
+ * __useGetUserByIdQuery__
+ *
+ * To run a query within a React component, call `useGetUserByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetUserByIdQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUserByIdQuery, GetUserByIdQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(GetUserByIdDocument, baseOptions);
+      }
+export function useGetUserByIdLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserByIdQuery, GetUserByIdQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(GetUserByIdDocument, baseOptions);
+        }
+export type GetUserByIdQueryHookResult = ReturnType<typeof useGetUserByIdQuery>;
+export type GetUserByIdLazyQueryHookResult = ReturnType<typeof useGetUserByIdLazyQuery>;
+export type GetUserByIdQueryResult = ApolloReactCommon.QueryResult<GetUserByIdQuery, GetUserByIdQueryVariables>;
 export const IsEmailAlreadyUsedDocument = gql`
     query IsEmailAlreadyUsed($email: String!) {
   isEmailAlreadyUsed(email: $email)

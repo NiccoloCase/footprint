@@ -117,6 +117,7 @@ export const HomeScreen: React.FC = () => {
       <FootprintCard
         feedId={item.id}
         footprintId={item.footprint.id}
+        authorId={item.footprint.authorId}
         title={item.footprint.title}
         username={item.footprint.author.username || "nicco"}
         image={
@@ -145,6 +146,7 @@ export const HomeScreen: React.FC = () => {
           itemWidth={FEED_CARD_WIDTH}
           inactiveSlideScale={0.93}
           onSnapToItem={onSnapToItem}
+          layout="tinder"
         />
       );
     else if (loading)

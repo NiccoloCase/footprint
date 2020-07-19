@@ -1,6 +1,6 @@
-import React from 'react';
-import {View, Text, Image} from 'react-native';
-import Mapbox from '@react-native-mapbox-gl/maps';
+import React from "react";
+import {View, Text, Image, StyleProp, ViewStyle} from "react-native";
+import Mapbox from "@react-native-mapbox-gl/maps";
 
 const coordinates = [
   [-73.98330688476561, 40.76975180901395],
@@ -18,24 +18,30 @@ const coordinates = [
   [-73.99155, 40.73681],
 ];
 
-export const MapView: React.FC = () => {
+interface MapViewProps {
+  containerStyle?: StyleProp<ViewStyle>;
+}
+
+export const MapView: React.FC<MapViewProps> = ({containerStyle}) => {
   const renderMarks = () =>
     coordinates.map((coordinate, index) => (
       <Mapbox.PointAnnotation
         key={index}
-        id={index + ''}
+        id={index + ""}
         // onSelected={() => Alert.alert('iojo')}
         coordinate={coordinate}>
         <Image
-          style={{flex: 1, width: 30, height: 40, backgroundColor: 'black'}}
-          source={require('../../assets/images/marker.png')}
+          style={{flex: 1, width: 30, height: 40, backgroundColor: "black"}}
+          source={require("../../assets/images/marker.png")}
         />
       </Mapbox.PointAnnotation>
     ));
 
+  return null;
+
   return (
     <Mapbox.MapView
-      style={{flex: 1}}
+      style={[{flex: 1}, containerStyle]}
       styleURL={Mapbox.StyleURL.Light}
       compassEnabled={false}>
       <Mapbox.Camera zoomLevel={16} centerCoordinate={coordinates[0]} />

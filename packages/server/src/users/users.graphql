@@ -18,7 +18,7 @@ type Query {
   # Controlla se un username è già utilizzata
   isUsernameAlreadyUsed(username: String!): Boolean!
   # Restituisce il profilo di un utente dao il suo ID
-  getUserById(id: String!): User!
+  getUserById(id: ID!): User!
 }
 
 type Mutation {

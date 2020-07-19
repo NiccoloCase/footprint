@@ -13,6 +13,7 @@ import { CurrentUser } from '../users/user.decorator';
 import { IUser } from '../users/users.schema';
 import { Footprint } from '../graphql';
 import { UsersService } from '../users/users.service';
+import { NotFoundException } from '@nestjs/common';
 
 @Resolver('Footprint')
 export class FootprintsResolver {
@@ -23,8 +24,10 @@ export class FootprintsResolver {
 
   // RESTITUISCE IL FOOTPRINT ASSOCIATOA UN DETERMINATO ID
   @Query()
-  getFootprintById(@Args('id') id: string) {
-    return this.footprintsService.findFootprintById(id);
+  async getFootprintById(@Args('id') id: string) {
+    const footprint = await this.footprintsService.findFootprintById(id);
+    if (!footprint) throw new NotFoundException('Footprint does not exist');
+    return footprint;
   }
 
   // RESTITUISCE IL FOOTPRINT ASSOCIATOA UN DETERMINATO ID

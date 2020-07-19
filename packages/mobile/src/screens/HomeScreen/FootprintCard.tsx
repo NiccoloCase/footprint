@@ -13,6 +13,10 @@ import EntypoIcon from "react-native-vector-icons/Entypo";
 import {LikeButton} from "../../components/buttons";
 import {useNavigation, NavigationProp} from "@react-navigation/native";
 import {HomeStackParamList} from "../../navigation";
+import {
+  navigateToUserProfile,
+  useNavigateToUserProfile,
+} from "../../navigation/navigateToUserProfile";
 
 interface FootprintCardProps {
   feedId: string;
@@ -20,6 +24,7 @@ interface FootprintCardProps {
   title: string;
   image: string;
   username: string;
+  authorId: string;
   profilePicture: string;
   likesCount?: number;
 }
@@ -30,12 +35,14 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
   title,
   image,
   profilePicture,
+  authorId,
   username,
   likesCount,
 }) => {
   const navigation = useNavigation<
     NavigationProp<HomeStackParamList, "Home">
   >();
+  const navigateToProfile = useNavigateToUserProfile();
 
   const goToFootprint = () => {
     navigation.navigate("Footprint", {
@@ -54,8 +61,7 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
         <View style={styles.overlay} />
         <View style={styles.header}>
           {/** USERNAME */}
-          <TouchableNativeFeedback
-            onPress={() => navigation.navigate("Profile" as any)}>
+          <TouchableNativeFeedback onPress={() => navigateToProfile(authorId)}>
             <View style={styles.inline}>
               <Image
                 style={styles.profilePicture}

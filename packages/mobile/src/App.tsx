@@ -1,5 +1,5 @@
 import React from "react";
-import {View} from "react-native";
+import {View, StatusBar} from "react-native";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import {GoogleSignin} from "@react-native-community/google-signin";
 import {StoreProvider} from "easy-peasy";
@@ -19,6 +19,7 @@ const App = () => {
     <View style={{flex: 1}}>
       <StoreProvider store={store}>
         <ApolloProvider>
+          <StatusBar backgroundColor="#fff" barStyle="dark-content" />
           <Navigation />
         </ApolloProvider>
       </StoreProvider>

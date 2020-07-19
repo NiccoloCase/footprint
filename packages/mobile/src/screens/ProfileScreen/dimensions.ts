@@ -1,0 +1,4 @@
+export const MIN_HEADER_HEIGHT = 60;
+export const MAX_HEADER_HEIGHT = 460;
+export const HEADER_DELTA = MAX_HEADER_HEIGHT - MIN_HEADER_HEIGHT;
+export const PROIFLE_IMAGE_MAX_RADIUS = 85;
