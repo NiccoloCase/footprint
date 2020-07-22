@@ -10,6 +10,7 @@ import FeatherIcon from "react-native-vector-icons/Feather";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
 import {useStoreActions, useStoreState} from "../store";
 import {Colors} from "../styles";
+import {client} from "../graphql";
 
 // COMPONENTI
 import {TabBar} from "../components/TabBar";
@@ -23,10 +24,11 @@ import {VerifyEmail} from "../screens/authScreens/VerifyEmail";
 import {ForgotPasswordScreen} from "../screens/authScreens/ForgotPassword";
 import {HomeScreen} from "../screens/HomeScreen";
 import {AddFootprintScreen} from "../screens/AddFootprintScreen";
-import {SearchScreen} from "../screens/SearchScreen";
+import {ExploreScreen} from "../screens/ExploreScreen";
 import {ProfileScreen} from "../screens/ProfileScreen";
 import {SettingsScreen} from "../screens/SettingsScreen";
 import {FootprintScreen} from "../screens/FootprintScreen";
+import {useGetNewsFeedLazyQuery} from "../generated/graphql";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center"},
@@ -105,17 +107,17 @@ const AddFootprintStackScreen = () => (
 
 // SERACH STACK
 export type SearchStackParamList = {
-  Search: undefined;
+  Explore: undefined;
 };
-const SearchStack = createStackNavigator<SearchStackParamList>();
-const SearchStackScreen = () => (
-  <SearchStack.Navigator screenOptions={defaultScreenOptions}>
-    <SearchStack.Screen
-      name="Search"
-      component={SearchScreen}
-      options={{title: "Cerca"}}
+const ExploreStack = createStackNavigator<SearchStackParamList>();
+const ExploreStackScreen = () => (
+  <ExploreStack.Navigator screenOptions={defaultScreenOptions}>
+    <ExploreStack.Screen
+      name="Explore"
+      component={ExploreScreen}
+      options={{headerShown: false}}
     />
-  </SearchStack.Navigator>
+  </ExploreStack.Navigator>
 );
 
 // PROFILE STACK
@@ -152,14 +154,14 @@ const SettingsStackScreen = () => (
 export type BottomTabParamList = {
   Home: undefined;
   AddFootprint: undefined;
-  Search: undefined;
+  Explore: undefined;
   Profile: undefined;
 };
 const Tabs = createBottomTabNavigator<BottomTabParamList>();
 
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="Profile"
+    initialRouteName="Explore"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,
@@ -175,6 +177,16 @@ const TabsScreen = () => (
       }}
     />
     <Tabs.Screen
+      name="Explore"
+      component={ExploreStackScreen}
+      options={{
+        title: "Esplora",
+        tabBarIcon: ({color, size}) => (
+          <FeatherIcon name="compass" size={size} color={color} />
+        ),
+      }}
+    />
+    <Tabs.Screen
       name="AddFootprint"
       component={AddFootprintStackScreen}
       options={{
@@ -184,16 +196,7 @@ const TabsScreen = () => (
         ),
       }}
     />
-    <Tabs.Screen
-      name="Search"
-      component={SearchStackScreen}
-      options={{
-        title: "Cerca",
-        tabBarIcon: ({color, size}) => (
-          <FeatherIcon name="search" size={size} color={color} />
-        ),
-      }}
-    />
+
     <Tabs.Screen
       name="Profile"
       component={ProfileStackScreen}
@@ -247,9 +250,14 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
 
 export const Navigation = () => {
   const [isLoading, setIsLoading] = useState(true);
-
   const isAuth = useStoreState((state) => state.auth.isAuthenticated);
   const singin = useStoreActions((actions) => actions.auth.singin);
+
+  // funzione per richiede il feed per salvarlo nella cache
+  const [loadFeed] = useGetNewsFeedLazyQuery({
+    variables: {pagination: {limit: 10}},
+  });
+  // TODO
 
   // richieda al server un nuovo token di accesso
   useEffect(() => {
@@ -258,9 +266,12 @@ export const Navigation = () => {
         const res = await fetchAccessToken();
         const data = await res.json();
         if (data && data.success && data.tokens) {
-          // imposta il nuovo token di accesso e quello di aggiornamento
+          // Imposta il nuovo token di accesso e quello di aggiornamento
           const {accessToken, refreshToken} = data.tokens;
           singin({accessToken, refreshToken});
+
+          // Richiede il feed per salvarlo nella cache
+          loadFeed();
         }
       } finally {
         setIsLoading(false);

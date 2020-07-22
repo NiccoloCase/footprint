@@ -132,6 +132,7 @@ export interface User {
     username: string;
     followersCount: number;
     followingCount: number;
+    isFollowed?: boolean;
     email?: string;
     authType?: AuthType;
     googleID?: string;

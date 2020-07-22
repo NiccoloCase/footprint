@@ -10,7 +10,12 @@ import {
 import {Colors} from "../../styles";
 import {TouchableHighlight} from "react-native-gesture-handler";
 import {abbreviateNumber} from "../../utils/abbreviateNumber";
-import {User} from "../../generated/graphql";
+import {
+  User,
+  useFollowUserMutation,
+  useUnfollowUserMutation,
+} from "../../generated/graphql";
+import Snackbar from "react-native-snackbar";
 
 const {interpolate, Extrapolate} = Animated;
 
@@ -18,11 +23,14 @@ interface CoverProps {
   y: Animated.Value<number>;
   opacity: Animated.Node<number>;
   user: User;
+  personal: boolean;
 }
 
-export const Cover: React.FC<CoverProps> = ({y, opacity, user}) => {
-  const [isFollowed, setIsFollowed] = useState(false);
-  const [followers, setFollowers] = useState(20);
+export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
+  const [isFollowed, setIsFollowed] = useState(user.isFollowed || false);
+  const [followers, setFollowers] = useState(user.followersCount);
+  const [followUser] = useFollowUserMutation();
+  const [unfollowUser] = useUnfollowUserMutation();
 
   const scale = interpolate(y, {
     inputRange: [-MAX_HEADER_HEIGHT, 0],
@@ -30,13 +38,33 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user}) => {
     extrapolateRight: Extrapolate.CLAMP,
   });
 
-  const handleFollowButton = () => {
-    // aggiorna lo stato
-    setFollowers(followers + (isFollowed ? -1 : 1));
-    setIsFollowed(!isFollowed);
+  /**
+   * Segue / smette di seguire l'utente
+   */
+  const handleFollowButton = async () => {
+    const target = user.id;
+    if (!target) return;
+
+    try {
+      const {data} = (await (isFollowed ? unfollowUser : followUser)({
+        variables: {target},
+      })) as any;
+      const res = data.followUser || data.unfollowUser || {};
+      if (!res.success) throw new Error();
+      // Aggiorna lo stato
+      setFollowers(followers + (isFollowed ? -1 : 1));
+      setIsFollowed(!isFollowed);
+    } catch (err) {
+      Snackbar.show({
+        text:
+          "Non è stato possibile poratare a termine l'operazione. Riprova più tardi",
+        duration: Snackbar.LENGTH_LONG,
+        backgroundColor: Colors.primary,
+      });
+    }
   };
 
-  const {profileImage, username, followersCount, followingCount} = user;
+  const {profileImage, username, followingCount} = user;
 
   return (
     <Animated.View style={[styles.container, {transform: [{scale}]}]}>
@@ -66,19 +94,20 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user}) => {
         <Animated.Text style={[styles.username]}>{username}</Animated.Text>
       </View>
       {/** BOTTONE SEGUI - NON SEGUIRE  */}
-      <TouchableHighlight
-        style={styles.button}
-        onPress={handleFollowButton}
-        underlayColor="rgba(255, 89, 110, .8)">
-        <Text style={styles.buttonText}>
-          {isFollowed ? "Non seguire" : "Segui"}
-        </Text>
-      </TouchableHighlight>
-
+      {!personal && (
+        <TouchableHighlight
+          style={styles.button}
+          onPress={handleFollowButton}
+          underlayColor="rgba(255, 89, 110, .8)">
+          <Text style={styles.buttonText}>
+            {isFollowed ? "Non seguire" : "Segui"}
+          </Text>
+        </TouchableHighlight>
+      )}
       <View style={styles.infoBox}>
         {/*FOLLOWERS*/}
         <View style={styles.counterBox}>
-          <Text style={styles.count}>{abbreviateNumber(followersCount)}</Text>
+          <Text style={styles.count}>{abbreviateNumber(followers)}</Text>
           <Text style={styles.countTitle}>Follower</Text>
         </View>
         <View style={[styles.divider, {borderRightWidth: 1}]} />

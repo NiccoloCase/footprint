@@ -3063,6 +3063,12 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
+"@types/node-geocoder@^3.24.1":
+  version "3.24.1"
+  resolved "https://registry.yarnpkg.com/@types/node-geocoder/-/node-geocoder-3.24.1.tgz#b6ec7e39453e0c3744736197b33350c4a568d587"
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*", "@types/node@>= 8":
   version "14.0.13"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.13.tgz#ee1128e881b874c371374c1f72201893616417c9"
@@ -3127,9 +3133,9 @@
     "@types/react" "*"
     "@types/react-native" "*"
 
-"@types/react-native-snap-carousel@^3.8.1":
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/@types/react-native-snap-carousel/-/react-native-snap-carousel-3.8.1.tgz#1fabbae6053c2c234f11cec6e5622086677b4da4"
+"@types/react-native-snap-carousel@^3.8.2":
+  version "3.8.2"
+  resolved "https://registry.yarnpkg.com/@types/react-native-snap-carousel/-/react-native-snap-carousel-3.8.2.tgz#31fb91530198183c658db0d23935ca79850419f5"
   dependencies:
     "@types/react" "*"
     "@types/react-native" "*"
@@ -7218,6 +7224,10 @@ he@1.2.0, he@^1.1.0, he@^1.2.0:
 hermes-engine@~0.4.0:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/hermes-engine/-/hermes-engine-0.4.1.tgz#2d02b295596298643c4d24b86687eb554db9e950"
+
+hex-to-rgba@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/hex-to-rgba/-/hex-to-rgba-2.0.1.tgz#4176977882a1cb32b83ce5ab1db6828ab84d5a13"
 
 hey-listen@^1.0.5:
   version "1.0.8"

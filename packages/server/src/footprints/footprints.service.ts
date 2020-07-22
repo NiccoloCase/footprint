@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { AddFootprintDTO, GetNearFootprintsDTO } from './footprints.dto';
 import { LocationType } from '../graphql';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,6 +17,7 @@ export class FootprintsService {
   constructor(
     @InjectModel('Footprint')
     private readonly footprintModel: Model<IFootprintModel>,
+    @Inject(forwardRef(() => NewsFeedService))
     private readonly newsFeedService: NewsFeedService,
   ) {}
 

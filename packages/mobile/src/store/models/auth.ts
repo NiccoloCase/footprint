@@ -1,5 +1,6 @@
 import {Action, action, thunk, Thunk} from "easy-peasy";
 import RNSecureKeyStore, {ACCESSIBLE} from "react-native-secure-key-store";
+import jwtDecode from "jwt-decode";
 
 /** Chiave con la quale è salvato il refresh token nello storage */
 const REFRESH_TOKEN_KEY = "refresh-token";
@@ -13,9 +14,11 @@ export interface AuthModel {
   // valori
   accessToken: string;
   refreshToken: string;
+  userId: string;
   isAuthenticated: boolean;
   // azioni
   setIsAuthenticated: Action<AuthModel, boolean>;
+  setUserId: Action<AuthModel, string>;
   setAccessToken: Action<AuthModel, string>;
   setRefreshToken: Action<AuthModel, string>;
   // thunk
@@ -26,6 +29,7 @@ export interface AuthModel {
 
 const authModel: AuthModel = {
   isAuthenticated: true, // <------ TOOD,
+  userId: "",
   accessToken: "",
   refreshToken: "",
 
@@ -38,6 +42,14 @@ const authModel: AuthModel = {
   })),
 
   /**
+   * Imposta l'ID dell'utente loggato
+   */
+  setUserId: action((state, userId) => ({
+    ...state,
+    userId,
+  })),
+
+  /**
    * Imposta un nuovo token di accesso
    */
   setAccessToken: action((state, accessToken) => ({
@@ -47,7 +59,6 @@ const authModel: AuthModel = {
 
   /**
    * Imposta un nuovo token di aggiornamento
-   *
    */
   setRefreshToken: action((state, refreshToken) => ({
     ...state,
@@ -73,8 +84,14 @@ const authModel: AuthModel = {
    */
   singin: thunk(async (actions, payload) => {
     const {accessToken, refreshToken} = payload;
+
+    // preleva dal token l'id dell'utente loggato
+    const {userId} = jwtDecode(accessToken);
+    actions.setUserId(userId);
+
     // imposta i nuovi token
     actions.setTokens({accessToken, refreshToken});
+
     // aggiorna lo stato riguardo l'autenticazione dell'utente
     actions.setIsAuthenticated(true);
   }),

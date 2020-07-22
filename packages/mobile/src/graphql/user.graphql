@@ -10,13 +10,14 @@ query Me {
   }
 }
 
-query getUserById($id: ID!) {
+query getUserById($id: ID!, $isFollowedBy: ID) {
   getUserById(id: $id) {
     id
     username
     #profileImage
     followersCount
     followingCount
+    isFollowed(id: $isFollowedBy)
   }
 }
 
@@ -54,6 +55,18 @@ mutation ForgotPassword($email: String!) {
 
 mutation ChangePasswordWithToken($token: String!, $newPassword: String!) {
   changePasswordWithToken(token: $token, newPassword: $newPassword) {
+    success
+  }
+}
+
+mutation FollowUser($target: ID!) {
+  followUser(target: $target) {
+    success
+  }
+}
+
+mutation UnfollowUser($target: ID!) {
+  unfollowUser(target: $target) {
     success
   }
 }

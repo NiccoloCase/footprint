@@ -1,6 +1,10 @@
-import React from "react";
+import React, {useRef, useEffect} from "react";
 import {View, Text, Image, StyleProp, ViewStyle} from "react-native";
 import Mapbox from "@react-native-mapbox-gl/maps";
+
+// 11.255814, 43.769562 --> frienze
+
+const {MapView, Camera} = Mapbox;
 
 const coordinates = [
   [-73.98330688476561, 40.76975180901395],
@@ -18,11 +22,31 @@ const coordinates = [
   [-73.99155, 40.73681],
 ];
 
-interface MapViewProps {
+interface ExploreMapProps {
   containerStyle?: StyleProp<ViewStyle>;
+  flyTo?: number[] | null;
 }
 
-export const MapView: React.FC<MapViewProps> = ({containerStyle}) => {
+export const ExploreMap: React.FC<ExploreMapProps> = ({
+  containerStyle,
+  flyTo,
+}) => {
+  const camera = useRef<Mapbox.Camera>();
+
+  useEffect(() => {
+    if (!flyTo || !camera.current) return;
+    camera.current.flyTo(flyTo, 500);
+  }, [flyTo]);
+
+  /* 
+  useEffect(() => {
+    setTimeout(() => {
+      if (!camera.current) return;
+      camera.current.flyTo([11.255814, 43.769562], 500);
+      console.log("ciao");
+    }, 11000);
+  }, []); */
+
   const renderMarks = () =>
     coordinates.map((coordinate, index) => (
       <Mapbox.PointAnnotation
@@ -37,15 +61,17 @@ export const MapView: React.FC<MapViewProps> = ({containerStyle}) => {
       </Mapbox.PointAnnotation>
     ));
 
-  //return null;
-
   return (
-    <Mapbox.MapView
+    <MapView
       style={[{flex: 1}, containerStyle]}
       styleURL={Mapbox.StyleURL.Light}
       compassEnabled={false}>
-      <Mapbox.Camera zoomLevel={16} centerCoordinate={coordinates[0]} />
+      <Camera
+        ref={camera as any}
+        zoomLevel={16}
+        centerCoordinate={coordinates[0]}
+      />
       {renderMarks()}
-    </Mapbox.MapView>
+    </MapView>
   );
 };

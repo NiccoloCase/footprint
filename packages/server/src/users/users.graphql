@@ -4,7 +4,9 @@ type User {
   username: String!
   followersCount: Int!
   followingCount: Int!
-  # informazioni private:
+  # Se l'utente è seguto da quello associato all'ID passato
+  isFollowed(id: ID): Boolean
+  # Informazioni private:
   email: String
   authType: AuthType
   googleID: String

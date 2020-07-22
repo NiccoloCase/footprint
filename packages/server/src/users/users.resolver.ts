@@ -1,4 +1,11 @@
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Args,
+  Mutation,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { isEmpty } from 'lodash';
 import { UsersService } from './users.service';
 import {
@@ -6,16 +13,41 @@ import {
   IsUsernameAlreadyUsedDTO,
   ChangePasswordWithTokenDTO,
 } from './users.dto';
-import { BadRequestException } from '@nestjs/common';
-import { EmailResponse, ProcessResult, TokenScope, AuthType } from '../graphql';
+import { BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import {
+  EmailResponse,
+  ProcessResult,
+  TokenScope,
+  AuthType,
+  User,
+} from '../graphql';
 import { TokenService } from '../token/token.service';
+import { FriendshipService } from '../friendship/friendship.service';
 
-@Resolver('Users')
+@Resolver('User')
 export class UsersResolver {
   constructor(
+    @Inject(forwardRef(() => FriendshipService))
+    private readonly friendshipService: FriendshipService,
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
   ) {}
+
+  // RESTITUISCE SE L'UTENTE É SEGUTO DALL'UTENTE PASSATO
+  @ResolveField()
+  async isFollowed(
+    @Parent() target: User,
+    @Args('id') user: string,
+  ): Promise<boolean | null> {
+    if (!user) return null;
+    else if (target.id === user) return null;
+
+    try {
+      return await this.friendshipService.checkIfIsFollower(user, target.id);
+    } catch (err) {
+      return null;
+    }
+  }
 
   // RESTITUISCE SE L'EMAIL PASSATA E' GIA' UTILIZZATA
   @Query()
@@ -31,11 +63,13 @@ export class UsersResolver {
     return !isEmpty(user);
   }
 
-  // RESTITUISCE UN UTENTE TRAMITE L'USERNAME
+  // RESTITUISCE UN UTENTE TRAMITE L'ID
   @Query()
-  getUserById(@Args('id') id: string) {
+  async getUserById(@Args('id') id: string) {
     // TODO -> rimuovere i dati sensibili
-    return this.usersService.getUserById(id);
+    const user = await this.usersService.getUserById(id);
+
+    return user;
   }
 
   // INVIA PER EMAIL IL TOKEN PER LA VERIFICA DELL'EMAIL

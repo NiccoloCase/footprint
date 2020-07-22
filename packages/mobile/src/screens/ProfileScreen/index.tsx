@@ -7,6 +7,7 @@ import {HEADER_DELTA} from "./dimensions";
 import {MeDocument, GetUserByIdDocument, User} from "../../generated/graphql";
 import {Spinner} from "../../components/Spinner";
 import {Colors} from "../../styles";
+import {useStoreState} from "../../store";
 
 // Componenti della schermata:
 import {Content} from "./Content";
@@ -14,9 +15,7 @@ import {Header} from "./Header";
 import {Cover} from "./Cover";
 import {client} from "../../graphql";
 
-// Animazione:
 const {Value, interpolate, Extrapolate} = Animated;
-const y = new Value<number>(0);
 
 let uri =
   "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020031/static/Alberto_conversi_profile_pic_gcbyuc.jpg";
@@ -26,32 +25,43 @@ type SearchScreenProps =
   | StackScreenProps<HomeStackParamList, "Profile">;
 
 export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
+  // ID dell'utente loggato
+  const loggedUser = useStoreState((s) => s.auth.userId);
   // utente mostrato nella schermata
   const [user, setUser] = useState<User>();
   // se si è verificato un errore nel recupero dei dati del'utente
   const [errorOccurred, setErrorOccurred] = useState<boolean>();
   // se la schermata mostra il profilo personale della persona loggata
-  const personal = !((route as any).params && (route as any).params.id);
+  const personal =
+    !((route as any).params && (route as any).params.id) ||
+    (route as any).params.id === loggedUser;
+
+  const y = new Value<number>(0);
 
   // Richiede al server il profilo dell'utente
   // (quello associato all'id passato o quello loggato)
   useEffect(() => {
     (async () => {
       const r = route as any;
-      // ID dell'utente
-      const userId: string | null =
-        r.params && r.params.id ? r.params.id : null;
+      // ID dell'utente passato come parametro
+      const user: string | null = r.params && r.params.id ? r.params.id : null;
 
       // Reimposta un eventuale errore
       if (errorOccurred) setErrorOccurred(false);
 
       try {
-        const {data, errors} = await (userId
-          ? client.query({query: GetUserByIdDocument, variables: {id: userId}})
-          : client.query({query: MeDocument}));
+        const {data, errors} = await (user
+          ? client.query({
+              query: GetUserByIdDocument,
+              variables: {id: user, isFollowedBy: loggedUser},
+            })
+          : client.query({
+              query: MeDocument,
+              variables: {isFollowedBy: loggedUser},
+            }));
 
         if (errors) throw new Error();
-        // imposta il nuovo utente
+        // Imposta il nuovo utente
         setUser(data.getUserById || data.whoami);
       } catch (err) {
         setErrorOccurred(true);
@@ -74,7 +84,7 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
       return (
         <>
           <StatusBar backgroundColor="#303030" barStyle="light-content" />
-          <Cover y={y} opacity={opacity} user={xuser} />
+          <Cover y={y} opacity={opacity} user={xuser} personal={personal} />
           <Content y={y} user={xuser} />
           <Header
             y={y}

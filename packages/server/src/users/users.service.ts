@@ -20,6 +20,13 @@ export class UsersService {
   ) {}
 
   /**
+   * Restituisce il modello della collezione degli utenti
+   */
+  getUserModel(): Model<IUserModel> {
+    return this.userModel;
+  }
+
+  /**
    * Restituisce l'utente associato all'ID passato
    * @param id
    */

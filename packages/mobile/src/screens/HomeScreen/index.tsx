@@ -122,11 +122,11 @@ export const HomeScreen: React.FC = () => {
         username={item.footprint.author.username || "nicco"}
         image={
           /*      item.footprint.media!*/
-          "https://res.cloudinary.com/dgjcj7htv/image/upload/v1594741910/static/photo-1444041103143-1d0586b9c0b8_dq5w61.jpg"
+          "https://picsum.photos/400/60" + Math.trunc(Math.random() * 10)
         }
         profilePicture={
           item.footprint.author.profileImage ||
-          "https://res.cloudinary.com/dgjcj7htv/image/upload/v1594741910/static/photo-1444041103143-1d0586b9c0b8_dq5w61.jpg"
+          "https://picsum.photos/200/30" + Math.trunc(Math.random() * 10)
         }
         key={index}
       />
@@ -140,7 +140,7 @@ export const HomeScreen: React.FC = () => {
     if (data)
       return (
         <Carousel
-          data={data.getNewsFeed}
+          data={data.getNewsFeed as any[]}
           renderItem={renderFeedItem}
           sliderWidth={width}
           itemWidth={FEED_CARD_WIDTH}

@@ -13,6 +13,7 @@ import { IUserModel, IUser } from '../users/users.schema';
 import { PaginationOptions, Friendship } from '../graphql';
 import { normalizePaginationOptions } from '../shared/pagination';
 import { NewsFeedService } from '../news-feed/news-feed.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class FriendshipService {
@@ -172,5 +173,19 @@ export class FriendshipService {
 
     // Rimuove dal feed dell'utente le attività più recenti dell'utente "target"
     this.newsFeedService.removeUsersContentsFromFeed(userId, targetUserId);
+  }
+
+  /**
+   * Verifica se l'utente associato al primo ID passato è un follower dell'utente
+   * passato come secondo argomento
+   * @param follower
+   * @param followed
+   */
+  async checkIfIsFollower(follower: string, followed: string) {
+    const friendship = await this.friendshipModel.findOne({
+      target: followed,
+      user: follower,
+    });
+    return !!friendship;
   }
 }

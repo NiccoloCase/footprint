@@ -6,7 +6,6 @@ import { FriendshipSchema } from './friendship.schema';
 import { UsersModule } from '../users/users.module';
 import { NewsFeedModule } from '../news-feed/news-feed.module';
 import { FootprintsModule } from '../footprints/footprints.module';
-import { NewsFeedService } from '../news-feed/news-feed.service';
 
 @Module({
   imports: [
@@ -15,7 +14,7 @@ import { NewsFeedService } from '../news-feed/news-feed.service';
     ]),
     forwardRef(() => NewsFeedModule),
     forwardRef(() => FootprintsModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [FriendshipService, FriendshipResolver],
   exports: [FriendshipService],

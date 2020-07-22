@@ -10,7 +10,7 @@ import { NewsFeedModule } from '../news-feed/news-feed.module';
   imports: [
     MongooseModule.forFeature([{ name: 'Footprint', schema: FootprintSchema }]),
     forwardRef(() => NewsFeedModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [FootprintsService, FootprintsResolver],
   exports: [FootprintsService],
