@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import Carousel from "react-native-snap-carousel";
 import {
   View,
@@ -21,42 +21,23 @@ const CARD_HEIGHT = 260;
 
 const INITIAL_INDEX = 0;
 
-const data = [
-  {
-    title: "Ciao questo è un footprint",
-    media: "https://picsum.photos/200/301",
-    username: "niccolo",
-    locationName: "City of Florence. Italyeee",
-    coordinates: [-73.98330688476561, 40.76975180901395],
-  },
-  {
-    title:
-      "Ciao questo è un footprint molto molto molot lunghissimomissimo ancora un po di piu e ci siamo",
-    media: "https://picsum.photos/200/302",
-    username: "niccolo",
-    locationName: "City of Florence. Italy",
-    coordinates: [-73.96682739257812, 40.761560925502806],
-  },
-  {
-    title: "Ciao",
-    media: "https://picsum.photos/200/303",
-    username: "niccolo",
-    locationName: "City of Florence. Italy",
-    coordinates: [-74.00751113891602, 40.746346606483826],
-  },
-];
-
 interface ExploreCarouselProps {
-  setCoordinates: (coords: number[]) => void;
   showFootprints: boolean;
   setShowFootprints: (vale: boolean) => void;
+  footprints: any[];
+  setCurrentFootprint: (index: number) => void;
+  currentFootprint: number;
 }
 
 export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
-  setCoordinates,
   showFootprints,
   setShowFootprints,
+  footprints,
+  setCurrentFootprint,
+  currentFootprint,
 }) => {
+  const carouselRef = useRef<Carousel<any> | null>(null);
+
   // Animazione per nascondere / mostrare i footprint
   const tranistion = useTimingTransition(showFootprints, {
     duration: 200,
@@ -69,8 +50,17 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
     setShowFootprints(true);
   }, []);
 
+  useEffect(() => {
+    if (
+      carouselRef.current &&
+      carouselRef.current.currentIndex !== currentFootprint
+    ) {
+      carouselRef.current.snapToItem(currentFootprint);
+    }
+  }, [currentFootprint]);
+
   const onSnapToItem = (index: number) => {
-    setCoordinates(data[index].coordinates);
+    setCurrentFootprint(index);
   };
 
   const renderItem = ({item, index}: {item: any; index: number}) => (
@@ -78,7 +68,6 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
       style={[styles.card, {transform: [{translateY}], opacity: tranistion}]}
       key={index}>
       <Image source={{uri: item.media}} style={styles.cardImage} />
-
       <View style={styles.content}>
         <View style={styles.contentWrapper}>
           <Text style={[styles.text, styles.username]} numberOfLines={1}>
@@ -109,8 +98,9 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
   return (
     <View style={styles.container}>
       <Carousel
+        ref={carouselRef}
         initialScrollIndex={INITIAL_INDEX}
-        data={data}
+        data={footprints}
         renderItem={renderItem}
         sliderWidth={width}
         itemWidth={CARD_WIDTH}

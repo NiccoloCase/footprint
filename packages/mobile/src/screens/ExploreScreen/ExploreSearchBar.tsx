@@ -10,18 +10,18 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import hexToRgba from "hex-to-rgba";
 import Icon from "react-native-vector-icons/Feather";
 import {useTimingTransition, mix} from "react-native-redash";
 import {Spacing, Colors} from "../../styles";
 import Animated, {Easing} from "react-native-reanimated";
-import {placeAutocomplete} from "../../utils/geocode";
+import {placeAutocomplete, PlaceTypes} from "../../utils/geocode";
+import {LocationState} from ".";
 
 const MAX_HEIGHT = 500;
 const RESULT_ITEM_HEIGHT = 55;
 
 interface ExploreSearchProps {
-  setCoordinates: (coordinates: number[]) => void;
+  setLocation: (location: LocationState) => void;
   setShowFootprints: (value: boolean) => void;
   showFootprints: boolean;
 }
@@ -29,13 +29,15 @@ interface ExploreSearchProps {
 interface ExploreSearchResult {
   text: string;
   coordinates: number[];
+  placeType: PlaceTypes;
 }
 
 export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
-  setCoordinates,
+  setLocation,
   showFootprints,
   setShowFootprints,
 }) => {
+  const [prevShowFootprints, setPrevShowFootprints] = useState<boolean>();
   const [value, setValue] = useState("");
   const [results, setResults] = useState<ExploreSearchResult[]>([]);
   const [showResults, setShowResults] = useState(true);
@@ -60,10 +62,11 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
 
       const formattedResults: ExploreSearchResult[] = results.map((r) => ({
         text: r.place_name,
-        coordinates: r.geometry.coordinates,
+        coordinates: r.center,
+        placeType: r.place_type[0],
       }));
 
-      // Aggiorna lo stato:
+      // Mostra i risultati
       setResults(formattedResults);
 
       if (formattedResults.length > 0) setShowResults(true);
@@ -92,7 +95,49 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
     // abbassa la tastiera deselezionano l'input
     if (inputRef.current) inputRef.current.blur();
     // chiama il callback
-    setCoordinates(result.coordinates);
+    const {coordinates, placeType} = result;
+    // a seconda della tipologia di luogo zoomma in modo differente
+    let zoom: number;
+    switch (placeType) {
+      case PlaceTypes.COUNTRY:
+        zoom = 5;
+        break;
+      case PlaceTypes.REGION:
+        zoom = 10;
+        break;
+      default:
+        zoom = 16;
+        break;
+    }
+
+    setLocation({coordinates, zoom});
+  };
+
+  /**
+   * Reimposta il valore iniziale riguardo se
+   * i footprint devono essere mostrati
+   */
+  const restShowFootprints = () => {
+    if (!prevShowFootprints || prevShowFootprints === showFootprints) return;
+    setShowFootprints(prevShowFootprints);
+  };
+
+  /**
+   * Nasconde i footprint preservando lo stato precedente
+   */
+  const hideFootprints = () => {
+    if (!showFootprints) return setPrevShowFootprints(false);
+    setShowFootprints(false);
+    setPrevShowFootprints(true);
+  };
+
+  /**
+   * Funzione chiamata quando l'utente preme la regione
+   * fuori al contenitore deli risultati
+   */
+  const onOutsideClick = () => {
+    if (inputRef.current) inputRef.current.blur();
+    setShowResults(false);
   };
 
   /**
@@ -116,7 +161,7 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
       <View
         pointerEvents={showResults ? "auto" : "none"}
         style={StyleSheet.absoluteFill}>
-        <TouchableWithoutFeedback onPress={() => setShowResults(false)}>
+        <TouchableWithoutFeedback onPress={onOutsideClick}>
           <View style={{flex: 1}} />
         </TouchableWithoutFeedback>
       </View>
@@ -129,6 +174,8 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
             placeholder="Cerca un luogo..."
             value={value}
             onChangeText={onChangeText}
+            onFocus={hideFootprints}
+            onBlur={restShowFootprints}
           />
           <TouchableOpacity
             disabled={!showResults && value.length === 0}
