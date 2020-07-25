@@ -10,6 +10,7 @@ export interface IFootprint {
   location: Location;
   media: string;
   created_at?: string;
+  likesCount?: number;
 }
 
 export type IFootprintModel = Document & IFootprint;
@@ -43,6 +44,8 @@ export const FootprintSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  // Numero di likes
+  likesCount: { type: Number, default: 0 },
 });
 
 FootprintSchema.index({ authorId: 1 });

@@ -1,0 +1,8 @@
+type Query {
+  getLikes(footprintId: ID!, page: Int): [User!]!
+}
+
+type Mutation {
+  addLikeToFootprint(footprintId: ID!): ProcessResult!
+  removeFootprintLike(footprintId: ID!): ProcessResult!
+}

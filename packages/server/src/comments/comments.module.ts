@@ -4,6 +4,7 @@ import { CommentsResolver } from './comments.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CommentBucketSchema } from './comments.schema';
 import { UsersModule } from '../users/users.module';
+import { FootprintsModule } from '../footprints/footprints.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UsersModule } from '../users/users.module';
       },
     ]),
     UsersModule,
+    FootprintsModule,
   ],
   providers: [CommentsService, CommentsResolver],
 })

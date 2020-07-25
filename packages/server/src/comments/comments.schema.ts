@@ -16,13 +16,13 @@ export interface ICommentBucket {
 export type ICommentBucketModel = Document & ICommentBucket;
 
 export const CommentBucketSchema = new Schema({
-  // ID del contnuto acui i commenti sono associati
+  // ID del contnuto a cui i commenti sono associati
   contentId: { type: Types.ObjectId, required: true },
   // Numero della pagina del bucket
   page: { type: Number, required: true },
   // Numero di commenti nel bucket
   commentsCount: { type: Number, default: 1 },
-  // Commeni
+  // Commenti
   comments: [
     {
       // Testo del commento

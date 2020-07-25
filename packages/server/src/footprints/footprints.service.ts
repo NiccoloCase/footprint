@@ -21,6 +21,10 @@ export class FootprintsService {
     private readonly newsFeedService: NewsFeedService,
   ) {}
 
+  /**
+   * Restituisce il footprint associato all'ID passato
+   * @param id
+   */
   async findFootprintById(id: string): Promise<IFootprint | null> {
     try {
       const footprint = await this.footprintModel.findById(id);
@@ -97,5 +101,16 @@ export class FootprintsService {
    */
   async findFootprintsByAuthor(authorId: string) {
     return this.footprintModel.find({ authorId });
+  }
+
+  /**
+   * Incremente diun certo valore il count dei like
+   * @param id ID del footprint
+   * @param value
+   */
+  async increaseLikeCounter(id: string, value: number): Promise<void> {
+    await this.footprintModel.findByIdAndUpdate(id, {
+      $inc: { likesCount: value },
+    });
   }
 }

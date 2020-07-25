@@ -67,6 +67,8 @@ export interface IMutation {
     addFootprint(title: string, coordinates: number[], body?: string, media?: string): Footprint | Promise<Footprint>;
     followUser(target: string): ProcessResult | Promise<ProcessResult>;
     unfollowUser(target: string): ProcessResult | Promise<ProcessResult>;
+    addLikeToFootprint(footprintId: string): ProcessResult | Promise<ProcessResult>;
+    removeFootprintLike(footprintId: string): ProcessResult | Promise<ProcessResult>;
     markFeedItemAsSeen(id: string): ProcessResult | Promise<ProcessResult>;
     sendConfirmationEmail(email: string): EmailResponse | Promise<EmailResponse>;
     forgotPassword(email: string): EmailResponse | Promise<EmailResponse>;
@@ -87,6 +89,7 @@ export interface IQuery {
     getNearFootprints(lng: number, lat: number, minDistance?: number, maxDistance?: number): Footprint[] | Promise<Footprint[]>;
     getFollowers(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
     getFollowing(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
+    getLikes(footprintId: string, page?: number): User[] | Promise<User[]>;
     getNewsFeed(pagination?: PaginationOptions): NewsFeedItem[] | Promise<NewsFeedItem[]>;
     whoami(): User | Promise<User>;
     isEmailAlreadyUsed(email: string): boolean | Promise<boolean>;
@@ -108,6 +111,7 @@ export interface Footprint {
     media?: string;
     location: Location;
     created_at: Date;
+    likesCount: number;
 }
 
 export interface Friendship {

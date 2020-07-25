@@ -1,7 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ICommentBucketModel, IComment } from './comments.schema';
+import { FootprintsService } from '../footprints/footprints.service';
 
 const COMMENTS_PER_BUCKET = 100;
 
@@ -10,6 +15,7 @@ export class CommentsService {
   constructor(
     @InjectModel('CommentBucket')
     private readonly commentModel: Model<ICommentBucketModel>,
+    private readonly footprintService: FootprintsService,
   ) {}
 
   /**
@@ -72,8 +78,21 @@ export class CommentsService {
       .sort('-page')
       .limit(1);
 
-    // Non esiste ancora nessun bucket -> Crea un nuovo bucket
-    if (!lastBucket) return this.createNewBucket(newComment, contentId);
+    // Non esiste ancora nessun bucket
+    if (!lastBucket) {
+      // Controlla che il contenuto passato esista
+      try {
+        const content = await this.footprintService.findFootprintById(
+          contentId,
+        );
+        if (!content) throw new Error();
+      } catch (err) {
+        throw new NotFoundException('Content not found');
+      }
+
+      // Crea un nuovo bucket
+      return this.createNewBucket(newComment, contentId);
+    }
 
     // Controlla se il bucket è pieno
     if (lastBucket.commentsCount >= COMMENTS_PER_BUCKET)
@@ -84,10 +103,14 @@ export class CommentsService {
     lastBucket.comments.unshift(newComment);
     // Incrementa il contatore di commenti
     lastBucket.commentsCount += 1;
-    // Salva il bucket
-    await lastBucket.save();
 
-    return lastBucket.comments[0];
+    // Salva il bucket
+    try {
+      await lastBucket.save();
+      return lastBucket.comments[0];
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
   }
 
   /**
