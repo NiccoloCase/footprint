@@ -1,0 +1,7 @@
+# Risultato per un generico processo
+type ProcessResult {
+  success: Boolean!
+}
+
+# Tipo data
+scalar Date

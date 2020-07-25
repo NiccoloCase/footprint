@@ -1,4 +1,4 @@
-import { Schema, Document, Types } from 'mongoose';
+import { Schema, Document, Types, model, Model } from 'mongoose';
 
 export interface INewFeed {
   ownerId: string;
@@ -19,3 +19,5 @@ export const NewsFeedSchema = new Schema({
   // Se il destinatario del feed ha visto l'elemento
   isSeen: { type: Boolean, default: false },
 });
+
+NewsFeedSchema.index({ ownerId: 1 });

@@ -20,6 +20,13 @@ export enum TokenScope {
     FORGOT_PASSWORD = "FORGOT_PASSWORD"
 }
 
+export interface NearToInput {
+    lng: number;
+    lat: number;
+    minDistance?: number;
+    maxDistance?: number;
+}
+
 export interface PaginationOptions {
     offset?: number;
     limit?: number;
@@ -55,6 +62,8 @@ export interface IMutation {
     login(email: string, password: string): AuthPayload | Promise<AuthPayload>;
     loginWithGoogle(): GoogleAuthResult | Promise<GoogleAuthResult>;
     verfyUser(token: string): VerfyUserResponse | Promise<VerfyUserResponse>;
+    postComment(contentId: string, text: string): Comment | Promise<Comment>;
+    delateComment(contentId: string, id: string): ProcessResult | Promise<ProcessResult>;
     addFootprint(title: string, coordinates: number[], body?: string, media?: string): Footprint | Promise<Footprint>;
     followUser(target: string): ProcessResult | Promise<ProcessResult>;
     unfollowUser(target: string): ProcessResult | Promise<ProcessResult>;
@@ -62,6 +71,27 @@ export interface IMutation {
     sendConfirmationEmail(email: string): EmailResponse | Promise<EmailResponse>;
     forgotPassword(email: string): EmailResponse | Promise<EmailResponse>;
     changePasswordWithToken(token: string, newPassword: string): ProcessResult | Promise<ProcessResult>;
+}
+
+export interface Comment {
+    id: string;
+    text: string;
+    authorId: string;
+    author: User;
+    createdAt: Date;
+}
+
+export interface IQuery {
+    getComments(contentId: string, page?: number): Comment[] | Promise<Comment[]>;
+    getFootprintById(id: string): Footprint | Promise<Footprint>;
+    getNearFootprints(lng: number, lat: number, minDistance?: number, maxDistance?: number): Footprint[] | Promise<Footprint[]>;
+    getFollowers(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
+    getFollowing(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
+    getNewsFeed(pagination?: PaginationOptions): NewsFeedItem[] | Promise<NewsFeedItem[]>;
+    whoami(): User | Promise<User>;
+    isEmailAlreadyUsed(email: string): boolean | Promise<boolean>;
+    isUsernameAlreadyUsed(username: string): boolean | Promise<boolean>;
+    getUserById(id: string): User | Promise<User>;
 }
 
 export interface EmailResponse {
@@ -78,18 +108,6 @@ export interface Footprint {
     media?: string;
     location: Location;
     created_at: Date;
-}
-
-export interface IQuery {
-    getFootprintById(id: string): Footprint | Promise<Footprint>;
-    getNearFootprints(lng: number, lat: number, minDistance?: number, maxDistance?: number): Footprint[] | Promise<Footprint[]>;
-    getFollowers(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
-    getFollowing(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
-    getNewsFeed(pagination?: PaginationOptions): NewsFeedItem[] | Promise<NewsFeedItem[]>;
-    whoami(): User | Promise<User>;
-    isEmailAlreadyUsed(email: string): boolean | Promise<boolean>;
-    isUsernameAlreadyUsed(username: string): boolean | Promise<boolean>;
-    getUserById(id: string): User | Promise<User>;
 }
 
 export interface Friendship {

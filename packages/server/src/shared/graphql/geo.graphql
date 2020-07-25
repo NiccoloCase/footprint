@@ -1,6 +1,8 @@
-# Risultato per un generico processo
-type ProcessResult {
-  success: Boolean!
+input NearToInput {
+  lng: Float!
+  lat: Float!
+  minDistance: Float
+  maxDistance: Float
 }
 
 # Tipologia di posizioni
@@ -13,6 +15,3 @@ type Location {
   type: LocationType!
   coordinates: [Float!]!
 }
-
-# Tipo data
-scalar Date

@@ -7,7 +7,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { INewsFeedModel } from './news-feed.schema';
 import { IFootprint } from '../footprints/footprints.schema';
 import { FriendshipService } from '../friendship/friendship.service';
@@ -44,6 +44,7 @@ export class NewsFeedService {
       .skip(offset)
       .limit(limit)
       .populate('footprint');
+
     return items;
   }
 

@@ -1,0 +1,18 @@
+type Comment {
+  id: ID!
+  text: String!
+  authorId: ID!
+  author: User!
+  createdAt: Date!
+}
+
+type Query {
+  getComments(contentId: ID!, page: Int): [Comment]!
+}
+
+type Mutation {
+  # Posta un nuovo commento
+  postComment(contentId: ID!, text: String!): Comment!
+  # Elimina un commento dato l'ID
+  delateComment(contentId: ID!, id: ID!): ProcessResult!
+}
