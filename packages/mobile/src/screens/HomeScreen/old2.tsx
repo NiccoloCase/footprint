@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState} from "react";
 import {
   View,
   Text,
@@ -14,7 +14,6 @@ import {
   useGetNewsFeedQuery,
   NewsFeedItem,
   useMarkFeedItemAsSeenMutation,
-  Footprint,
 } from "../../generated/graphql";
 import {Spinner} from "../../components/Spinner";
 import {ScrollView} from "react-native-gesture-handler";
@@ -23,7 +22,6 @@ const {width} = Dimensions.get("screen");
 const FEED_CARD_WIDTH = (width * 90) / 100;
 
 export const HomeScreen: React.FC = () => {
-  const carousel = useRef<Carousel<NewsFeedItem> | null>(null);
   // Se il feed si sta venendo aggiornato
   const [refreshing, setRefreshing] = useState(false);
   // GRAPHQL
@@ -115,22 +113,15 @@ export const HomeScreen: React.FC = () => {
     item: NewsFeedItem;
     index: number;
   }) => {
-    const current = carousel.current
-      ? carousel.current.currentIndex === index
-      : false;
-
     return (
       <FootprintCard
-        current={current}
         feedId={item.id}
         footprintId={item.footprint.id}
         authorId={item.footprint.authorId}
         title={item.footprint.title}
         username={item.footprint.author.username || "nicco"}
         image={
-          index === 0
-            ? "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020013/sample.jpg"
-            : "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595854452/static/photo-1552752399-22aa8f97ade0_fqkui9.jpg"
+          "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595854452/static/photo-1552752399-22aa8f97ade0_fqkui9.jpg"
           /*      item.footprint.media!*/
           /* "https://picsum.photos/400/60" + Math.trunc(Math.random() * 10) */
         }
@@ -151,7 +142,6 @@ export const HomeScreen: React.FC = () => {
     if (data && data.getNewsFeed.length > 0)
       return (
         <Carousel
-          ref={carousel}
           data={data.getNewsFeed as any[]}
           renderItem={renderFeedItem}
           sliderWidth={width}

@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import {Spacing} from "../../styles";
 import {HEADER_DELTA, MIN_HEADER_HEIGHT} from "./dimensions";
 import {useNavigation} from "@react-navigation/native";
+import {store} from "../../store";
 const {Extrapolate, interpolate, color} = Animated;
 
 interface HeaderProps {
@@ -12,6 +13,10 @@ interface HeaderProps {
   opacity: Animated.Node<number>;
   username: string;
   personal?: boolean;
+}
+
+function logout() {
+  store.getActions().auth.logout();
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -32,34 +37,35 @@ export const Header: React.FC<HeaderProps> = ({
     if (navigation.canGoBack()) navigation.goBack();
   };
 
+  const renderButton = (iconName: string, onPress: () => void) => (
+    <TouchableHighlight
+      underlayColor="rgba(0,0,0,0.2)"
+      onPress={onPress}
+      style={styles.button}>
+      <Icon name={iconName} color="#fff" size={20} />
+    </TouchableHighlight>
+  );
+
   return (
     <Animated.View
       style={[styles.container, {backgroundColor: color(48, 48, 48, opacity)}]}>
       <View style={styles.button}>
-        {navigation.canGoBack() && (
-          <TouchableHighlight
-            style={styles.button}
-            onPress={goBack}
-            underlayColor="rgba(0,0,0,0.1)">
-            <Icon name="chevron-left" color="#fff" size={20} />
-          </TouchableHighlight>
-        )}
+        {navigation.canGoBack() && renderButton("chevron-left", goBack)}
       </View>
       <Animated.Text
         style={[styles.title, {opacity: titleOpacity}]}
         numberOfLines={1}>
         {username}
       </Animated.Text>
-      <TouchableHighlight
-        onPress={() => {}}
-        underlayColor="rgba(0,0,0,0.2)"
-        style={styles.button}>
-        {personal ? (
-          <Icon name="edit" color="#fff" size={20} />
-        ) : (
-          <Icon name="share-alt" color="#fff" size={20} />
-        )}
-      </TouchableHighlight>
+
+      {personal ? (
+        <View style={styles.inline}>
+          {renderButton("edit", () => {})}
+          {renderButton("ellipsis-v", logout)}
+        </View>
+      ) : (
+        renderButton("share-alt", () => {})
+      )}
     </Animated.View>
   );
 };
@@ -86,5 +92,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     flex: 1,
     textAlign: "center",
+  },
+  inline: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

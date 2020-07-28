@@ -4,13 +4,13 @@ import {
   createStackNavigator,
   StackNavigationOptions,
 } from "@react-navigation/stack";
+import {createSharedElementStackNavigator} from "react-navigation-shared-element";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {MainHeader} from "../components/Header";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
 import {useStoreActions, useStoreState} from "../store";
 import {Colors} from "../styles";
-import {client} from "../graphql";
 
 // COMPONENTI
 import {TabBar} from "../components/TabBar";
@@ -32,8 +32,8 @@ import {useGetNewsFeedLazyQuery} from "../generated/graphql";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center"},
-  headerStyle: {backgroundColor: Colors.primary},
-  headerTintColor: "#fff",
+  headerStyle: {backgroundColor: /* Colors.primary */ "#fff"},
+  headerTintColor: /* "#fff" */ Colors.darkGrey,
   headerTitleAlign: "center",
 };
 
@@ -66,12 +66,6 @@ const AuthStackScreen = () => (
 // HOME STACK
 export type HomeStackParamList = {
   Home: undefined;
-  Profile: {id: string};
-  Footprint: {
-    id: string;
-    title: string;
-    authorUsername: string;
-  };
 };
 const HomeStack = createStackNavigator<HomeStackParamList>();
 const HomeStackScreen = () => (
@@ -80,12 +74,6 @@ const HomeStackScreen = () => (
       name="Home"
       component={HomeScreen}
       options={{header: () => <MainHeader />}}
-    />
-    <HomeStack.Screen name="Footprint" component={FootprintScreen} />
-    <HomeStack.Screen
-      name="Profile"
-      component={ProfileScreen}
-      options={{title: "Profilo", headerShown: false}}
     />
   </HomeStack.Navigator>
 );
@@ -106,10 +94,10 @@ const AddFootprintStackScreen = () => (
 );
 
 // SERACH STACK
-export type SearchStackParamList = {
+export type ExploreStackParamList = {
   Explore: undefined;
 };
-const ExploreStack = createStackNavigator<SearchStackParamList>();
+const ExploreStack = createStackNavigator<ExploreStackParamList>();
 const ExploreStackScreen = () => (
   <ExploreStack.Navigator screenOptions={defaultScreenOptions}>
     <ExploreStack.Screen
@@ -124,15 +112,15 @@ const ExploreStackScreen = () => (
 export type ProfileStackParamList = {
   MyProfile: undefined;
 };
-const ProfileStack = createStackNavigator<ProfileStackParamList>();
-const ProfileStackScreen = () => (
-  <ProfileStack.Navigator screenOptions={defaultScreenOptions}>
-    <ProfileStack.Screen
+const MyProfileStack = createStackNavigator<ProfileStackParamList>();
+const MyProfileStackScreen = () => (
+  <MyProfileStack.Navigator screenOptions={defaultScreenOptions}>
+    <MyProfileStack.Screen
       name="MyProfile"
       component={ProfileScreen}
       options={{title: "Profilo", headerShown: false}}
     />
-  </ProfileStack.Navigator>
+  </MyProfileStack.Navigator>
 );
 
 // SETTINGS STACK
@@ -155,13 +143,13 @@ export type BottomTabParamList = {
   Home: undefined;
   AddFootprint: undefined;
   Explore: undefined;
-  Profile: undefined;
+  MyProfile: undefined;
 };
 const Tabs = createBottomTabNavigator<BottomTabParamList>();
 
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="Explore"
+    initialRouteName="Home"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,
@@ -196,10 +184,9 @@ const TabsScreen = () => (
         ),
       }}
     />
-
     <Tabs.Screen
-      name="Profile"
-      component={ProfileStackScreen}
+      name="MyProfile"
+      component={MyProfileStackScreen}
       options={{
         title: "Profilo",
         tabBarIcon: ({color, size}) => (
@@ -211,12 +198,8 @@ const TabsScreen = () => (
 );
 
 // APP
-export type AppStackParamList = {
-  Home: undefined;
-  Settings: undefined;
-};
 
-const AppStack = createStackNavigator();
+/* const AppStack = createStackNavigator();
 const AppStackScreen = () => (
   <AppStack.Navigator headerMode="none">
     <AppStack.Screen name="Home" component={TabsScreen} />
@@ -225,6 +208,51 @@ const AppStackScreen = () => (
       component={SettingsStackScreen}
       options={{title: "Impostazioni"}}
     />
+  </AppStack.Navigator>
+); */
+export type AppStackParamList = {
+  Home: undefined;
+  Settings: undefined;
+  Footprint: {
+    id: string;
+    title: string;
+    authorUsername: string;
+    image: string;
+  };
+  Profile: {id: string};
+};
+const AppStack = createSharedElementStackNavigator();
+const AppStackScreen = () => (
+  <AppStack.Navigator screenOptions={{headerShown: false}}>
+    <AppStack.Screen name="Home" component={TabsScreen} />
+    <AppStack.Screen
+      name="Settings"
+      component={SettingsStackScreen}
+      options={{title: "Impostazioni"}}
+    />
+    <AppStack.Screen
+      name="Footprint"
+      component={FootprintScreen}
+      options={(navigation) => ({
+        headerBackTitleVisible: false,
+        //   gestureEnabled: false,
+        cardStyleInterpolator: ({current: {progress}}) => ({
+          cardStyle: {opacity: progress},
+        }),
+        cardStyle: {backgroundColor: "transparent"},
+      })}
+      sharedElementsConfig={({params}) => {
+        return [
+          {
+            id: `footprint.${params.id}.image`,
+            animation: "move",
+            resize: "clip",
+            align: "center-top",
+          },
+        ];
+      }}
+    />
+    <AppStack.Screen name="Profile" component={ProfileScreen} />
   </AppStack.Navigator>
 );
 
@@ -253,11 +281,11 @@ export const Navigation = () => {
   const isAuth = useStoreState((state) => state.auth.isAuthenticated);
   const singin = useStoreActions((actions) => actions.auth.singin);
 
-  // funzione per richiede il feed per salvarlo nella cache
-  const [loadFeed] = useGetNewsFeedLazyQuery({
+  // Funzione per richiede il feed per salvarlo nella cache
+  // TODO
+  const [loadFeed, {error}] = useGetNewsFeedLazyQuery({
     variables: {pagination: {limit: 10}},
   });
-  // TODO
 
   // richieda al server un nuovo token di accesso
   useEffect(() => {

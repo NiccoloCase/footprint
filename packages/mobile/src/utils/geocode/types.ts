@@ -9,3 +9,9 @@ export enum PlaceTypes {
   ADDRESS = "address",
   POI = "poi",
 }
+
+export interface Position {
+  latitude: number;
+  longitude: number;
+  altitude: number | null;
+}

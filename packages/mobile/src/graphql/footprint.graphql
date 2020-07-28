@@ -1,3 +1,19 @@
+query GetNearFootprints($lng: Float!, $lat: Float!, $maxDistance: Float!) {
+  getNearFootprints(lng: $lng, lat: $lat, maxDistance: $maxDistance) {
+    id
+    title
+    media
+    location {
+      coordinates
+    }
+    author {
+      id
+      username
+      #profileImage
+    }
+  }
+}
+
 query GetNewsFeed($pagination: PaginationOptions) {
   getNewsFeed(pagination: $pagination) {
     id
@@ -21,5 +37,49 @@ query GetNewsFeed($pagination: PaginationOptions) {
 mutation MarkFeedItemAsSeen($id: ID!) {
   markFeedItemAsSeen(id: $id) {
     success
+  }
+}
+
+mutation RemoveFootprintLike($id: ID!) {
+  removeFootprintLike(footprintId: $id) {
+    success
+  }
+}
+
+mutation AddLikeToFootprint($id: ID!) {
+  addLikeToFootprint(footprintId: $id) {
+    success
+  }
+}
+
+mutation PostComment($contentId: ID!, $text: String!) {
+  postComment(contentId: $contentId, text: $text) {
+    id
+    text
+    createdAt
+    author {
+      id
+      username
+      #profileImage
+    }
+  }
+}
+
+mutation DelateComment($contentId: ID!, $id: ID!) {
+  delateComment(contentId: $contentId, id: $id) {
+    success
+  }
+}
+
+query GetComments($contentId: ID!, $page: Int) {
+  getComments(contentId: $contentId, page: $page) {
+    id
+    text
+    author {
+      id
+      username
+      #profileImage
+    }
+    createdAt
   }
 }

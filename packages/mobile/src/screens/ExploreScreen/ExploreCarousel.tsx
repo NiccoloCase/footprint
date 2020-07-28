@@ -13,6 +13,12 @@ import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Animated, {Easing} from "react-native-reanimated";
 import {useTimingTransition, mix} from "react-native-redash";
+import {Footprint} from "../../generated/graphql";
+import {MainHeader} from "../../components/Header";
+import {getDistanceFromUser} from "../../utils/geocode";
+import {useNavigation} from "@react-navigation/native";
+import {TouchableWithoutFeedback} from "react-native-gesture-handler";
+import {SharedElement} from "react-navigation-shared-element";
 
 // Dimenzioni
 const {width} = Dimensions.get("window");
@@ -24,7 +30,7 @@ const INITIAL_INDEX = 0;
 interface ExploreCarouselProps {
   showFootprints: boolean;
   setShowFootprints: (vale: boolean) => void;
-  footprints: any[];
+  footprints: Footprint[] | null;
   setCurrentFootprint: (index: number) => void;
   currentFootprint: number;
 }
@@ -37,6 +43,7 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
   currentFootprint,
 }) => {
   const carouselRef = useRef<Carousel<any> | null>(null);
+  const navigation = useNavigation();
 
   // Animazione per nascondere / mostrare i footprint
   const tranistion = useTimingTransition(showFootprints, {
@@ -49,6 +56,8 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
     onSnapToItem(INITIAL_INDEX);
     setShowFootprints(true);
   }, []);
+
+  useEffect(() => setShowFootprints(!!footprints), [footprints]);
 
   useEffect(() => {
     if (
@@ -63,44 +72,82 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
     setCurrentFootprint(index);
   };
 
-  const renderItem = ({item, index}: {item: any; index: number}) => (
-    <Animated.View
-      style={[styles.card, {transform: [{translateY}], opacity: tranistion}]}
-      key={index}>
-      <Image source={{uri: item.media}} style={styles.cardImage} />
-      <View style={styles.content}>
-        <View style={styles.contentWrapper}>
-          <Text style={[styles.text, styles.username]} numberOfLines={1}>
-            {item.username}
-          </Text>
-          <Text style={[styles.text, styles.title]} numberOfLines={4}>
-            {item.title}
-          </Text>
-          <View style={{flexDirection: "row"}}>
-            <Icon name="map-marker-alt" color={Colors.primary} size={18} />
-            <View>
-              <Text style={[styles.text, styles.location]} numberOfLines={2}>
-                {item.locationName}
-              </Text>
-              <Text style={[styles.text, styles.distance]} numberOfLines={1}>
-                30km da te
-              </Text>
+  /**
+   * Porta l'utente alla schermata del footprint
+   * @param index
+   */
+  const goToFootprint = (index: number) => () => {
+    if (!footprints) return;
+    const {id, title, author} = footprints[index];
+
+    navigation.navigate("Footprint", {
+      title,
+      id,
+      authorUsername: author.username,
+    });
+  };
+
+  const renderItem = ({item, index}: {item: Footprint; index: number}) => {
+    const {coordinates} = item.location;
+
+    const distance = getDistanceFromUser(coordinates[1], coordinates[0]);
+
+    return (
+      <Animated.View
+        style={[styles.card, {transform: [{translateY}], opacity: tranistion}]}
+        key={index}>
+        <TouchableWithoutFeedback onPress={goToFootprint(index)}>
+          <SharedElement id={`footprint.${item.id}.image`}>
+            <Image
+              source={{
+                uri:
+                  /* item.media  */
+                  "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595854452/static/photo-1552752399-22aa8f97ade0_fqkui9.jpg",
+              }}
+              style={styles.cardImage}
+            />
+          </SharedElement>
+        </TouchableWithoutFeedback>
+        <View style={styles.content}>
+          <View style={styles.contentWrapper}>
+            <Text style={[styles.text, styles.username]} numberOfLines={1}>
+              {item.author.username}
+            </Text>
+            <Text style={[styles.text, styles.title]} numberOfLines={4}>
+              {item.title}
+            </Text>
+            <View style={{flexDirection: "row"}}>
+              <Icon name="map-marker-alt" color={Colors.primary} size={18} />
+              <View>
+                <Text style={[styles.text, styles.location]} numberOfLines={2}>
+                  {/* item.locationName || */ "Firenze"}
+                </Text>
+                {distance && (
+                  <Text
+                    style={[styles.text, styles.distance]}
+                    numberOfLines={1}>
+                    {distance.formattedDistance}
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
+          <TouchableOpacity
+            style={styles.goIcon}
+            onPress={goToFootprint(index)}>
+            <AntDesignIcon name="arrowright" color={Colors.primary} size={28} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.goIcon}>
-          <AntDesignIcon name="arrowright" color={Colors.primary} size={28} />
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
-  );
+      </Animated.View>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Carousel
         ref={carouselRef}
         initialScrollIndex={INITIAL_INDEX}
-        data={footprints}
+        data={footprints || []}
         renderItem={renderItem}
         sliderWidth={width}
         itemWidth={CARD_WIDTH}

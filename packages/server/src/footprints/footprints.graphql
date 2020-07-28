@@ -13,7 +13,7 @@ type Footprint {
 type Query {
   # Restituisce il footprint associato all'id passato
   getFootprintById(id: ID!): Footprint!
-
+  # Restituisce tutti i footprint nei pressi del punto passato
   getNearFootprints(
     lng: Float!
     lat: Float!

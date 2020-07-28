@@ -20,9 +20,8 @@ const {Value, interpolate, Extrapolate} = Animated;
 let uri =
   "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020031/static/Alberto_conversi_profile_pic_gcbyuc.jpg";
 
-type SearchScreenProps =
-  | StackScreenProps<ProfileStackParamList, "MyProfile">
-  | StackScreenProps<HomeStackParamList, "Profile">;
+type SearchScreenProps = StackScreenProps<ProfileStackParamList, "MyProfile">;
+// | StackScreenProps<HomeStackParamList, "">;
 
 export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
   // ID dell'utente loggato

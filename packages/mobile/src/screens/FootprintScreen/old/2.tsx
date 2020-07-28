@@ -41,7 +41,6 @@ import {Spacing} from "../../styles";
 import {MapCard} from "./cards/MapCard";
 
 // Dimenzioni:
-// @ts-ignore
 const {height} = Dimensions.get("window");
 const IMAGE_HEIGHT = /* (height * 90) / 100 */ height - 150;
 
@@ -118,13 +117,12 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      {/*  <ScrollView style={styles.scrollView}> */}
       <PanGestureHandler {...gestureHandler}>
         <Animated.View
           style={{
             flex: 1,
             borderRadius: borderRadius,
-            // overflow: "hidden",
+            overflow: "hidden",
             transform: [{translateX}, {translateY}, {scale}],
           }}>
           <View style={styles.imageContainer}>
@@ -134,7 +132,6 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
                 source={{uri: image}}
               />
             </SharedElement>
-
             <View
               style={{
                 position: "absolute",
@@ -159,48 +156,48 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
               </TouchableOpacity>
             </View>
           </View>
+          <SafeAreaView>
+            <ScrollView style={styles.scrollView} overScrollMode="never">
+              <Animated.View style={[styles.content]}>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+                <Text>ciao</Text>
+              </Animated.View>
+            </ScrollView>
+          </SafeAreaView>
         </Animated.View>
       </PanGestureHandler>
-
-      <SafeAreaView>
-        <Animated.View style={[styles.content]}>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-          <Text>ciao</Text>
-        </Animated.View>
-      </SafeAreaView>
-      {/*  </ScrollView> */}
     </View>
   );
 };

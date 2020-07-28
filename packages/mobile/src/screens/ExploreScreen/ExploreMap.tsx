@@ -1,16 +1,18 @@
 import React, {useRef, useEffect} from "react";
-import {StyleProp, ViewStyle} from "react-native";
+import {StyleProp, ViewStyle, PermissionsAndroid} from "react-native";
 import Mapbox from "@react-native-mapbox-gl/maps";
 import {Marker} from "../../components/map";
 import {LocationState} from ".";
+import {Footprint} from "../../generated/graphql";
+
 // 11.255814, 43.769562 --> frienze
 
-const {MapView, Camera} = Mapbox;
+const {MapView, Camera, UserLocation} = Mapbox;
 
 interface ExploreMapProps {
   containerStyle?: StyleProp<ViewStyle>;
   location?: LocationState;
-  footprints: any[];
+  footprints: Footprint[] | null;
   currentFootprint: number;
   setCurrentFootprint: (index: number) => void;
 }
@@ -23,6 +25,13 @@ export const ExploreMap: React.FC<ExploreMapProps> = ({
   setCurrentFootprint,
 }) => {
   const camera = useRef<Mapbox.Camera>();
+
+  useEffect(() => {
+    PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+    ]);
+  }, []);
 
   useEffect(() => {
     if (!location || !camera.current) return;
@@ -40,11 +49,12 @@ export const ExploreMap: React.FC<ExploreMapProps> = ({
     else camera.current.flyTo(location.coordinates, animationDuration);
   }, [location]);
 
-  const renderAnnotations = () =>
-    footprints.map((footprint, index) => {
+  const renderAnnotations = () => {
+    if (!footprints) return;
+    return footprints.map((footprint, index) => {
       const current = currentFootprint === index;
       const id = `pointAnnotation${index}${current ? "-current" : ""}`;
-      const {coordinates} = footprint;
+      const {coordinates} = footprint.location;
 
       const onPress = () => {
         if (current) return;
@@ -61,6 +71,11 @@ export const ExploreMap: React.FC<ExploreMapProps> = ({
         />
       );
     });
+  };
+
+  const centerCoordinate = footprints
+    ? footprints[0].location.coordinates
+    : [11.255814, 43.769562];
 
   return (
     <MapView
@@ -69,9 +84,10 @@ export const ExploreMap: React.FC<ExploreMapProps> = ({
       compassEnabled={false}>
       <Camera
         ref={camera as any}
-        zoomLevel={15}
-        centerCoordinate={footprints[0].coordinates}
+        zoomLevel={5 /** TODO */}
+        centerCoordinate={centerCoordinate}
       />
+      <UserLocation />
       {renderAnnotations()}
     </MapView>
   );
