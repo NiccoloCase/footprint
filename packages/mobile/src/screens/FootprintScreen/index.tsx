@@ -51,8 +51,8 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
   route,
   navigation,
 }) => {
-  const {id, title, authorUsername, image} = route.params;
-
+  const {id, title, image} = route.params;
+  console.log(id);
   // Animazione:
   const [
     translationX,

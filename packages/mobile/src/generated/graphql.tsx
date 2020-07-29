@@ -106,8 +106,9 @@ export type MutationDelateCommentArgs = {
 export type MutationAddFootprintArgs = {
   title: Scalars['String'];
   coordinates: Array<Scalars['Float']>;
+  locationName: Scalars['String'];
+  media: Scalars['String'];
   body?: Maybe<Scalars['String']>;
-  media?: Maybe<Scalars['String']>;
 };
 
 
@@ -288,6 +289,7 @@ export type Location = {
   __typename?: 'Location';
   type: LocationType;
   coordinates: Array<Scalars['Float']>;
+  locationName: Scalars['String'];
 };
 
 export type PaginationOptions = {
@@ -531,6 +533,23 @@ export type GetCommentsQuery = (
       & Pick<User, 'id' | 'username'>
     ) }
   )>> }
+);
+
+export type AddFootprintMutationVariables = Exact<{
+  title: Scalars['String'];
+  body: Scalars['String'];
+  coordinates: Array<Scalars['Float']>;
+  media: Scalars['String'];
+  locationName: Scalars['String'];
+}>;
+
+
+export type AddFootprintMutation = (
+  { __typename?: 'Mutation' }
+  & { addFootprint: (
+    { __typename?: 'Footprint' }
+    & Pick<Footprint, 'id'>
+  ) }
 );
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -1113,6 +1132,42 @@ export function useGetCommentsLazyQuery(baseOptions?: ApolloReactHooks.LazyQuery
 export type GetCommentsQueryHookResult = ReturnType<typeof useGetCommentsQuery>;
 export type GetCommentsLazyQueryHookResult = ReturnType<typeof useGetCommentsLazyQuery>;
 export type GetCommentsQueryResult = ApolloReactCommon.QueryResult<GetCommentsQuery, GetCommentsQueryVariables>;
+export const AddFootprintDocument = gql`
+    mutation AddFootprint($title: String!, $body: String!, $coordinates: [Float!]!, $media: String!, $locationName: String!) {
+  addFootprint(title: $title, body: $body, coordinates: $coordinates, media: $media, locationName: $locationName) {
+    id
+  }
+}
+    `;
+export type AddFootprintMutationFn = ApolloReactCommon.MutationFunction<AddFootprintMutation, AddFootprintMutationVariables>;
+
+/**
+ * __useAddFootprintMutation__
+ *
+ * To run a mutation, you first call `useAddFootprintMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddFootprintMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addFootprintMutation, { data, loading, error }] = useAddFootprintMutation({
+ *   variables: {
+ *      title: // value for 'title'
+ *      body: // value for 'body'
+ *      coordinates: // value for 'coordinates'
+ *      media: // value for 'media'
+ *      locationName: // value for 'locationName'
+ *   },
+ * });
+ */
+export function useAddFootprintMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddFootprintMutation, AddFootprintMutationVariables>) {
+        return ApolloReactHooks.useMutation<AddFootprintMutation, AddFootprintMutationVariables>(AddFootprintDocument, baseOptions);
+      }
+export type AddFootprintMutationHookResult = ReturnType<typeof useAddFootprintMutation>;
+export type AddFootprintMutationResult = ApolloReactCommon.MutationResult<AddFootprintMutation>;
+export type AddFootprintMutationOptions = ApolloReactCommon.BaseMutationOptions<AddFootprintMutation, AddFootprintMutationVariables>;
 export const MeDocument = gql`
     query Me {
   whoami {

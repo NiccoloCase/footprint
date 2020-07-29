@@ -43,14 +43,14 @@ export class FootprintsService {
     payload: AddFootprintDTO,
     author: IUser,
   ): Promise<IFootprint> {
-    const { title, body, coordinates, media } = payload;
+    const { title, body, coordinates, media, locationName } = payload;
 
     const data = {
       authorId: author.id,
       title,
       body,
       media,
-      location: { coordinates, type: LocationType.Point },
+      location: { coordinates, type: LocationType.Point, locationName },
     };
 
     try {

@@ -10,4 +10,8 @@ export const PointSchema = new Schema({
     type: [Number],
     required: true,
   },
+  locationName: {
+    type: String,
+    required: true,
+  },
 });

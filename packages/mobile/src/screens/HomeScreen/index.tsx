@@ -136,7 +136,7 @@ export const HomeScreen: React.FC = () => {
         }
         profilePicture={
           item.footprint.author.profileImage ||
-          "https://picsum.photos/200/30" + Math.trunc(Math.random() * 10)
+          "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020031/static/Alberto_conversi_profile_pic_gcbyuc.jpg"
         }
         key={index}
       />

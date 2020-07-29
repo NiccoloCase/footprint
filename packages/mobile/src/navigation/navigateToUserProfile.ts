@@ -4,10 +4,7 @@ export const navigateToUserProfile = (
   userId?: string,
 ): CommonActions.Action => {
   if (!userId || userId === ownId) return CommonActions.navigate("MyProfile");
-  else {
-    console.log("Dio");
-    return CommonActions.navigate("Profile", {id: userId});
-  }
+  else return CommonActions.navigate("Profile", {id: userId});
 };
 
 const ownId = "io";

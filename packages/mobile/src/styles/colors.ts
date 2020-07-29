@@ -9,3 +9,6 @@ export const mediumGrey = "#abb7b7";
 
 /** Grigio chiaro */
 export const lightGrey = "#EDD5DD";
+
+/** Rosso */
+export const errorRed = "red";

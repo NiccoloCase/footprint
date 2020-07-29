@@ -64,7 +64,7 @@ export interface IMutation {
     verfyUser(token: string): VerfyUserResponse | Promise<VerfyUserResponse>;
     postComment(contentId: string, text: string): Comment | Promise<Comment>;
     delateComment(contentId: string, id: string): ProcessResult | Promise<ProcessResult>;
-    addFootprint(title: string, coordinates: number[], body?: string, media?: string): Footprint | Promise<Footprint>;
+    addFootprint(title: string, coordinates: number[], locationName: string, media: string, body?: string): Footprint | Promise<Footprint>;
     followUser(target: string): ProcessResult | Promise<ProcessResult>;
     unfollowUser(target: string): ProcessResult | Promise<ProcessResult>;
     addLikeToFootprint(footprintId: string): ProcessResult | Promise<ProcessResult>;
@@ -135,6 +135,7 @@ export interface ProcessResult {
 export interface Location {
     type: LocationType;
     coordinates: number[];
+    locationName: string;
 }
 
 export interface Token {

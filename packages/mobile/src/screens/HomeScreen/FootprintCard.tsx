@@ -54,8 +54,6 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
     };
   }, [navigation]);
 
-  //console.log(isFocused);
-
   const goToFootprint = () => {
     navigation.navigate("Footprint", {
       title,

@@ -76,9 +76,17 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
 
   const renderContent = () => {
     // SCHERMATA DEL PROFILO
-    if (user) {
-      const {username} = user;
-      let xuser = {...user, profileImage: uri};
+    if (true || user) {
+      //const {username} = user;
+      //let xuser = {...user, profileImage: uri};
+      const username = "niccolocase";
+      const xuser: User = {
+        profileImage: uri,
+        followersCount: 100,
+        followingCount: 29,
+        username,
+        id: "5eff94323dc86ce1298e1340",
+      };
 
       return (
         <>

@@ -16,6 +16,8 @@ export interface GeoModel {
   setError: Action<GeoModel, GeolocationError | null>;
   // Inizia a registare la posizione dell'utente
   startRecordingLocation: Thunk<GeoModel>;
+  // Reacupera la posizione del dipositvo
+  fetchPosition: Thunk<GeoModel>;
   // Interrompe la registrazione della posizione del'utente
   stopRecordingLocation: Thunk<GeoModel>;
 }
@@ -40,6 +42,25 @@ const geoModel: GeoModel = {
   })),
 
   /**
+   * Recupera la posizione del dipositivo
+   */
+  fetchPosition: thunk((actions) =>
+    geolocation.getCurrentPosition(
+      (res) => {
+        const {latitude, longitude, altitude} = res.coords;
+        // elimina eventuali errori
+        actions.setError(null);
+        // imposta la nuova posizione
+        actions.setUserPosition({latitude, longitude, altitude});
+      },
+      (err: GeolocationError) => {
+        actions.setUserPosition(null);
+        actions.setError(err);
+      },
+    ),
+  ),
+
+  /**
    * Inizia a registrare la posizione dell'utente
    */
   startRecordingLocation: thunk((actions) => {
@@ -57,7 +78,10 @@ const geoModel: GeoModel = {
         // imposta la nuova posizione
         actions.setUserPosition({latitude, longitude, altitude});
       },
-      (err: GeolocationError) => actions.setError(err),
+      (err: GeolocationError) => {
+        actions.setUserPosition(null);
+        actions.setError(err);
+      },
     );
   }),
 

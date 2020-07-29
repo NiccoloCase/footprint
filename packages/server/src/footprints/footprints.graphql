@@ -27,7 +27,8 @@ type Mutation {
   addFootprint(
     title: String!
     coordinates: [Float!]!
+    locationName: String!
+    media: String!
     body: String
-    media: String
   ): Footprint!
 }

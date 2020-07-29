@@ -11,4 +11,10 @@ export const ValidationConfig = {
       length: { min: 3, max: 30 },
     },
   },
+  footprint: {
+    title: {
+      length: { min: 3, max: 50 },
+    },
+    body: { length: { max: 150 } },
+  },
 };

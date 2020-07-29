@@ -1,10 +1,12 @@
 import React, {useRef, useEffect} from "react";
-import {TouchableOpacity, Text, StyleSheet, View} from "react-native";
+import {Text, StyleSheet, View, TouchableHighlight} from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import {Spacing, Colors} from "../../../styles";
 import {pickPhoto} from "./pickPhoto";
 import {ImageSource} from "../../../utils/types";
+
+const TEXT_COLOR = "#808080";
 
 interface MedaPickerModalProps {
   /** Se il modal è aperto */
@@ -69,18 +71,24 @@ const MediaPickerModal: React.FC<MedaPickerModalProps> = ({
       <Text style={styles.title}>Scegli foto</Text>
 
       <View style={styles.buttonsWrapper}>
-        <TouchableOpacity
+        <TouchableHighlight
+          underlayColor="#eee"
           style={styles.button}
           onPress={handlePickPhoto("library")}>
-          <Text style={styles.buttonText}>Seleziona dalla galleria</Text>
-          <Icon name="photo" size={25} color={Colors.mediumGrey} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
+          <View style={styles.buttonWrapper}>
+            <Text style={styles.buttonText}>Seleziona dalla galleria</Text>
+            <Icon name="photo" size={25} color={TEXT_COLOR} />
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight
+          underlayColor="#eee"
+          style={[styles.button, styles.buttonOutile]}
           onPress={handlePickPhoto("camera")}>
-          <Text style={styles.buttonText}>Scatta una foto</Text>
-          <Icon name="add-a-photo" size={25} color={Colors.mediumGrey} />
-        </TouchableOpacity>
+          <View style={styles.buttonWrapper}>
+            <Text style={styles.buttonText}>Scatta una foto</Text>
+            <Icon name="add-a-photo" size={25} color={TEXT_COLOR} />
+          </View>
+        </TouchableHighlight>
       </View>
     </RBSheet>
   );
@@ -88,7 +96,7 @@ const MediaPickerModal: React.FC<MedaPickerModalProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 10,
+    borderRadius: 15,
     paddingHorizontal: Spacing.screenHorizontalPadding,
   },
   title: {
@@ -107,16 +115,20 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 5,
     borderRadius: 10,
+  },
+  buttonOutile: {
+    borderColor: "#eee",
+    borderWidth: 3,
+    backgroundColor: "transparent",
+  },
+  buttonWrapper: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
   buttonText: {
-    //   textAlign: "center",
-    marginRight: 10,
-    color: Colors.mediumGrey,
-    //color: "#fff",
-    fontWeight: "bold",
+    color: TEXT_COLOR,
+    marginRight: 15,
     fontSize: 18,
   },
 });

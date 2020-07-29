@@ -1,8 +1,9 @@
 export class AddFootprintDTO {
   title: string;
   coordinates: [number, number];
+  locationName: string;
+  media: string;
   body?: string;
-  media?: string;
 }
 
 export class GetNearFootprintsDTO {

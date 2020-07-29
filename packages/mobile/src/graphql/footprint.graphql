@@ -83,3 +83,21 @@ query GetComments($contentId: ID!, $page: Int) {
     createdAt
   }
 }
+
+mutation AddFootprint(
+  $title: String!
+  $body: String!
+  $coordinates: [Float!]!
+  $media: String!
+  $locationName: String!
+) {
+  addFootprint(
+    title: $title
+    body: $body
+    coordinates: $coordinates
+    media: $media
+    locationName: $locationName
+  ) {
+    id
+  }
+}

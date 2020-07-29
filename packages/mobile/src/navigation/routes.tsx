@@ -28,12 +28,19 @@ import {ExploreScreen} from "../screens/ExploreScreen";
 import {ProfileScreen} from "../screens/ProfileScreen";
 import {SettingsScreen} from "../screens/SettingsScreen";
 import {FootprintScreen} from "../screens/FootprintScreen";
-import {useGetNewsFeedLazyQuery} from "../generated/graphql";
+import {GetNewsFeedDocument} from "../generated/graphql";
+import {useLazyQuery} from "../graphql/useLazyQuery";
+import {MediaScreen} from "../screens/MediaScreen";
 
 const defaultScreenOptions: StackNavigationOptions = {
-  headerTitleStyle: {alignSelf: "center"},
-  headerStyle: {backgroundColor: /* Colors.primary */ "#fff"},
-  headerTintColor: /* "#fff" */ Colors.darkGrey,
+  headerTitleStyle: {alignSelf: "center", fontWeight: "bold"},
+  headerStyle: {
+    backgroundColor: "#fff",
+    shadowColor: "transparent",
+    borderBottomWidth: 0,
+    elevation: 0,
+  },
+  headerTintColor: Colors.darkGrey,
   headerTitleAlign: "center",
 };
 
@@ -88,7 +95,7 @@ const AddFootprintStackScreen = () => (
     <AddFootprintStack.Screen
       name="AddFootprint"
       component={AddFootprintScreen}
-      options={{title: "Aggiungi un footprint"}}
+      options={{title: "Pubblica un footprint"}}
     />
   </AddFootprintStack.Navigator>
 );
@@ -149,7 +156,7 @@ const Tabs = createBottomTabNavigator<BottomTabParamList>();
 
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="Home"
+    initialRouteName="AddFootprint"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,
@@ -198,28 +205,16 @@ const TabsScreen = () => (
 );
 
 // APP
-
-/* const AppStack = createStackNavigator();
-const AppStackScreen = () => (
-  <AppStack.Navigator headerMode="none">
-    <AppStack.Screen name="Home" component={TabsScreen} />
-    <AppStack.Screen
-      name="Settings"
-      component={SettingsStackScreen}
-      options={{title: "Impostazioni"}}
-    />
-  </AppStack.Navigator>
-); */
 export type AppStackParamList = {
   Home: undefined;
   Settings: undefined;
   Footprint: {
     id: string;
     title: string;
-    authorUsername: string;
     image: string;
   };
   Profile: {id: string};
+  Image: {uri: string};
 };
 const AppStack = createSharedElementStackNavigator();
 const AppStackScreen = () => (
@@ -252,7 +247,30 @@ const AppStackScreen = () => (
         ];
       }}
     />
-    <AppStack.Screen name="Profile" component={ProfileScreen} />
+    <AppStack.Screen
+      name="Profile"
+      component={ProfileScreen}
+      options={() => ({
+        headerBackTitleVisible: false,
+        cardStyle: {backgroundColor: "transparent"},
+        cardStyleInterpolator: ({current: {progress}}) => ({
+          cardStyle: {opacity: progress},
+        }),
+      })}
+    />
+
+    <AppStack.Screen
+      name="Image"
+      component={MediaScreen}
+      options={(navigation) => ({
+        headerBackTitleVisible: false,
+        gestureEnabled: false,
+        cardStyleInterpolator: ({current: {progress}}) => ({
+          cardStyle: {opacity: progress},
+        }),
+        cardStyle: {backgroundColor: "transparent"},
+      })}
+    />
   </AppStack.Navigator>
 );
 
@@ -282,10 +300,7 @@ export const Navigation = () => {
   const singin = useStoreActions((actions) => actions.auth.singin);
 
   // Funzione per richiede il feed per salvarlo nella cache
-  // TODO
-  const [loadFeed, {error}] = useGetNewsFeedLazyQuery({
-    variables: {pagination: {limit: 10}},
-  });
+  const prefetchFeed = useLazyQuery(GetNewsFeedDocument);
 
   // richieda al server un nuovo token di accesso
   useEffect(() => {
@@ -299,7 +314,7 @@ export const Navigation = () => {
           singin({accessToken, refreshToken});
 
           // Richiede il feed per salvarlo nella cache
-          loadFeed();
+          await prefetchFeed({pagination: {limit: 10}});
         }
       } finally {
         setIsLoading(false);

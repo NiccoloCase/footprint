@@ -85,12 +85,11 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
       />
       {/* AVATAR */}
       <View>
-        <View style={styles.avatar}>
-          <Image
-            source={{uri: profileImage}}
-            style={{flex: 1, width: null, height: null} as any}
-          />
-        </View>
+        <Image
+          resizeMode="cover"
+          source={{uri: profileImage}}
+          style={styles.avatar}
+        />
         <Animated.Text style={[styles.username]}>{username}</Animated.Text>
       </View>
       {/** BOTTONE SEGUI - NON SEGUIRE  */}

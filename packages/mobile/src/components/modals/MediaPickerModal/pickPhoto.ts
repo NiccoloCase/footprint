@@ -15,16 +15,16 @@ export const pickPhoto = (
   callback: (src: ImageSource) => void,
 ) => {
   const options: any = {
-    width: 300,
-    height: 400,
+    width: 1080,
+    height: 1920,
     cropping: true,
     mediaType: "photo",
     cropperActiveWidgetColor: Colors.primary,
     cropperToolbarTitle: "Modifica la foto",
     loadingLabelText: "Caricamento...",
+    writeTempFile: true,
     // cropperToolbarColor: Colors.primary,
     // cropperStatusBarColor: Colors.primary,
-    includeBase64: true,
   };
 
   Promise.resolve(
@@ -44,6 +44,7 @@ export const pickPhoto = (
             ? image.filename
             : image.path.substring(image.path.lastIndexOf("/") + 1),
       };
+      //console.log(image.exif);
       callback(source);
     })
     .catch((err) => {
