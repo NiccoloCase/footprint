@@ -9,7 +9,7 @@ import { LocationType } from '../graphql';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IFootprintModel, IFootprint } from './footprints.schema';
-import { IUser } from '../users/users.schema';
+import { IUserModel, IUser } from '../users/users.schema';
 import { NewsFeedService } from '../news-feed/news-feed.service';
 
 @Injectable()
@@ -17,6 +17,8 @@ export class FootprintsService {
   constructor(
     @InjectModel('Footprint')
     private readonly footprintModel: Model<IFootprintModel>,
+    @InjectModel('User')
+    private readonly userModel: Model<IUserModel>,
     @Inject(forwardRef(() => NewsFeedService))
     private readonly newsFeedService: NewsFeedService,
   ) {}
@@ -28,6 +30,19 @@ export class FootprintsService {
   async findFootprintById(id: string): Promise<IFootprint | null> {
     try {
       const footprint = await this.footprintModel.findById(id);
+      return footprint;
+    } catch (err) {
+      throw new BadRequestException();
+    }
+  }
+
+  /**
+   * Restituisce i footprints creati dall'utente associato all'id passato
+   * @param authorId
+   */
+  async findFootprintsByUser(authorId: string): Promise<IFootprint[]> {
+    try {
+      const footprint = await this.footprintModel.find({ authorId });
       return footprint;
     } catch (err) {
       throw new BadRequestException();
@@ -55,6 +70,11 @@ export class FootprintsService {
 
     try {
       const newFootprint = await this.footprintModel.create(data);
+
+      // Incremeneta il numero di footprint dell'utente
+      await this.userModel.findByIdAndUpdate(author.id, {
+        $inc: { footprintsCount: 1 },
+      });
 
       // Diffonde il footprint appena creato nei news feed di tutti
       // i followers dell'autore

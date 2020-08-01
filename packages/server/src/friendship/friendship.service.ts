@@ -37,14 +37,13 @@ export class FriendshipService {
   ): Promise<IUser[]> {
     // impostazioni dell'impaginazione
     const { offset, limit } = normalizePaginationOptions(pagination);
-
     const docs = await this.friendshipModel
-      .find({ target: userId }, { target: 1, _id: 0 })
+      .find({ target: userId }, { user: 1, _id: 0 })
       .skip(offset)
       .limit(limit)
-      .populate('target');
-
-    const followers: IUser[] = docs.map(doc => doc.target) as any;
+      .populate('user');
+    if (docs.length === 0) return [];
+    const followers: IUser[] = docs.map(doc => doc.user) as any;
     return followers;
   }
 
@@ -70,11 +69,12 @@ export class FriendshipService {
     const { offset, limit } = normalizePaginationOptions(pagination);
 
     const docs = await this.friendshipModel
-      .find({ user: userId }, { user: 1, _id: 0 })
+      .find({ user: userId }, { target: 1, _id: 0 })
       .skip(offset)
       .limit(limit)
       .populate('user');
 
+    if (docs.length === 0) return [];
     const following: IUser[] = docs.map(doc => doc.target) as any;
     return following;
   }

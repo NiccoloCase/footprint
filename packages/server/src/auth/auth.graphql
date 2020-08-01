@@ -30,9 +30,19 @@ type VerfyUserResponse {
 type Mutation {
   # REGISTRAZIONE:
   # registra un utente in locale
-  signup(username: String!, email: String!, password: String!): EmailResponse!
+  signup(
+    email: String!
+    password: String!
+    username: String!
+    location: PointLocation!
+    profileImage: String
+  ): EmailResponse!
   # registra un utente con un account google
-  signupWithGoogle(username: String!): GoogleAuthResult!
+  signupWithGoogle(
+    username: String!
+    location: PointLocation!
+    profileImage: String
+  ): GoogleAuthResult!
 
   # LOGIN:
   # accesso in locale

@@ -90,8 +90,10 @@ export const Content: React.FC<ContentProps> = ({y, user}) => {
             <Icon name="chevron-up" color={Colors.darkGrey} size={22} />
           </Animated.View>
         </TouchableHighlight>
-        <FollowerCard />
-        <MapCard />
+        {user.followers.length > 0 && (
+          <FollowerCard followers={user.followers} />
+        )}
+        <MapCard userId={user.id} />
         <FootprintsCard />
       </Animated.View>
     </Animated.ScrollView>

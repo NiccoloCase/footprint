@@ -65,18 +65,23 @@ export type Mutation = {
   sendConfirmationEmail: EmailResponse;
   forgotPassword: EmailResponse;
   changePasswordWithToken: ProcessResult;
+  editProfile: EditProfileResult;
 };
 
 
 export type MutationSignupArgs = {
-  username: Scalars['String'];
   email: Scalars['String'];
   password: Scalars['String'];
+  username: Scalars['String'];
+  location: PointLocation;
+  profileImage?: Maybe<Scalars['String']>;
 };
 
 
 export type MutationSignupWithGoogleArgs = {
   username: Scalars['String'];
+  location: PointLocation;
+  profileImage?: Maybe<Scalars['String']>;
 };
 
 
@@ -152,6 +157,14 @@ export type MutationChangePasswordWithTokenArgs = {
   newPassword: Scalars['String'];
 };
 
+
+export type MutationEditProfileArgs = {
+  username?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  profileImage?: Maybe<Scalars['String']>;
+  location?: Maybe<PointLocation>;
+};
+
 export type Comment = {
   __typename?: 'Comment';
   id: Scalars['ID'];
@@ -166,6 +179,7 @@ export type Query = {
   getComments: Array<Maybe<Comment>>;
   getFootprintById: Footprint;
   getNearFootprints: Array<Footprint>;
+  getFootprintsByUser: Array<Footprint>;
   getFollowers: Array<User>;
   getFollowing: Array<User>;
   getLikes: Array<User>;
@@ -193,6 +207,11 @@ export type QueryGetNearFootprintsArgs = {
   lat: Scalars['Float'];
   minDistance?: Maybe<Scalars['Float']>;
   maxDistance?: Maybe<Scalars['Float']>;
+};
+
+
+export type QueryGetFootprintsByUserArgs = {
+  userId: Scalars['ID'];
 };
 
 
@@ -292,6 +311,11 @@ export type Location = {
   locationName: Scalars['String'];
 };
 
+export type PointLocation = {
+  coordinates: Array<Scalars['Float']>;
+  locationName: Scalars['String'];
+};
+
 export type PaginationOptions = {
   offset?: Maybe<Scalars['Int']>;
   limit?: Maybe<Scalars['Int']>;
@@ -322,6 +346,10 @@ export type User = {
   username: Scalars['String'];
   followersCount: Scalars['Int'];
   followingCount: Scalars['Int'];
+  footprintsCount: Scalars['Int'];
+  location: Location;
+  followers: Array<User>;
+  following: Array<User>;
   isFollowed?: Maybe<Scalars['Boolean']>;
   email?: Maybe<Scalars['String']>;
   authType?: Maybe<AuthType>;
@@ -329,14 +357,32 @@ export type User = {
 };
 
 
+export type UserFollowersArgs = {
+  pagination?: Maybe<PaginationOptions>;
+};
+
+
+export type UserFollowingArgs = {
+  pagination?: Maybe<PaginationOptions>;
+};
+
+
 export type UserIsFollowedArgs = {
   id?: Maybe<Scalars['ID']>;
+};
+
+export type EditProfileResult = {
+  __typename?: 'EditProfileResult';
+  success: Scalars['Boolean'];
+  isEmailConfirmationRequired: Scalars['Boolean'];
 };
 
 export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
   email: Scalars['String'];
   password: Scalars['String'];
+  location: PointLocation;
+  profileImage?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -364,6 +410,8 @@ export type LoginMutation = (
 
 export type SignupWithGoogleMutationVariables = Exact<{
   username: Scalars['String'];
+  location: PointLocation;
+  profileImage?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -417,7 +465,7 @@ export type GetNearFootprintsQuery = (
       & Pick<Location, 'coordinates'>
     ), author: (
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'username'>
+      & Pick<User, 'id' | 'username' | 'profileImage'>
     ) }
   )> }
 );
@@ -440,8 +488,25 @@ export type GetNewsFeedQuery = (
         & Pick<Location, 'coordinates'>
       ), author: (
         { __typename?: 'User' }
-        & Pick<User, 'username'>
+        & Pick<User, 'username' | 'profileImage'>
       ) }
+    ) }
+  )> }
+);
+
+export type GetFootprintsByUserQueryVariables = Exact<{
+  userId: Scalars['ID'];
+}>;
+
+
+export type GetFootprintsByUserQuery = (
+  { __typename?: 'Query' }
+  & { getFootprintsByUser: Array<(
+    { __typename?: 'Footprint' }
+    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount'>
+    & { location: (
+      { __typename?: 'Location' }
+      & Pick<Location, 'coordinates' | 'locationName'>
     ) }
   )> }
 );
@@ -498,7 +563,7 @@ export type PostCommentMutation = (
     & Pick<Comment, 'id' | 'text' | 'createdAt'>
     & { author: (
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'username'>
+      & Pick<User, 'id' | 'username' | 'profileImage'>
     ) }
   ) }
 );
@@ -530,7 +595,7 @@ export type GetCommentsQuery = (
     & Pick<Comment, 'id' | 'text' | 'createdAt'>
     & { author: (
       { __typename?: 'User' }
-      & Pick<User, 'id' | 'username'>
+      & Pick<User, 'id' | 'username' | 'profileImage'>
     ) }
   )>> }
 );
@@ -559,7 +624,17 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { whoami: (
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'email' | 'username' | 'followersCount' | 'followingCount'>
+    & Pick<User, 'id' | 'username' | 'email' | 'authType' | 'profileImage' | 'followersCount' | 'followingCount' | 'footprintsCount'>
+    & { location: (
+      { __typename?: 'Location' }
+      & Pick<Location, 'coordinates' | 'locationName'>
+    ), followers: Array<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username' | 'profileImage'>
+    )>, following: Array<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username' | 'profileImage'>
+    )> }
   ) }
 );
 
@@ -573,7 +648,17 @@ export type GetUserByIdQuery = (
   { __typename?: 'Query' }
   & { getUserById: (
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'username' | 'followersCount' | 'followingCount' | 'isFollowed'>
+    & Pick<User, 'id' | 'username' | 'profileImage' | 'isFollowed' | 'followersCount' | 'followingCount' | 'footprintsCount'>
+    & { location: (
+      { __typename?: 'Location' }
+      & Pick<Location, 'coordinates' | 'locationName'>
+    ), followers: Array<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username' | 'profileImage'>
+    )>, following: Array<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username' | 'profileImage'>
+    )> }
   ) }
 );
 
@@ -680,10 +765,26 @@ export type UnfollowUserMutation = (
   ) }
 );
 
+export type EditProfileMutationVariables = Exact<{
+  username?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  location?: Maybe<PointLocation>;
+  profileImage?: Maybe<Scalars['String']>;
+}>;
+
+
+export type EditProfileMutation = (
+  { __typename?: 'Mutation' }
+  & { editProfile: (
+    { __typename?: 'EditProfileResult' }
+    & Pick<EditProfileResult, 'success' | 'isEmailConfirmationRequired'>
+  ) }
+);
+
 
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $email: String!, $password: String!) {
-  signup(username: $username, email: $email, password: $password) {
+    mutation Register($username: String!, $email: String!, $password: String!, $location: PointLocation!, $profileImage: String) {
+  signup(username: $username, email: $email, password: $password, location: $location, profileImage: $profileImage) {
     success
   }
 }
@@ -706,6 +807,8 @@ export type RegisterMutationFn = ApolloReactCommon.MutationFunction<RegisterMuta
  *      username: // value for 'username'
  *      email: // value for 'email'
  *      password: // value for 'password'
+ *      location: // value for 'location'
+ *      profileImage: // value for 'profileImage'
  *   },
  * });
  */
@@ -750,8 +853,8 @@ export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = ApolloReactCommon.MutationResult<LoginMutation>;
 export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const SignupWithGoogleDocument = gql`
-    mutation SignupWithGoogle($username: String!) {
-  signupWithGoogle(username: $username) {
+    mutation SignupWithGoogle($username: String!, $location: PointLocation!, $profileImage: String) {
+  signupWithGoogle(username: $username, location: $location, profileImage: $profileImage) {
     isRegistrationRequired
     googleProfile {
       name
@@ -783,6 +886,8 @@ export type SignupWithGoogleMutationFn = ApolloReactCommon.MutationFunction<Sign
  * const [signupWithGoogleMutation, { data, loading, error }] = useSignupWithGoogleMutation({
  *   variables: {
  *      username: // value for 'username'
+ *      location: // value for 'location'
+ *      profileImage: // value for 'profileImage'
  *   },
  * });
  */
@@ -846,6 +951,7 @@ export const GetNearFootprintsDocument = gql`
     author {
       id
       username
+      profileImage
     }
   }
 }
@@ -893,6 +999,7 @@ export const GetNewsFeedDocument = gql`
       authorId
       author {
         username
+        profileImage
       }
     }
   }
@@ -924,6 +1031,47 @@ export function useGetNewsFeedLazyQuery(baseOptions?: ApolloReactHooks.LazyQuery
 export type GetNewsFeedQueryHookResult = ReturnType<typeof useGetNewsFeedQuery>;
 export type GetNewsFeedLazyQueryHookResult = ReturnType<typeof useGetNewsFeedLazyQuery>;
 export type GetNewsFeedQueryResult = ApolloReactCommon.QueryResult<GetNewsFeedQuery, GetNewsFeedQueryVariables>;
+export const GetFootprintsByUserDocument = gql`
+    query GetFootprintsByUser($userId: ID!) {
+  getFootprintsByUser(userId: $userId) {
+    id
+    title
+    body
+    media
+    likesCount
+    location {
+      coordinates
+      locationName
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFootprintsByUserQuery__
+ *
+ * To run a query within a React component, call `useGetFootprintsByUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFootprintsByUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFootprintsByUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetFootprintsByUserQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetFootprintsByUserQuery, GetFootprintsByUserQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetFootprintsByUserQuery, GetFootprintsByUserQueryVariables>(GetFootprintsByUserDocument, baseOptions);
+      }
+export function useGetFootprintsByUserLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetFootprintsByUserQuery, GetFootprintsByUserQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetFootprintsByUserQuery, GetFootprintsByUserQueryVariables>(GetFootprintsByUserDocument, baseOptions);
+        }
+export type GetFootprintsByUserQueryHookResult = ReturnType<typeof useGetFootprintsByUserQuery>;
+export type GetFootprintsByUserLazyQueryHookResult = ReturnType<typeof useGetFootprintsByUserLazyQuery>;
+export type GetFootprintsByUserQueryResult = ApolloReactCommon.QueryResult<GetFootprintsByUserQuery, GetFootprintsByUserQueryVariables>;
 export const MarkFeedItemAsSeenDocument = gql`
     mutation MarkFeedItemAsSeen($id: ID!) {
   markFeedItemAsSeen(id: $id) {
@@ -1029,6 +1177,7 @@ export const PostCommentDocument = gql`
     author {
       id
       username
+      profileImage
     }
   }
 }
@@ -1100,6 +1249,7 @@ export const GetCommentsDocument = gql`
     author {
       id
       username
+      profileImage
     }
     createdAt
   }
@@ -1172,11 +1322,27 @@ export const MeDocument = gql`
     query Me {
   whoami {
     id
-    email
     username
+    email
+    authType
+    profileImage
     followersCount
     followingCount
-    email
+    footprintsCount
+    location {
+      coordinates
+      locationName
+    }
+    followers {
+      id
+      username
+      profileImage
+    }
+    following {
+      id
+      username
+      profileImage
+    }
   }
 }
     `;
@@ -1210,9 +1376,25 @@ export const GetUserByIdDocument = gql`
   getUserById(id: $id) {
     id
     username
+    profileImage
+    isFollowed(id: $isFollowedBy)
     followersCount
     followingCount
-    isFollowed(id: $isFollowedBy)
+    footprintsCount
+    location {
+      coordinates
+      locationName
+    }
+    followers {
+      id
+      username
+      profileImage
+    }
+    following {
+      id
+      username
+      profileImage
+    }
   }
 }
     `;
@@ -1505,3 +1687,39 @@ export function useUnfollowUserMutation(baseOptions?: ApolloReactHooks.MutationH
 export type UnfollowUserMutationHookResult = ReturnType<typeof useUnfollowUserMutation>;
 export type UnfollowUserMutationResult = ApolloReactCommon.MutationResult<UnfollowUserMutation>;
 export type UnfollowUserMutationOptions = ApolloReactCommon.BaseMutationOptions<UnfollowUserMutation, UnfollowUserMutationVariables>;
+export const EditProfileDocument = gql`
+    mutation EditProfile($username: String, $email: String, $location: PointLocation, $profileImage: String) {
+  editProfile(username: $username, email: $email, location: $location, profileImage: $profileImage) {
+    success
+    isEmailConfirmationRequired
+  }
+}
+    `;
+export type EditProfileMutationFn = ApolloReactCommon.MutationFunction<EditProfileMutation, EditProfileMutationVariables>;
+
+/**
+ * __useEditProfileMutation__
+ *
+ * To run a mutation, you first call `useEditProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editProfileMutation, { data, loading, error }] = useEditProfileMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *      email: // value for 'email'
+ *      location: // value for 'location'
+ *      profileImage: // value for 'profileImage'
+ *   },
+ * });
+ */
+export function useEditProfileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<EditProfileMutation, EditProfileMutationVariables>) {
+        return ApolloReactHooks.useMutation<EditProfileMutation, EditProfileMutationVariables>(EditProfileDocument, baseOptions);
+      }
+export type EditProfileMutationHookResult = ReturnType<typeof useEditProfileMutation>;
+export type EditProfileMutationResult = ApolloReactCommon.MutationResult<EditProfileMutation>;
+export type EditProfileMutationOptions = ApolloReactCommon.BaseMutationOptions<EditProfileMutation, EditProfileMutationVariables>;

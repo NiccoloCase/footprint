@@ -27,6 +27,11 @@ export interface NearToInput {
     maxDistance?: number;
 }
 
+export interface PointLocation {
+    coordinates: number[];
+    locationName: string;
+}
+
 export interface PaginationOptions {
     offset?: number;
     limit?: number;
@@ -57,8 +62,8 @@ export interface VerfyUserResponse {
 }
 
 export interface IMutation {
-    signup(username: string, email: string, password: string): EmailResponse | Promise<EmailResponse>;
-    signupWithGoogle(username: string): GoogleAuthResult | Promise<GoogleAuthResult>;
+    signup(email: string, password: string, username: string, location: PointLocation, profileImage?: string): EmailResponse | Promise<EmailResponse>;
+    signupWithGoogle(username: string, location: PointLocation, profileImage?: string): GoogleAuthResult | Promise<GoogleAuthResult>;
     login(email: string, password: string): AuthPayload | Promise<AuthPayload>;
     loginWithGoogle(): GoogleAuthResult | Promise<GoogleAuthResult>;
     verfyUser(token: string): VerfyUserResponse | Promise<VerfyUserResponse>;
@@ -73,6 +78,7 @@ export interface IMutation {
     sendConfirmationEmail(email: string): EmailResponse | Promise<EmailResponse>;
     forgotPassword(email: string): EmailResponse | Promise<EmailResponse>;
     changePasswordWithToken(token: string, newPassword: string): ProcessResult | Promise<ProcessResult>;
+    editProfile(username?: string, email?: string, profileImage?: string, location?: PointLocation): EditProfileResult | Promise<EditProfileResult>;
 }
 
 export interface Comment {
@@ -87,6 +93,7 @@ export interface IQuery {
     getComments(contentId: string, page?: number): Comment[] | Promise<Comment[]>;
     getFootprintById(id: string): Footprint | Promise<Footprint>;
     getNearFootprints(lng: number, lat: number, minDistance?: number, maxDistance?: number): Footprint[] | Promise<Footprint[]>;
+    getFootprintsByUser(userId: string): Footprint[] | Promise<Footprint[]>;
     getFollowers(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
     getFollowing(userId: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
     getLikes(footprintId: string, page?: number): User[] | Promise<User[]>;
@@ -155,8 +162,17 @@ export interface User {
     username: string;
     followersCount: number;
     followingCount: number;
+    footprintsCount: number;
+    location: Location;
+    followers: User[];
+    following: User[];
     isFollowed?: boolean;
     email?: string;
     authType?: AuthType;
     googleID?: string;
+}
+
+export interface EditProfileResult {
+    success: boolean;
+    isEmailConfirmationRequired: boolean;
 }

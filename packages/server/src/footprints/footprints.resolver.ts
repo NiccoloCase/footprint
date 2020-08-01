@@ -30,10 +30,16 @@ export class FootprintsResolver {
     return footprint;
   }
 
-  // RESTITUISCE IL FOOTPRINT ASSOCIATOA UN DETERMINATO ID
+  // RESTITUISCE IL FOOPRINT VICINI A UN PUNTO GEOGRAFICO
   @Query()
   getNearFootprints(@Args() payload: GetNearFootprintsDTO) {
     return this.footprintsService.findNearFootprints(payload);
+  }
+
+  // RESTITUISCE I FOOTPRINT DI UN UTENTE
+  @Query()
+  getFootprintsByUser(@Args('userId') user: string) {
+    return this.footprintsService.findFootprintsByAuthor(user);
   }
 
   // CREA UN NOVO FOOTPRINT

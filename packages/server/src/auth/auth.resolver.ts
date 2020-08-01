@@ -6,6 +6,7 @@ import {
   EmailResponse,
   VerfyUserResponse,
   GoogleAuthResult,
+  LocationType,
 } from '../graphql';
 import { UsersService } from '../users/users.service';
 import { CreateNewUserDTO } from '../users/users.dto';
@@ -15,6 +16,7 @@ import { CurrentUser } from '../users/user.decorator';
 import { IUser } from '../users/users.schema';
 import { BadRequestException, UseGuards } from '@nestjs/common';
 import { GoogleStrategyResult } from './auth.types';
+import { type } from 'os';
 
 @Resolver('Auth')
 export class AuthResolver {
@@ -38,7 +40,12 @@ export class AuthResolver {
       username: args.username,
       email: args.email,
       localPassword: args.password,
+      profileImage: args.profileImage,
       authType: AuthType.LOCAL,
+      location: {
+        ...args.location,
+        type: LocationType.Point,
+      },
     };
 
     try {
@@ -61,7 +68,7 @@ export class AuthResolver {
     @Args() args: SignupWithGoogleDTO,
     @CurrentUser() payload: GoogleStrategyResult,
   ): Promise<GoogleAuthResult> {
-    const { username } = args;
+    const { username, location, profileImage } = args;
     const { googleProfile, user } = payload;
 
     // l'utente è già registrato:
@@ -70,9 +77,14 @@ export class AuthResolver {
 
     const userData: CreateNewUserDTO = {
       username,
+      profileImage,
       email: googleProfile.email,
-      authType: AuthType.GOOGLE,
       googleID: googleProfile.id,
+      authType: AuthType.GOOGLE,
+      location: {
+        ...location,
+        type: LocationType.Point,
+      },
     };
 
     try {

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {SafeAreaView, StatusBar, View, StyleSheet, Text} from "react-native";
 import Animated from "react-native-reanimated";
 import {StackScreenProps} from "@react-navigation/stack";
-import {ProfileStackParamList, HomeStackParamList} from "../../navigation";
+import {MyProfileDrawerParamList, AppStackParamList} from "../../navigation";
 import {HEADER_DELTA} from "./dimensions";
 import {MeDocument, GetUserByIdDocument, User} from "../../generated/graphql";
 import {Spinner} from "../../components/Spinner";
@@ -20,8 +20,9 @@ const {Value, interpolate, Extrapolate} = Animated;
 let uri =
   "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020031/static/Alberto_conversi_profile_pic_gcbyuc.jpg";
 
-type SearchScreenProps = StackScreenProps<ProfileStackParamList, "MyProfile">;
-// | StackScreenProps<HomeStackParamList, "">;
+type SearchScreenProps =
+  | StackScreenProps<MyProfileDrawerParamList, "MyProfile">
+  | StackScreenProps<AppStackParamList, "Profile">;
 
 export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
   // ID dell'utente loggato
@@ -76,17 +77,16 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
 
   const renderContent = () => {
     // SCHERMATA DEL PROFILO
-    if (true || user) {
-      //const {username} = user;
-      //let xuser = {...user, profileImage: uri};
-      const username = "niccolocase";
+    if (user) {
+      let xuser = {...user, profileImage: uri};
+      /*       const username = "niccolocase";
       const xuser: User = {
         profileImage: uri,
         followersCount: 100,
         followingCount: 29,
         username,
         id: "5eff94323dc86ce1298e1340",
-      };
+      }; */
 
       return (
         <>
@@ -96,7 +96,7 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
           <Header
             y={y}
             opacity={opacity}
-            username={username}
+            username={xuser.username}
             personal={personal}
           />
         </>

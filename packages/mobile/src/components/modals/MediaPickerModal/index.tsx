@@ -9,6 +9,8 @@ import {ImageSource} from "../../../utils/types";
 const TEXT_COLOR = "#808080";
 
 interface MedaPickerModalProps {
+  /** Tipo di contenuto */
+  contentType: "footprint" | "avatar";
   /** Se il modal è aperto */
   isOpen?: boolean;
   /** Funzione chiamata quando il modal viene aperto/chiuso */
@@ -22,6 +24,7 @@ interface MedaPickerModalProps {
  * o scattarla sul momento
  */
 const MediaPickerModal: React.FC<MedaPickerModalProps> = ({
+  contentType,
   isOpen,
   onStateChange,
   onPhotoIsPicked,
@@ -53,8 +56,22 @@ const MediaPickerModal: React.FC<MedaPickerModalProps> = ({
   const handlePickPhoto = (from: "library" | "camera") => () => {
     // chiude la finestra
     onClose();
+
+    // formato della foto
+    let imageWidth = undefined;
+    let imageHeight = undefined;
+
+    switch (contentType) {
+      case "footprint":
+        imageWidth = 1080;
+        imageHeight = 1920;
+      case "avatar":
+        imageWidth = 800;
+        imageHeight = 800;
+    }
+
     // apre il picker
-    pickPhoto(from, onPhotoIsPicked);
+    pickPhoto(from, onPhotoIsPicked, {imageWidth, imageHeight});
   };
 
   return (
@@ -118,7 +135,7 @@ const styles = StyleSheet.create({
   },
   buttonOutile: {
     borderColor: "#eee",
-    borderWidth: 3,
+    borderWidth: 4,
     backgroundColor: "transparent",
   },
   buttonWrapper: {

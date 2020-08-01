@@ -306,6 +306,7 @@ export const AddFootprintScreen: React.FC<AddFootprintScreenProps> = ({
       </KeyboardAvoidingView>
       {/** POPUP PER CARICARE UN IMMAGINE */}
       <MediaPickerModal
+        contentType="footprint"
         isOpen={isPickerModalOpen}
         onStateChange={setIsPickerModalOpen}
         onPhotoIsPicked={onPhotoIsPicked}
@@ -315,7 +316,7 @@ export const AddFootprintScreen: React.FC<AddFootprintScreenProps> = ({
         title="Seleziona il nome del luogo più adeguato"
         isOpen={isLocationPickerOpen}
         setIsOpen={setIsLocationPickerOpen}
-        options={locationNames}
+        defaultOptions={locationNames}
         selectedOption={values.locationName}
         onSelected={(name) => setFieldValue("locationName", name)}
       />

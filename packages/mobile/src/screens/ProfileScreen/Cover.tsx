@@ -64,7 +64,7 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
     }
   };
 
-  const {profileImage, username, followingCount} = user;
+  const {profileImage, username, followingCount, footprintsCount} = user;
 
   return (
     <Animated.View style={[styles.container, {transform: [{scale}]}]}>
@@ -120,7 +120,7 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
 
         {/*FOOTPRINT*/}
         <View style={styles.counterBox}>
-          <Text style={styles.count}>{abbreviateNumber(30000)}</Text>
+          <Text style={styles.count}>{abbreviateNumber(footprintsCount)}</Text>
           <Text style={styles.countTitle}>Footprint</Text>
         </View>
       </View>

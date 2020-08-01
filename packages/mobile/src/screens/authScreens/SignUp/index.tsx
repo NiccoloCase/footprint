@@ -12,12 +12,13 @@ import {includes} from "lodash";
 import {FormikProps, useFormik} from "formik";
 import {AuthStackParamList} from "../../../navigation";
 import {EmailAndPasswordForm} from "./steps/EmailAndPasswordForm";
-import {UsernameAndPictureForm} from "./steps/UsernameAndPictureForm";
+import {ProfileForm} from "./steps/ProfileForm";
 import {useSubmitSignUp} from "./submit";
 import {SignupValidationSchema} from "../../../utils/validation";
 import {Colors, Spacing} from "../../../styles";
 import {AuthHeader} from "../../../components/Header/AuthHeader";
-import {ScrollView} from "react-native-gesture-handler";
+import {PointLocation} from "../../../generated/graphql";
+import {ImageSource} from "../../../utils/types";
 
 /** valori del form di registrazione */
 export interface SingUpFormValues {
@@ -25,8 +26,10 @@ export interface SingUpFormValues {
   password: string;
   password2: string;
   username: string;
-  pictureURL: string;
-  googleAccessToken: string;
+  location?: PointLocation;
+  googleAccessToken?: string;
+  profileImage?: ImageSource;
+  socialPictureUrl?: string;
 }
 
 /** Propietà della scheramata di registrazione */
@@ -43,7 +46,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   navigation,
 }) => {
   // Index della schermata corrente
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
 
   // Funzione di submit
   const [onSubmit, {loading}] = useSubmitSignUp(
@@ -58,15 +61,13 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       password: "",
       password2: "",
       username: "",
-      pictureURL: "",
-      googleAccessToken: "",
     },
     validationSchema: SignupValidationSchema,
     onSubmit,
   });
 
   /** Passaggi del form */
-  const steps = [EmailAndPasswordForm, UsernameAndPictureForm];
+  const steps = [EmailAndPasswordForm, ProfileForm];
   // Se la registrazione avviene tramite google, la prima schermata non
   // è necessaria quidni viene rimossa
   if (route.params && route.params.withGoogle) steps.shift();
@@ -80,7 +81,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       // 1) Rimuove la prima schermata del form
       steps.shift();
       // 2) Imposta l'immagine profilo e il token di accesso passati da Google
-      formik.setFieldValue("pictureURL", route.params.picture);
+      formik.setFieldValue("socialPictureUrl", route.params.picture);
       formik.setFieldValue("googleAccessToken", route.params.googleAccessToken);
       // 3) Cambia il titolo della schermata
       navigation.setOptions({title: "Completa la registrazione"});

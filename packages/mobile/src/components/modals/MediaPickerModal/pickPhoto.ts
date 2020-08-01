@@ -4,6 +4,11 @@ import {ImageSource} from "../../../utils/types";
 import {Platform} from "react-native";
 import Snackbar from "react-native-snackbar";
 
+interface PickPhotoOptions {
+  imageWidth?: number;
+  imageHeight?: number;
+}
+
 /**
  * Seleziona una foto dalla galleria o apre la fotoamera per
  * scattarne una
@@ -13,10 +18,11 @@ import Snackbar from "react-native-snackbar";
 export const pickPhoto = (
   from: "library" | "camera",
   callback: (src: ImageSource) => void,
+  options: PickPhotoOptions = {},
 ) => {
-  const options: any = {
-    width: 1080,
-    height: 1920,
+  const pickerOptions: any = {
+    width: options.imageWidth || 1080,
+    height: options.imageHeight || 1920,
     cropping: true,
     mediaType: "photo",
     cropperActiveWidgetColor: Colors.primary,
@@ -29,8 +35,8 @@ export const pickPhoto = (
 
   Promise.resolve(
     from === "library"
-      ? ImagePicker.openPicker(options)
-      : ImagePicker.openCamera(options),
+      ? ImagePicker.openPicker(pickerOptions)
+      : ImagePicker.openCamera(pickerOptions),
   )
     .then((image) => {
       // se sono piu immagini considera solo la prima

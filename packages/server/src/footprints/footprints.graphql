@@ -20,6 +20,8 @@ type Query {
     minDistance: Float
     maxDistance: Float
   ): [Footprint!]!
+  # Restituisce i footprints creati dall'utente associato all'id passato
+  getFootprintsByUser(userId: ID!): [Footprint!]!
 }
 
 type Mutation {

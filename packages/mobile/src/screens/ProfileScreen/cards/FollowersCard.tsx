@@ -2,42 +2,15 @@ import React from "react";
 import {View, Text, StyleSheet, Image} from "react-native";
 import {ScrollView} from "react-native-gesture-handler";
 import {Card} from "./Card";
-
-const followers = [
-  {
-    username: "nicco",
-    profileImage: "https://picsum.photos/200",
-  },
-  {
-    username: "niccocase",
-    profileImage:
-      "https://res.cloudinary.com/dgjcj7htv/image/upload/v1594926021/static/unnamed_kjegki.png",
-  },
-  {
-    username: "niccolo.caseli",
-    profileImage:
-      "https://res.cloudinary.com/dgjcj7htv/image/upload/v1594926665/static/download_ukbyph.jpg",
-  },
-
-  {
-    username: "nicco",
-    profileImage: "https://picsum.photos/200",
-  },
-  {
-    username: "niccocase",
-    profileImage:
-      "https://res.cloudinary.com/dgjcj7htv/image/upload/v1594926021/static/unnamed_kjegki.png",
-  },
-  {
-    username: "niccolo.caseli",
-    profileImage:
-      "https://res.cloudinary.com/dgjcj7htv/image/upload/v1594926665/static/download_ukbyph.jpg",
-  },
-];
+import {User} from "../../../generated/graphql";
 
 const AVATAR_RADIUS = 32;
 
-export const FollowerCard: React.FC = () => {
+interface FollowerCardProps {
+  followers: User[];
+}
+
+export const FollowerCard: React.FC<FollowerCardProps> = ({followers}) => {
   const renderAvatar = (name: string, uri: string, index: number) => (
     <View
       style={[

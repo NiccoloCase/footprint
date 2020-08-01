@@ -1,11 +1,17 @@
+import { PointLocation } from '../graphql';
+
 export class SignupDTO {
-  username: string;
   email: string;
   password: string;
+  username: string;
+  location: PointLocation;
+  profileImage?: string;
 }
 
 export class SignupWithGoogleDTO {
   username: string;
+  location: PointLocation;
+  profileImage?: string;
 }
 
 export class LoginDTO {

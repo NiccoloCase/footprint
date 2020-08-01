@@ -19,9 +19,11 @@ export const Card: React.FC<CardProps> = (props) => {
     <Animated.View style={styles.card}>
       <View style={styles.inline}>
         <Text style={[styles.text, styles.sectionTitle]}>{props.title}</Text>
-        <TouchableOpacity onPress={onPress}>
-          <Text style={[styles.text, styles.link]}>{props.buttonText}</Text>
-        </TouchableOpacity>
+        {props.buttonText && (
+          <TouchableOpacity onPress={onPress}>
+            <Text style={[styles.text, styles.link]}>{props.buttonText}</Text>
+          </TouchableOpacity>
+        )}
       </View>
       {props.children}
     </Animated.View>

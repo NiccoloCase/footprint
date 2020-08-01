@@ -1,6 +1,9 @@
 import { Schema, Document, HookNextFunction } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { AuthType } from '../graphql';
+import { PointSchema } from '../shared/mongoose';
+import { assetURLs } from '@footprint/common';
+
 const mongooseHidden = require('mongoose-hidden')();
 
 export interface IUser {
@@ -16,6 +19,7 @@ export interface IUser {
   created_at?: string;
   followersCount: number;
   followingCount: number;
+  footprintsCount: number;
 
   /** Compara la password dell'utente con la password passata */
   comparePassword: (password: string) => Promise<boolean>;
@@ -64,15 +68,26 @@ export const UserSchema = new Schema({
     },
   },
   // ID Google (richiesto solo se l'utente ha eseguito l'acesso con google)
+  // Posizione geografica dell'utente
+  location: {
+    type: PointSchema,
+    required: true,
+  },
   googleID: { type: String },
   // URL dell'immagine del profilo
-  profileImage: { type: String, required: false },
+  profileImage: {
+    type: String,
+    required: false,
+    default: assetURLs.blankAvatar,
+  },
   // Data di apertura del profilo
   created_at: { type: Date, default: Date.now },
   // Numero di followers
   followersCount: { type: Number, default: 0 },
   // Numero di utenti seguiti
   followingCount: { type: Number, default: 0 },
+  // Numero di footprint
+  footprintsCount: { type: Number, default: 0 },
 });
 
 // Index

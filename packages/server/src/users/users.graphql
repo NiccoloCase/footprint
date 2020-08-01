@@ -4,12 +4,23 @@ type User {
   username: String!
   followersCount: Int!
   followingCount: Int!
+  footprintsCount: Int!
+  location: Location!
+  # Followers dell'utene
+  followers(pagination: PaginationOptions): [User!]!
+  # Utenti seguiti
+  following(pagination: PaginationOptions): [User!]!
   # Se l'utente è seguto da quello associato all'ID passato
   isFollowed(id: ID): Boolean
   # Informazioni private:
   email: String
   authType: AuthType
   googleID: String
+}
+
+type EditProfileResult {
+  success: Boolean!
+  isEmailConfirmationRequired: Boolean!
 }
 
 type Query {
@@ -30,4 +41,11 @@ type Mutation {
   forgotPassword(email: String!): EmailResponse!
   # Cambia password con il token inviato per email
   changePasswordWithToken(token: String!, newPassword: String!): ProcessResult!
+  # Modifica il profilo
+  editProfile(
+    username: String
+    email: String
+    profileImage: String
+    location: PointLocation
+  ): EditProfileResult!
 }

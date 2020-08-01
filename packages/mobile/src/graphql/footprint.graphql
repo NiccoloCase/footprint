@@ -9,7 +9,7 @@ query GetNearFootprints($lng: Float!, $lat: Float!, $maxDistance: Float!) {
     author {
       id
       username
-      #profileImage
+      profileImage
     }
   }
 }
@@ -28,8 +28,22 @@ query GetNewsFeed($pagination: PaginationOptions) {
       authorId
       author {
         username
-        #profileImage
+        profileImage
       }
+    }
+  }
+}
+
+query GetFootprintsByUser($userId: ID!) {
+  getFootprintsByUser(userId: $userId) {
+    id
+    title
+    body
+    media
+    likesCount
+    location {
+      coordinates
+      locationName
     }
   }
 }
@@ -60,7 +74,7 @@ mutation PostComment($contentId: ID!, $text: String!) {
     author {
       id
       username
-      #profileImage
+      profileImage
     }
   }
 }
@@ -78,7 +92,7 @@ query GetComments($contentId: ID!, $page: Int) {
     author {
       id
       username
-      #profileImage
+      profileImage
     }
     createdAt
   }

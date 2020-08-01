@@ -1,4 +1,5 @@
-import React, {useState, useEffect, useContext, useRef} from "react";
+import React, {useState, useEffect} from "react";
+import {TouchableOpacity} from "react-native";
 import {NavigationContainer} from "@react-navigation/native";
 import {
   createStackNavigator,
@@ -6,13 +7,18 @@ import {
 } from "@react-navigation/stack";
 import {createSharedElementStackNavigator} from "react-navigation-shared-element";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import {createDrawerNavigator} from "@react-navigation/drawer";
 import {MainHeader} from "../components/Header";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
 import {useStoreActions, useStoreState} from "../store";
 import {Colors} from "../styles";
+import hexToRgba from "hex-to-rgba";
+import {GetNewsFeedDocument} from "../generated/graphql";
+import {useLazyQuery} from "../graphql/useLazyQuery";
 
 // COMPONENTI
+import {ProfileScreenDrawerContent} from "../components/ProfileScreenDrawer";
 import {TabBar} from "../components/TabBar";
 
 // SCHERMATE
@@ -28,9 +34,10 @@ import {ExploreScreen} from "../screens/ExploreScreen";
 import {ProfileScreen} from "../screens/ProfileScreen";
 import {SettingsScreen} from "../screens/SettingsScreen";
 import {FootprintScreen} from "../screens/FootprintScreen";
-import {GetNewsFeedDocument} from "../generated/graphql";
-import {useLazyQuery} from "../graphql/useLazyQuery";
 import {MediaScreen} from "../screens/MediaScreen";
+import {MapScreen} from "../screens/MapScreen";
+import {EditProfileScreen} from "../screens/EditProfile";
+import {EditPasswordScreen} from "../screens/authScreens/EditPassword";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center", fontWeight: "bold"},
@@ -61,7 +68,7 @@ export type AuthStackParamList = {
 };
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
-  <AuthStack.Navigator initialRouteName="Welcome" headerMode="none">
+  <AuthStack.Navigator initialRouteName="SignUp" headerMode="none">
     <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
     <AuthStack.Screen name="SignIn" component={SignInScreen} />
     <AuthStack.Screen name="SignUp" component={SignUpScreen} />
@@ -100,7 +107,7 @@ const AddFootprintStackScreen = () => (
   </AddFootprintStack.Navigator>
 );
 
-// SERACH STACK
+// EXPLORE STACK
 export type ExploreStackParamList = {
   Explore: undefined;
 };
@@ -115,34 +122,122 @@ const ExploreStackScreen = () => (
   </ExploreStack.Navigator>
 );
 
-// PROFILE STACK
-export type ProfileStackParamList = {
-  MyProfile: undefined;
-};
-const MyProfileStack = createStackNavigator<ProfileStackParamList>();
-const MyProfileStackScreen = () => (
-  <MyProfileStack.Navigator screenOptions={defaultScreenOptions}>
-    <MyProfileStack.Screen
-      name="MyProfile"
-      component={ProfileScreen}
-      options={{title: "Profilo", headerShown: false}}
-    />
-  </MyProfileStack.Navigator>
-);
-
 // SETTINGS STACK
 export type SettingsStackParamList = {
   Settings: undefined;
 };
 const SettingsStack = createStackNavigator<SettingsStackParamList>();
 const SettingsStackScreen = () => (
-  <SettingsStack.Navigator screenOptions={defaultScreenOptions}>
+  <SettingsStack.Navigator
+    screenOptions={({navigation}) => ({
+      ...defaultScreenOptions,
+      headerRightContainerStyle: {marginRight: 15},
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+          <FeatherIcon name="menu" size={22} />
+        </TouchableOpacity>
+      ),
+    })}>
     <SettingsStack.Screen
       name="Settings"
       component={SettingsScreen}
       options={{title: "Impostazioni"}}
     />
   </SettingsStack.Navigator>
+);
+
+// EDIT PROFILE STACK
+export type EditProfileStackParamList = {
+  EditProfile: undefined;
+  EditPassword: undefined;
+};
+const EditProfileStack = createStackNavigator<EditProfileStackParamList>();
+const EditProfileStackScreen = () => (
+  <EditProfileStack.Navigator
+    screenOptions={({navigation}) => ({
+      ...defaultScreenOptions,
+      headerRightContainerStyle: {marginRight: 15},
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+          <FeatherIcon name="menu" size={22} />
+        </TouchableOpacity>
+      ),
+    })}>
+    <EditProfileStack.Screen
+      name="EditProfile"
+      component={EditProfileScreen}
+      options={{title: "Modifica il profilo"}}
+    />
+    <EditProfileStack.Screen
+      name="EditPassword"
+      component={EditPasswordScreen}
+      options={{title: "Modifica la password"}}
+    />
+  </EditProfileStack.Navigator>
+);
+
+// PERSONAL PROFILE DRAWER
+export type MyProfileDrawerParamList = {
+  MyProfile: undefined;
+  EditProfile: undefined;
+  SavedFootpritns: undefined;
+  Settings: undefined;
+};
+const MyProfileDrawer = createDrawerNavigator<MyProfileDrawerParamList>();
+const MyProfileDrawerScreen = () => (
+  <MyProfileDrawer.Navigator
+    initialRouteName="EditProfile"
+    drawerContentOptions={{
+      labelStyle: {fontWeight: "bold"},
+      itemStyle: {marginBottom: 15},
+      activeBackgroundColor: hexToRgba(Colors.primary, 0.25),
+      inactiveTintColor: Colors.darkGrey,
+      activeTintColor: Colors.primary,
+    }}
+    drawerContent={ProfileScreenDrawerContent}
+    screenOptions={defaultScreenOptions}
+    drawerPosition="right">
+    <MyProfileDrawer.Screen
+      name="MyProfile"
+      component={ProfileScreen}
+      options={{
+        drawerLabel: "Profilo",
+        drawerIcon: ({color, size}) => (
+          <FeatherIcon name="user" color={color} size={size} />
+        ),
+      }}
+    />
+    <MyProfileDrawer.Screen
+      name="EditProfile"
+      component={EditProfileStackScreen}
+      options={{
+        drawerLabel: "Modifica profilo",
+        drawerIcon: ({color, size}) => (
+          <FeatherIcon name="edit" color={color} size={size} />
+        ),
+      }}
+    />
+    <MyProfileDrawer.Screen
+      name="SavedFootpritns"
+      component={ProfileScreen}
+      options={{
+        drawerLabel: "Footprint salvati",
+        drawerIcon: ({color, size}) => (
+          <FeatherIcon name="bookmark" color={color} size={size} />
+        ),
+      }}
+    />
+    <MyProfileDrawer.Screen
+      name="Settings"
+      component={SettingsStackScreen}
+      options={{
+        drawerLabel: "Impostazioni",
+        drawerIcon: ({color, size}) => (
+          <FeatherIcon name="settings" color={color} size={size} />
+        ),
+      }}
+    />
+  </MyProfileDrawer.Navigator>
 );
 
 // TAB NAVIGATION
@@ -156,7 +251,7 @@ const Tabs = createBottomTabNavigator<BottomTabParamList>();
 
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="AddFootprint"
+    initialRouteName="MyProfile"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,
@@ -193,7 +288,7 @@ const TabsScreen = () => (
     />
     <Tabs.Screen
       name="MyProfile"
-      component={MyProfileStackScreen}
+      component={MyProfileDrawerScreen}
       options={{
         title: "Profilo",
         tabBarIcon: ({color, size}) => (
@@ -207,7 +302,6 @@ const TabsScreen = () => (
 // APP
 export type AppStackParamList = {
   Home: undefined;
-  Settings: undefined;
   Footprint: {
     id: string;
     title: string;
@@ -215,16 +309,14 @@ export type AppStackParamList = {
   };
   Profile: {id: string};
   Image: {uri: string};
+  MapScreen: {
+    annotations?: {coordinates: number[]}[];
+  };
 };
-const AppStack = createSharedElementStackNavigator();
+const AppStack = createSharedElementStackNavigator<AppStackParamList>();
 const AppStackScreen = () => (
   <AppStack.Navigator screenOptions={{headerShown: false}}>
     <AppStack.Screen name="Home" component={TabsScreen} />
-    <AppStack.Screen
-      name="Settings"
-      component={SettingsStackScreen}
-      options={{title: "Impostazioni"}}
-    />
     <AppStack.Screen
       name="Footprint"
       component={FootprintScreen}
@@ -258,11 +350,22 @@ const AppStackScreen = () => (
         }),
       })}
     />
-
     <AppStack.Screen
       name="Image"
       component={MediaScreen}
       options={(navigation) => ({
+        headerBackTitleVisible: false,
+        gestureEnabled: false,
+        cardStyleInterpolator: ({current: {progress}}) => ({
+          cardStyle: {opacity: progress},
+        }),
+        cardStyle: {backgroundColor: "transparent"},
+      })}
+    />
+    <AppStack.Screen
+      name="MapScreen"
+      component={MapScreen}
+      options={() => ({
         headerBackTitleVisible: false,
         gestureEnabled: false,
         cardStyleInterpolator: ({current: {progress}}) => ({

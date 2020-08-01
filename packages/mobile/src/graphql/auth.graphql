@@ -1,5 +1,17 @@
-mutation Register($username: String!, $email: String!, $password: String!) {
-  signup(username: $username, email: $email, password: $password) {
+mutation Register(
+  $username: String!
+  $email: String!
+  $password: String!
+  $location: PointLocation!
+  $profileImage: String
+) {
+  signup(
+    username: $username
+    email: $email
+    password: $password
+    location: $location
+    profileImage: $profileImage
+  ) {
     success
   }
 }
@@ -11,8 +23,16 @@ mutation Login($email: String!, $password: String!) {
   }
 }
 
-mutation SignupWithGoogle($username: String!) {
-  signupWithGoogle(username: $username) {
+mutation SignupWithGoogle(
+  $username: String!
+  $location: PointLocation!
+  $profileImage: String
+) {
+  signupWithGoogle(
+    username: $username
+    location: $location
+    profileImage: $profileImage
+  ) {
     isRegistrationRequired
     googleProfile {
       name

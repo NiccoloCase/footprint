@@ -1,12 +1,27 @@
 query Me {
   whoami {
     id
-    email
     username
-    #profileImage
+    email
+    authType
+    profileImage
     followersCount
     followingCount
-    email
+    footprintsCount
+    location {
+      coordinates
+      locationName
+    }
+    followers {
+      id
+      username
+      profileImage
+    }
+    following {
+      id
+      username
+      profileImage
+    }
   }
 }
 
@@ -14,10 +29,25 @@ query getUserById($id: ID!, $isFollowedBy: ID) {
   getUserById(id: $id) {
     id
     username
-    #profileImage
+    profileImage
+    isFollowed(id: $isFollowedBy)
     followersCount
     followingCount
-    isFollowed(id: $isFollowedBy)
+    footprintsCount
+    location {
+      coordinates
+      locationName
+    }
+    followers {
+      id
+      username
+      profileImage
+    }
+    following {
+      id
+      username
+      profileImage
+    }
   }
 }
 
@@ -68,5 +98,22 @@ mutation FollowUser($target: ID!) {
 mutation UnfollowUser($target: ID!) {
   unfollowUser(target: $target) {
     success
+  }
+}
+
+mutation EditProfile(
+  $username: String
+  $email: String
+  $location: PointLocation
+  $profileImage: String
+) {
+  editProfile(
+    username: $username
+    email: $email
+    location: $location
+    profileImage: $profileImage
+  ) {
+    success
+    isEmailConfirmationRequired
   }
 }

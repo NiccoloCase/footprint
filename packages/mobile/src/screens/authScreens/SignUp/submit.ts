@@ -10,6 +10,7 @@ import {NavigationProp, CommonActions} from "@react-navigation/native";
 import {AuthStackParamList} from "../../../navigation";
 import {store} from "../../../store";
 import {Colors} from "../../../styles";
+import {uploadImage} from "../../../utils/cloudinary";
 
 export function useSubmitSignUp(
   withGoogle: boolean,
@@ -25,16 +26,37 @@ export function useSubmitSignUp(
   });
 
   const submit = async (values: SingUpFormValues) => {
-    const {username, email, password, googleAccessToken} = values;
+    const {
+      username,
+      email,
+      password,
+      googleAccessToken,
+      location,
+      socialPictureUrl,
+      profileImage: selectedProfileImage,
+    } = values;
+
+    if (!location) return;
 
     try {
+      // Immagine Profilo
+      let profileImage: string | undefined;
+      if (socialPictureUrl) profileImage = socialPictureUrl;
+      // Se l'utente ha impostato un'immagine, la carica su cloudinary
+      else
+        profileImage = selectedProfileImage
+          ? (await uploadImage(selectedProfileImage)).url
+          : undefined;
+
+      // REGISTRAZIONE CON GOOGLE
       if (withGoogle) {
         const {errors, data} = await signupGoogle({
-          variables: {username},
+          variables: {username, location, profileImage},
           context: {
             headers: {access_token: googleAccessToken},
           },
         });
+
         // Se l'operazione ha avuto successo esegue l'accesso dell'utente
         // con i token passati dal server
         if (
@@ -46,8 +68,14 @@ export function useSubmitSignUp(
           const {accessToken, refreshToken} = data.signupWithGoogle.tokens;
           store.getActions().auth.singin({accessToken, refreshToken});
         }
-      } else {
-        await signupLocally({variables: {username, email, password}});
+      }
+      // REGISTRAZIONE LOCALE
+      else {
+        const {data, errors} = await signupLocally({
+          variables: {username, email, password, location, profileImage},
+        });
+        if (errors || !data || !data.signup.success) throw new Error();
+
         // Reindirizza l'utente alla schermata per confermare l'email
         navigation.dispatch(
           CommonActions.reset({
@@ -62,6 +90,7 @@ export function useSubmitSignUp(
         );
       }
     } catch (err) {
+      console.log(err);
       Snackbar.show({
         text: "Ops...semba che ci sia stato un errore ",
         duration: Snackbar.LENGTH_LONG,

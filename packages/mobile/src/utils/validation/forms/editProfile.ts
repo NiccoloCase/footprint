@@ -8,20 +8,13 @@ import {
 import {ValidationConfig} from "@footprint/common";
 
 /**
- * Schema di validazione del form di registrazione
+ * Schema di validazione del form per modifcare il profilo
  */
-export const SignupValidationSchema = Yup.object().shape({
-  // GOOGLE ACCESS TOKEN
-  googleAccessToken: Yup.string(),
+export const EditProfileFormValidationSchema = Yup.object().shape({
   // EMAIL
   email: Yup.string()
     .email("Email non valida")
     .max(ValidationConfig.user.email.length.max, "L'email è troppo lunga")
-    // Il campo è richiesto solo quando la registrazione non avviene con google
-    .when("googleAccessToken", {
-      is: (val) => isEmpty(val),
-      then: Yup.string().required("Questo campo è richiesto"),
-    })
     // Controlla che l'email non sia già utilizzata
     .test("unique-email", "L'email è già utilizzata", function (email: string) {
       if (!!email)
@@ -34,35 +27,11 @@ export const SignupValidationSchema = Yup.object().shape({
           .catch(() => false);
       else return true;
     }),
-  // PASSWORD
-  password: Yup.string()
-    .min(
-      ValidationConfig.user.password.length.min,
-      "La password è troppo corta",
-    )
-    .max(
-      ValidationConfig.user.password.length.max,
-      "La password è troppo lunga",
-    )
-    // Il campo è richiesto solo quando la registrazione non avviene con google
-    .when("googleAccessToken", {
-      is: (val) => isEmpty(val),
-      then: Yup.string().required("Questo campo è richiesto"),
-    }),
-  // CONFERMA DELLA PASSWORD
-  password2: Yup.string()
-    .oneOf([Yup.ref("password")], "Le password non corrispondono")
-    // Il campo è richiesto solo quando la registrazione non avviene con google
-    .when("googleAccessToken", {
-      is: (val) => isEmpty(val),
-      then: Yup.string().required("Questo campo è richiesto"),
-    }),
   // USERNAME
   username: Yup.string()
     .min(ValidationConfig.user.username.length.min, "L'username è troppo corto")
     .max(ValidationConfig.user.username.length.max, "L'username è troppo lungo")
     .matches(ValidationConfig.user.username.regex, "Formarto non consentito")
-    .required("Questo campo è richiesto")
     // Controlla che non sia già utilizzato
     .test("unique-username", "L'username non è disponibile", function (
       username: string,
@@ -77,10 +46,4 @@ export const SignupValidationSchema = Yup.object().shape({
           .catch(() => false);
       else return true;
     }),
-  // IMMAGINE PROFILO CARICATA
-  profileImage: Yup.object(),
-  // URL DELL'IMMAGINE DEL PROFILO SOCIAL COLLEGATO ALL'ACCOUNT
-  socialPictureUrl: Yup.string(),
-  // LOCATION
-  location: Yup.object().nullable().required("É richiesta la posizione"),
 });

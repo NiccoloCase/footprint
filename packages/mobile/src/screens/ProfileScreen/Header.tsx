@@ -2,10 +2,10 @@ import React from "react";
 import {TouchableHighlight, StyleSheet, View} from "react-native";
 import Animated from "react-native-reanimated";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import {Spacing} from "../../styles";
 import {HEADER_DELTA, MIN_HEADER_HEIGHT} from "./dimensions";
 import {useNavigation} from "@react-navigation/native";
-import {store} from "../../store";
+import {DrawerNavigationProp} from "@react-navigation/drawer";
+import {MyProfileDrawerParamList} from "../../navigation";
 const {Extrapolate, interpolate, color} = Animated;
 
 interface HeaderProps {
@@ -15,17 +15,15 @@ interface HeaderProps {
   personal?: boolean;
 }
 
-function logout() {
-  store.getActions().auth.logout();
-}
-
 export const Header: React.FC<HeaderProps> = ({
   y,
   opacity,
   username,
   personal,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<
+    DrawerNavigationProp<MyProfileDrawerParamList, "MyProfile">
+  >();
 
   const titleOpacity = interpolate(y, {
     inputRange: [HEADER_DELTA - 40, HEADER_DELTA + 10],
@@ -58,14 +56,9 @@ export const Header: React.FC<HeaderProps> = ({
         {username}
       </Animated.Text>
 
-      {personal ? (
-        <View style={styles.inline}>
-          {renderButton("edit", () => {})}
-          {renderButton("ellipsis-v", logout)}
-        </View>
-      ) : (
-        renderButton("share-alt", () => {})
-      )}
+      {personal
+        ? renderButton("bars", () => navigation.toggleDrawer())
+        : renderButton("share-alt", () => {})}
     </Animated.View>
   );
 };
@@ -77,7 +70,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: Spacing.screenHorizontalPadding,
+    paddingHorizontal: 5,
   },
   button: {
     width: 35,

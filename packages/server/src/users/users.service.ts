@@ -3,7 +3,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateNewUserDTO } from './users.dto';
+import { CreateNewUserDTO, EditProfileDTO } from './users.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IUser, IUserModel } from './users.schema';
@@ -181,5 +181,17 @@ export class UsersService {
     } catch (err) {
       throw new InternalServerErrorException();
     }
+  }
+
+  /**
+   * Modifica il profilo dell'utente passato
+   */
+  async editUserProfile(
+    changes: Partial<IUser>,
+    userId: string,
+  ): Promise<IUser> {
+    return await this.userModel.findByIdAndUpdate(userId, changes, {
+      new: true,
+    });
   }
 }

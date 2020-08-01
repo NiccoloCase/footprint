@@ -12,6 +12,7 @@ import {
   IsEmailAlreadyUsedDTO,
   IsUsernameAlreadyUsedDTO,
   ChangePasswordWithTokenDTO,
+  EditProfileDTO,
 } from './users.dto';
 import { BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import {
@@ -20,9 +21,15 @@ import {
   TokenScope,
   AuthType,
   User,
+  PaginationOptions,
+  LocationType,
 } from '../graphql';
 import { TokenService } from '../token/token.service';
 import { FriendshipService } from '../friendship/friendship.service';
+import { Private } from '../auth/auth.guard';
+import { CurrentUser } from './user.decorator';
+import { IUser } from './users.schema';
+import { EditProfileResult } from '../graphql';
 
 @Resolver('User')
 export class UsersResolver {
@@ -49,6 +56,43 @@ export class UsersResolver {
     }
   }
 
+  // RESTITUISCE I FOLLOWERS DELL'UTENTE
+  @ResolveField()
+  async followers(
+    @Parent() target: User,
+    @Args('pagination') pagination: PaginationOptions,
+  ) {
+    const { id } = target;
+    try {
+      const followers = await this.friendshipService.getFollowers(
+        id,
+        pagination,
+      );
+      return followers;
+    } catch (err) {
+      return [];
+    }
+  }
+
+  // RESTITUISCE GLI UTENTI SEGUITI
+  @ResolveField()
+  async following(
+    @Parent() target: User,
+    @Args('pagination') pagination: PaginationOptions,
+  ) {
+    const { id } = target;
+    try {
+      const following = await this.friendshipService.getFollowing(
+        id,
+        pagination,
+      );
+
+      return following;
+    } catch (err) {
+      return [];
+    }
+  }
+
   // RESTITUISCE SE L'EMAIL PASSATA E' GIA' UTILIZZATA
   @Query()
   async isEmailAlreadyUsed(@Args() { email }: IsEmailAlreadyUsedDTO) {
@@ -70,6 +114,41 @@ export class UsersResolver {
     const user = await this.usersService.getUserById(id);
 
     return user;
+  }
+
+  // MODIFICA IL PROFILO
+  @Mutation()
+  @Private()
+  async editProfile(
+    @Args() changes: EditProfileDTO,
+    @CurrentUser() user: IUser,
+  ): Promise<EditProfileResult> {
+    // Se è stata cambiata l'email
+    const isEmailConfirmationRequired =
+      !!changes.email && changes.email !== user.email;
+
+    // Se l'email è stata cambiata richiede all'utente la conferma
+    if (isEmailConfirmationRequired) changes['isVerified'] = false;
+
+    // Normalizza la posizione
+    if (typeof changes.location === 'object')
+      changes.location['type'] = LocationType.Point;
+
+    try {
+      const newUser = await this.usersService.editUserProfile(changes, user.id);
+
+      // Se l'email è stata cambiata invia all'utente un email per
+      // eseguire la conferma
+      if (isEmailConfirmationRequired)
+        await this.usersService.sendConfirmationEmail(newUser);
+
+      return {
+        success: true,
+        isEmailConfirmationRequired,
+      };
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
   }
 
   // INVIA PER EMAIL IL TOKEN PER LA VERIFICA DELL'EMAIL

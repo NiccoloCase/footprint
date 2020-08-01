@@ -16,3 +16,8 @@ type Location {
   coordinates: [Float!]!
   locationName: String!
 }
+
+input PointLocation {
+  coordinates: [Float!]!
+  locationName: String!
+}
