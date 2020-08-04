@@ -79,6 +79,7 @@ export interface IMutation {
     forgotPassword(email: string): EmailResponse | Promise<EmailResponse>;
     changePasswordWithToken(token: string, newPassword: string): ProcessResult | Promise<ProcessResult>;
     editProfile(username?: string, email?: string, profileImage?: string, location?: PointLocation): EditProfileResult | Promise<EditProfileResult>;
+    editPassword(oldPassword: string, newPassword: string): ProcessResult | Promise<ProcessResult>;
 }
 
 export interface Comment {
@@ -102,6 +103,7 @@ export interface IQuery {
     isEmailAlreadyUsed(email: string): boolean | Promise<boolean>;
     isUsernameAlreadyUsed(username: string): boolean | Promise<boolean>;
     getUserById(id: string): User | Promise<User>;
+    searchUser(query: string, pagination?: PaginationOptions): User[] | Promise<User[]>;
 }
 
 export interface EmailResponse {

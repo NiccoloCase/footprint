@@ -38,6 +38,7 @@ import {MediaScreen} from "../screens/MediaScreen";
 import {MapScreen} from "../screens/MapScreen";
 import {EditProfileScreen} from "../screens/EditProfile";
 import {EditPasswordScreen} from "../screens/authScreens/EditPassword";
+import {FollowersScreen} from "../screens/FollowersScreen";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center", fontWeight: "bold"},
@@ -63,12 +64,13 @@ export type AuthStackParamList = {
   };
   VerifyEmail: {
     email: string;
+    editedProfile?: boolean;
   };
   ForgotPassword: undefined;
 };
 const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthStackScreen = () => (
-  <AuthStack.Navigator initialRouteName="SignUp" headerMode="none">
+  <AuthStack.Navigator initialRouteName="Welcome" headerMode="none">
     <AuthStack.Screen name="Welcome" component={WelcomeScreen} />
     <AuthStack.Screen name="SignIn" component={SignInScreen} />
     <AuthStack.Screen name="SignUp" component={SignUpScreen} />
@@ -186,7 +188,6 @@ export type MyProfileDrawerParamList = {
 const MyProfileDrawer = createDrawerNavigator<MyProfileDrawerParamList>();
 const MyProfileDrawerScreen = () => (
   <MyProfileDrawer.Navigator
-    initialRouteName="EditProfile"
     drawerContentOptions={{
       labelStyle: {fontWeight: "bold"},
       itemStyle: {marginBottom: 15},
@@ -312,6 +313,10 @@ export type AppStackParamList = {
   MapScreen: {
     annotations?: {coordinates: number[]}[];
   };
+  FollowersScreen: {
+    userId: string;
+    following?: boolean;
+  };
 };
 const AppStack = createSharedElementStackNavigator<AppStackParamList>();
 const AppStackScreen = () => (
@@ -341,7 +346,7 @@ const AppStackScreen = () => (
     />
     <AppStack.Screen
       name="Profile"
-      component={ProfileScreen}
+      component={(props) => <ProfileScreen {...props} />}
       options={() => ({
         headerBackTitleVisible: false,
         cardStyle: {backgroundColor: "transparent"},
@@ -373,6 +378,43 @@ const AppStackScreen = () => (
         }),
         cardStyle: {backgroundColor: "transparent"},
       })}
+    />
+    <AppStack.Screen
+      name="FollowersScreen"
+      component={FollowersScreen}
+      options={() => ({
+        headerBackTitleVisible: false,
+        gestureEnabled: false,
+        cardStyleInterpolator: ({current: {progress}}) => ({
+          cardStyle: {opacity: progress},
+        }),
+        cardStyle: {backgroundColor: "transparent"},
+      })}
+      sharedElementsConfig={({params}) => {
+        const {userId} = params;
+        return [
+          {
+            id: `followers.card.${userId}`,
+            animation: "move",
+            resize: "stretch",
+            align: "center-top",
+          },
+          {
+            id: `followers.card.${userId}.title`,
+            animation: "move",
+            resize: "stretch",
+            // align: "center-top",
+          },
+          {
+            id: `followers.card.${userId}.link`,
+            animation: "fade-out",
+          },
+          {
+            id: `followers.card.${userId}.content`,
+            animation: "fade-out",
+          },
+        ];
+      }}
     />
   </AppStack.Navigator>
 );

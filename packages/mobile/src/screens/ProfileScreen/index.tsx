@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {SafeAreaView, StatusBar, View, StyleSheet, Text} from "react-native";
 import Animated from "react-native-reanimated";
 import {StackScreenProps} from "@react-navigation/stack";
+import {useFocusEffect} from "@react-navigation/native";
 import {MyProfileDrawerParamList, AppStackParamList} from "../../navigation";
 import {HEADER_DELTA} from "./dimensions";
 import {MeDocument, GetUserByIdDocument, User} from "../../generated/graphql";
@@ -17,9 +18,6 @@ import {client} from "../../graphql";
 
 const {Value, interpolate, Extrapolate} = Animated;
 
-let uri =
-  "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020031/static/Alberto_conversi_profile_pic_gcbyuc.jpg";
-
 type SearchScreenProps =
   | StackScreenProps<MyProfileDrawerParamList, "MyProfile">
   | StackScreenProps<AppStackParamList, "Profile">;
@@ -31,6 +29,8 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
   const [user, setUser] = useState<User>();
   // se si è verificato un errore nel recupero dei dati del'utente
   const [errorOccurred, setErrorOccurred] = useState<boolean>();
+  // Se sta caricando
+  const [loading, setLoading] = useState(false);
   // se la schermata mostra il profilo personale della persona loggata
   const personal =
     !((route as any).params && (route as any).params.id) ||
@@ -38,36 +38,45 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
 
   const y = new Value<number>(0);
 
-  // Richiede al server il profilo dell'utente
-  // (quello associato all'id passato o quello loggato)
-  useEffect(() => {
-    (async () => {
-      const r = route as any;
-      // ID dell'utente passato come parametro
-      const user: string | null = r.params && r.params.id ? r.params.id : null;
+  useFocusEffect(
+    React.useCallback(() => {
+      loadUserProfile();
+    }, [route]),
+  );
 
-      // Reimposta un eventuale errore
-      if (errorOccurred) setErrorOccurred(false);
+  /**
+   *  Richiede al server il profilo dell'utente
+   *  (quello associato all'id passato o quello loggato)
+   */
+  const loadUserProfile = async () => {
+    const r = route as any;
+    // ID dell'utente passato come parametro
+    const user: string | null = r.params && r.params.id ? r.params.id : null;
 
-      try {
-        const {data, errors} = await (user
-          ? client.query({
-              query: GetUserByIdDocument,
-              variables: {id: user, isFollowedBy: loggedUser},
-            })
-          : client.query({
-              query: MeDocument,
-              variables: {isFollowedBy: loggedUser},
-            }));
+    // Reimposta un eventuale errore
+    if (errorOccurred) setErrorOccurred(false);
 
-        if (errors) throw new Error();
-        // Imposta il nuovo utente
-        setUser(data.getUserById || data.whoami);
-      } catch (err) {
-        setErrorOccurred(true);
-      }
-    })();
-  }, [route]);
+    // Avvia il caricamento
+    setLoading(true);
+
+    try {
+      const {data, errors} = await (user
+        ? client.query({
+            query: GetUserByIdDocument,
+            variables: {id: user, isFollowedBy: loggedUser},
+          })
+        : client.query({query: MeDocument}));
+
+      if (errors) throw new Error();
+      // Imposta il nuovo utente
+      setUser(data.getUserById || data.whoami);
+    } catch (err) {
+      console.log(err);
+      setErrorOccurred(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const opacity = interpolate(y, {
     inputRange: [0, HEADER_DELTA],
@@ -78,25 +87,20 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
   const renderContent = () => {
     // SCHERMATA DEL PROFILO
     if (user) {
-      let xuser = {...user, profileImage: uri};
-      /*       const username = "niccolocase";
-      const xuser: User = {
-        profileImage: uri,
-        followersCount: 100,
-        followingCount: 29,
-        username,
-        id: "5eff94323dc86ce1298e1340",
-      }; */
-
       return (
         <>
           <StatusBar backgroundColor="#303030" barStyle="light-content" />
-          <Cover y={y} opacity={opacity} user={xuser} personal={personal} />
-          <Content y={y} user={xuser} />
+          <Cover y={y} opacity={opacity} user={user} personal={personal} />
+          <Content
+            y={y}
+            user={user}
+            refresh={loadUserProfile}
+            refreshing={loading}
+          />
           <Header
             y={y}
             opacity={opacity}
-            username={xuser.username}
+            username={user.username}
             personal={personal}
           />
         </>

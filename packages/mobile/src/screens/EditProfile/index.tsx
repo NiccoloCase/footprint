@@ -57,8 +57,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
    * Funzione chiamata quando l'utente seleziona una'immagine come foto profilo
    */
   const onProfilePictureIsPicked = (image: ImageSource) => {
-    const {uri} = image;
-    formik.setFieldValue("profileImage", uri);
+    formik.setFieldValue("profileImage", image);
   };
 
   const {
@@ -128,7 +127,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
             {/* POSIZIONE */}
             <TouchableOpacity
               style={styles.inline}
-              disabled={!values.location}
+              disabled={!data || !data.whoami.location.locationName}
               onPress={() => setIsLocationPickerOpen(true)}>
               <View style={styles.roundIcon}>
                 <Icon name="map-marked-alt" color="#fff" size={24} />
@@ -140,6 +139,8 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
                 <Text style={styles.positionText}>
                   {values.location
                     ? values.location.locationName
+                    : data
+                    ? data.whoami.location.locationName
                     : "Caricamento..."}
                 </Text>
               </View>
@@ -157,7 +158,7 @@ export const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
             {/** SUBMIT */}
             <SubmitButton
               title="Modifica profilo"
-              disabled={!data}
+              disabled={!data || Object.keys(values).length === 0}
               isLoading={isSubmitting}
               onPress={handleSubmit as any}
             />

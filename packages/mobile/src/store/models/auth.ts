@@ -28,7 +28,7 @@ export interface AuthModel {
 }
 
 const authModel: AuthModel = {
-  isAuthenticated: false, // <------
+  isAuthenticated: true, // <------
   userId: "",
   accessToken: "",
   refreshToken: "",
@@ -100,10 +100,14 @@ const authModel: AuthModel = {
    * Disconnette l'utente loggato
    */
   logout: thunk(async (actions) => {
-    // elimina il token di accesso e di aggiornamento
-    actions.setTokens({accessToken: "", refreshToken: ""});
-    // aggiorna lo stato riguardo l'autenticazione dell'utente
-    actions.setIsAuthenticated(false);
+    try {
+      // elimina il token di accesso e di aggiornamento
+      actions.setTokens({accessToken: "", refreshToken: ""});
+      // aggiorna lo stato riguardo l'autenticazione dell'utente
+      actions.setIsAuthenticated(false);
+    } catch (err) {
+      console.log(err);
+    }
   }),
 };
 

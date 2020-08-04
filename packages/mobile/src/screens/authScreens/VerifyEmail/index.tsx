@@ -27,7 +27,7 @@ type VerifyEmailScreenProps = StackScreenProps<
 >;
 
 export const VerifyEmail: React.FC<VerifyEmailScreenProps> = ({route}) => {
-  const {email} = route.params;
+  const {email, editedProfile} = route.params;
 
   // GRAPHQL
   const [verfyUser] = useVerfyUserMutation();
@@ -88,8 +88,10 @@ export const VerifyEmail: React.FC<VerifyEmailScreenProps> = ({route}) => {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.card}>
         <AuthHeader
-          subtitle="Abbiamo quasi finito!"
-          title="Verifica l'account,"
+          title="Abbiamo quasi finito!"
+          subtitle={
+            editedProfile ? "Conferma la nuova email" : "Verifica l'account"
+          }
         />
         <Text style={styles.text}>
           Devi solo confermare l'email inserita in fase di registrazione.
@@ -98,7 +100,6 @@ export const VerifyEmail: React.FC<VerifyEmailScreenProps> = ({route}) => {
           Inserisci perfavore il codice che è stato inviato all'email{" "}
           <Text style={styles.email}> {email}</Text> nella casella sottostante
         </Text>
-
         <View style={{flexDirection: "row"}}>
           <TouchableOpacity
             onPress={sendEmail}

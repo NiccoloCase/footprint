@@ -73,9 +73,10 @@ export const ExploreMap: React.FC<ExploreMapProps> = ({
     });
   };
 
-  const centerCoordinate = footprints
-    ? footprints[0].location.coordinates
-    : [11.255814, 43.769562];
+  const centerCoordinate =
+    footprints && footprints.length > 0
+      ? footprints[0].location.coordinates
+      : [11.255814, 43.769562];
 
   return (
     <MapView

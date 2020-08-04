@@ -66,6 +66,7 @@ export type Mutation = {
   forgotPassword: EmailResponse;
   changePasswordWithToken: ProcessResult;
   editProfile: EditProfileResult;
+  editPassword: ProcessResult;
 };
 
 
@@ -165,6 +166,12 @@ export type MutationEditProfileArgs = {
   location?: Maybe<PointLocation>;
 };
 
+
+export type MutationEditPasswordArgs = {
+  oldPassword: Scalars['String'];
+  newPassword: Scalars['String'];
+};
+
 export type Comment = {
   __typename?: 'Comment';
   id: Scalars['ID'];
@@ -188,6 +195,7 @@ export type Query = {
   isEmailAlreadyUsed: Scalars['Boolean'];
   isUsernameAlreadyUsed: Scalars['Boolean'];
   getUserById: User;
+  searchUser: Array<User>;
 };
 
 
@@ -250,6 +258,12 @@ export type QueryIsUsernameAlreadyUsedArgs = {
 
 export type QueryGetUserByIdArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QuerySearchUserArgs = {
+  query: Scalars['String'];
+  pagination?: Maybe<PaginationOptions>;
 };
 
 export type EmailResponse = {
@@ -631,9 +645,6 @@ export type MeQuery = (
     ), followers: Array<(
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username' | 'profileImage'>
-    )>, following: Array<(
-      { __typename?: 'User' }
-      & Pick<User, 'id' | 'username' | 'profileImage'>
     )> }
   ) }
 );
@@ -655,11 +666,36 @@ export type GetUserByIdQuery = (
     ), followers: Array<(
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username' | 'profileImage'>
-    )>, following: Array<(
-      { __typename?: 'User' }
-      & Pick<User, 'id' | 'username' | 'profileImage'>
     )> }
   ) }
+);
+
+export type GetFollowersQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  pagination?: Maybe<PaginationOptions>;
+}>;
+
+
+export type GetFollowersQuery = (
+  { __typename?: 'Query' }
+  & { getFollowers: Array<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username' | 'profileImage'>
+  )> }
+);
+
+export type GetFollowingQueryVariables = Exact<{
+  userId: Scalars['ID'];
+  pagination?: Maybe<PaginationOptions>;
+}>;
+
+
+export type GetFollowingQuery = (
+  { __typename?: 'Query' }
+  & { getFollowing: Array<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username' | 'profileImage'>
+  )> }
 );
 
 export type IsEmailAlreadyUsedQueryVariables = Exact<{
@@ -670,6 +706,20 @@ export type IsEmailAlreadyUsedQueryVariables = Exact<{
 export type IsEmailAlreadyUsedQuery = (
   { __typename?: 'Query' }
   & Pick<Query, 'isEmailAlreadyUsed'>
+);
+
+export type SearchUserQueryVariables = Exact<{
+  query: Scalars['String'];
+  pagination?: Maybe<PaginationOptions>;
+}>;
+
+
+export type SearchUserQuery = (
+  { __typename?: 'Query' }
+  & { searchUser: Array<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username' | 'profileImage'>
+  )> }
 );
 
 export type IsUsernameAlreadyUsedQueryVariables = Exact<{
@@ -778,6 +828,20 @@ export type EditProfileMutation = (
   & { editProfile: (
     { __typename?: 'EditProfileResult' }
     & Pick<EditProfileResult, 'success' | 'isEmailConfirmationRequired'>
+  ) }
+);
+
+export type EditPasswordMutationVariables = Exact<{
+  oldPassword: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+
+export type EditPasswordMutation = (
+  { __typename?: 'Mutation' }
+  & { editPassword: (
+    { __typename?: 'ProcessResult' }
+    & Pick<ProcessResult, 'success'>
   ) }
 );
 
@@ -1333,12 +1397,7 @@ export const MeDocument = gql`
       coordinates
       locationName
     }
-    followers {
-      id
-      username
-      profileImage
-    }
-    following {
+    followers(pagination: {limit: 10}) {
       id
       username
       profileImage
@@ -1385,12 +1444,7 @@ export const GetUserByIdDocument = gql`
       coordinates
       locationName
     }
-    followers {
-      id
-      username
-      profileImage
-    }
-    following {
+    followers(pagination: {limit: 10}) {
       id
       username
       profileImage
@@ -1425,6 +1479,78 @@ export function useGetUserByIdLazyQuery(baseOptions?: ApolloReactHooks.LazyQuery
 export type GetUserByIdQueryHookResult = ReturnType<typeof useGetUserByIdQuery>;
 export type GetUserByIdLazyQueryHookResult = ReturnType<typeof useGetUserByIdLazyQuery>;
 export type GetUserByIdQueryResult = ApolloReactCommon.QueryResult<GetUserByIdQuery, GetUserByIdQueryVariables>;
+export const GetFollowersDocument = gql`
+    query GetFollowers($userId: ID!, $pagination: PaginationOptions) {
+  getFollowers(userId: $userId, pagination: $pagination) {
+    id
+    username
+    profileImage
+  }
+}
+    `;
+
+/**
+ * __useGetFollowersQuery__
+ *
+ * To run a query within a React component, call `useGetFollowersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFollowersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFollowersQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useGetFollowersQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetFollowersQuery, GetFollowersQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetFollowersQuery, GetFollowersQueryVariables>(GetFollowersDocument, baseOptions);
+      }
+export function useGetFollowersLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetFollowersQuery, GetFollowersQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetFollowersQuery, GetFollowersQueryVariables>(GetFollowersDocument, baseOptions);
+        }
+export type GetFollowersQueryHookResult = ReturnType<typeof useGetFollowersQuery>;
+export type GetFollowersLazyQueryHookResult = ReturnType<typeof useGetFollowersLazyQuery>;
+export type GetFollowersQueryResult = ApolloReactCommon.QueryResult<GetFollowersQuery, GetFollowersQueryVariables>;
+export const GetFollowingDocument = gql`
+    query GetFollowing($userId: ID!, $pagination: PaginationOptions) {
+  getFollowing(userId: $userId, pagination: $pagination) {
+    id
+    username
+    profileImage
+  }
+}
+    `;
+
+/**
+ * __useGetFollowingQuery__
+ *
+ * To run a query within a React component, call `useGetFollowingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFollowingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFollowingQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useGetFollowingQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetFollowingQuery, GetFollowingQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetFollowingQuery, GetFollowingQueryVariables>(GetFollowingDocument, baseOptions);
+      }
+export function useGetFollowingLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetFollowingQuery, GetFollowingQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetFollowingQuery, GetFollowingQueryVariables>(GetFollowingDocument, baseOptions);
+        }
+export type GetFollowingQueryHookResult = ReturnType<typeof useGetFollowingQuery>;
+export type GetFollowingLazyQueryHookResult = ReturnType<typeof useGetFollowingLazyQuery>;
+export type GetFollowingQueryResult = ApolloReactCommon.QueryResult<GetFollowingQuery, GetFollowingQueryVariables>;
 export const IsEmailAlreadyUsedDocument = gql`
     query IsEmailAlreadyUsed($email: String!) {
   isEmailAlreadyUsed(email: $email)
@@ -1456,6 +1582,42 @@ export function useIsEmailAlreadyUsedLazyQuery(baseOptions?: ApolloReactHooks.La
 export type IsEmailAlreadyUsedQueryHookResult = ReturnType<typeof useIsEmailAlreadyUsedQuery>;
 export type IsEmailAlreadyUsedLazyQueryHookResult = ReturnType<typeof useIsEmailAlreadyUsedLazyQuery>;
 export type IsEmailAlreadyUsedQueryResult = ApolloReactCommon.QueryResult<IsEmailAlreadyUsedQuery, IsEmailAlreadyUsedQueryVariables>;
+export const SearchUserDocument = gql`
+    query SearchUser($query: String!, $pagination: PaginationOptions) {
+  searchUser(query: $query, pagination: $pagination) {
+    id
+    username
+    profileImage
+  }
+}
+    `;
+
+/**
+ * __useSearchUserQuery__
+ *
+ * To run a query within a React component, call `useSearchUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchUserQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useSearchUserQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SearchUserQuery, SearchUserQueryVariables>) {
+        return ApolloReactHooks.useQuery<SearchUserQuery, SearchUserQueryVariables>(SearchUserDocument, baseOptions);
+      }
+export function useSearchUserLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SearchUserQuery, SearchUserQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<SearchUserQuery, SearchUserQueryVariables>(SearchUserDocument, baseOptions);
+        }
+export type SearchUserQueryHookResult = ReturnType<typeof useSearchUserQuery>;
+export type SearchUserLazyQueryHookResult = ReturnType<typeof useSearchUserLazyQuery>;
+export type SearchUserQueryResult = ApolloReactCommon.QueryResult<SearchUserQuery, SearchUserQueryVariables>;
 export const IsUsernameAlreadyUsedDocument = gql`
     query IsUsernameAlreadyUsed($username: String!) {
   isUsernameAlreadyUsed(username: $username)
@@ -1723,3 +1885,36 @@ export function useEditProfileMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type EditProfileMutationHookResult = ReturnType<typeof useEditProfileMutation>;
 export type EditProfileMutationResult = ApolloReactCommon.MutationResult<EditProfileMutation>;
 export type EditProfileMutationOptions = ApolloReactCommon.BaseMutationOptions<EditProfileMutation, EditProfileMutationVariables>;
+export const EditPasswordDocument = gql`
+    mutation EditPassword($oldPassword: String!, $newPassword: String!) {
+  editPassword(oldPassword: $oldPassword, newPassword: $newPassword) {
+    success
+  }
+}
+    `;
+export type EditPasswordMutationFn = ApolloReactCommon.MutationFunction<EditPasswordMutation, EditPasswordMutationVariables>;
+
+/**
+ * __useEditPasswordMutation__
+ *
+ * To run a mutation, you first call `useEditPasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditPasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editPasswordMutation, { data, loading, error }] = useEditPasswordMutation({
+ *   variables: {
+ *      oldPassword: // value for 'oldPassword'
+ *      newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useEditPasswordMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<EditPasswordMutation, EditPasswordMutationVariables>) {
+        return ApolloReactHooks.useMutation<EditPasswordMutation, EditPasswordMutationVariables>(EditPasswordDocument, baseOptions);
+      }
+export type EditPasswordMutationHookResult = ReturnType<typeof useEditPasswordMutation>;
+export type EditPasswordMutationResult = ApolloReactCommon.MutationResult<EditPasswordMutation>;
+export type EditPasswordMutationOptions = ApolloReactCommon.BaseMutationOptions<EditPasswordMutation, EditPasswordMutationVariables>;

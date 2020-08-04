@@ -7,9 +7,10 @@ import { CreateNewUserDTO, EditProfileDTO } from './users.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IUser, IUserModel } from './users.schema';
-import { AuthType, TokenScope } from '../graphql';
+import { AuthType, TokenScope, PaginationOptions } from '../graphql';
 import { TokenService } from '../token/token.service';
 import { EmailService } from '../email/email.service';
+import { normalizePaginationOptions } from '../shared/pagination';
 
 @Injectable()
 export class UsersService {
@@ -194,4 +195,24 @@ export class UsersService {
       new: true,
     });
   }
+
+  /**
+   * restituisce gli utenti con l'username simile a quello passato
+   * @param username
+   * @param pagination
+   */
+  searchUserByUsername = async (
+    username: string,
+    pagination?: PaginationOptions,
+  ): Promise<IUser[]> => {
+    const { limit, offset } = normalizePaginationOptions(pagination);
+
+    const users = await this.userModel
+      .find({
+        username: { $regex: username, $options: 'i' },
+      })
+      .limit(limit)
+      .skip(offset);
+    return users;
+  };
 }

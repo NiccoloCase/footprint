@@ -1,2 +1,2 @@
-- nascondere la password in mongoose
+
 - cambiare logo nelle email

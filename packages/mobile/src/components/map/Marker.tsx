@@ -1,6 +1,7 @@
 import React from "react";
 import Mapbox from "@react-native-mapbox-gl/maps";
-import {Image, Platform, Text} from "react-native";
+import {Image} from "react-native";
+import {HackMarker} from "./HackMarker";
 
 const {PointAnnotation} = Mapbox;
 
@@ -10,12 +11,6 @@ interface MarkerPros {
   current?: boolean;
   onPress: () => void;
 }
-
-const HackMarker: React.FC<any> = ({children}) =>
-  Platform.select({
-    ios: children,
-    android: <Text style={{lineHeight: 100}}>{children}</Text>,
-  });
 
 export const Marker: React.FC<MarkerPros> = ({
   coordinate,

@@ -7,14 +7,22 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { isEmpty } from 'lodash';
+import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import {
   IsEmailAlreadyUsedDTO,
   IsUsernameAlreadyUsedDTO,
   ChangePasswordWithTokenDTO,
   EditProfileDTO,
+  EditPasswordDTO,
+  SearchUserDTO,
 } from './users.dto';
-import { BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  forwardRef,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {
   EmailResponse,
   ProcessResult,
@@ -116,6 +124,13 @@ export class UsersResolver {
     return user;
   }
 
+  // CERCA UN UTENTE TRAMITE IL NOME
+  @Query()
+  searchUser(@Args() payload: SearchUserDTO) {
+    const { query, pagination } = payload;
+    return this.usersService.searchUserByUsername(query, pagination);
+  }
+
   // MODIFICA IL PROFILO
   @Mutation()
   @Private()
@@ -194,6 +209,27 @@ export class UsersResolver {
       );
 
       await this.usersService.changePassword(userId, newPassword);
+
+      return { success: true };
+    } catch (err) {
+      return { success: false };
+    }
+  }
+
+  // MODIFICA LA PASSWORD DELL'UTETE
+  @Mutation()
+  @Private()
+  async editPassword(
+    @Args() { oldPassword, newPassword }: EditPasswordDTO,
+    @CurrentUser() user: IUser,
+  ): Promise<ProcessResult> {
+    try {
+      // Controlla che la password passata sia corretta
+      const match = await bcrypt.compare(oldPassword, user.localPassword);
+      if (!match) throw new UnauthorizedException('Password is wrong');
+
+      // Modifica la password
+      await this.usersService.changePassword(user.id, newPassword);
 
       return { success: true };
     } catch (err) {

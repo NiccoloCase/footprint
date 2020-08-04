@@ -32,6 +32,8 @@ type Query {
   isUsernameAlreadyUsed(username: String!): Boolean!
   # Restituisce il profilo di un utente dao il suo ID
   getUserById(id: ID!): User!
+  # Restituisce l'utente in base a una stringa di ricerca
+  searchUser(query: String!, pagination: PaginationOptions): [User!]!
 }
 
 type Mutation {
@@ -48,4 +50,5 @@ type Mutation {
     profileImage: String
     location: PointLocation
   ): EditProfileResult!
+  editPassword(oldPassword: String!, newPassword: String!): ProcessResult!
 }

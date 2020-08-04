@@ -1,25 +1,33 @@
 import React from "react";
-import {View, StyleSheet} from "react-native";
+import {View, StyleSheet, Image, Text} from "react-native";
 import {MapView} from "../../../components/map";
 import {Card} from "./Card";
-import {useGetFootprintsByUserQuery} from "../../../generated/graphql";
+import {User, Footprint, Location} from "../../../generated/graphql";
 import {useNavigation} from "@react-navigation/native";
+import {Colors} from "../../../styles";
 
 interface MapCardProps {
-  userId: string;
+  user: User;
+  footprints?: Array<
+    Pick<Footprint, "id" | "title" | "body" | "media"> & {
+      location: {__typename?: "Location"} & Pick<
+        Location,
+        "coordinates" | "locationName"
+      >;
+    }
+  >;
+  loading?: boolean;
 }
 
-export const MapCard: React.FC<MapCardProps> = ({userId}) => {
+export const MapCard: React.FC<MapCardProps> = ({
+  user,
+  loading,
+  footprints,
+}) => {
   const navigation = useNavigation();
 
-  const {data, error, loading} = useGetFootprintsByUserQuery({
-    variables: {userId},
-  });
-
   const annotations =
-    !error && !loading && data
-      ? data.getFootprintsByUser.map((res) => res.location)
-      : [];
+    !loading && footprints ? footprints.map((res) => res.location) : [];
 
   const goToMapScreen = () => {
     navigation.navigate("MapScreen", {annotations});
@@ -31,7 +39,17 @@ export const MapCard: React.FC<MapCardProps> = ({userId}) => {
       buttonText={annotations.length > 0 ? "Espandi" : undefined}
       onButtonPress={goToMapScreen}>
       <View style={styles.map}>
-        <MapView annotations={annotations} />
+        <MapView
+          annotations={annotations}
+          userHome={user.location.coordinates}
+        />
+      </View>
+      <View style={styles.location}>
+        <Image
+          source={require("../../../assets/images/home-marker.png")}
+          style={styles.locationIcon}
+        />
+        <Text style={styles.locationText}>{user.location.locationName}</Text>
       </View>
     </Card>
   );
@@ -43,5 +61,19 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     overflow: "hidden",
     borderRadius: 20,
+  },
+
+  location: {
+    marginTop: 15,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  locationIcon: {
+    width: 30,
+    height: 30,
+  },
+  locationText: {
+    color: Colors.darkGrey,
+    marginLeft: 10,
   },
 });

@@ -3,6 +3,7 @@ import {
   StyleSheet,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  RefreshControl,
 } from "react-native";
 import {Spacing, Colors} from "../../styles";
 import Animated from "react-native-reanimated";
@@ -12,21 +13,34 @@ import {MapCard} from "./cards/MapCard";
 import {FootprintsCard} from "./cards/FootprintsCard";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {TouchableHighlight} from "react-native-gesture-handler";
-import {User} from "../../generated/graphql";
+import {User, useGetFootprintsByUserQuery} from "../../generated/graphql";
 const {Extrapolate, interpolate} = Animated;
 
 interface ContentProps {
   y: Animated.Value<number>;
   user: User;
+  refresh: () => void;
+  refreshing: boolean;
 }
 
-export const Content: React.FC<ContentProps> = ({y, user}) => {
+export const Content: React.FC<ContentProps> = ({
+  y,
+  user,
+  refresh,
+  refreshing,
+}) => {
   const scrollView = useRef<Animated.ScrollView>(null);
   // direzion della freccia del bottone per espandere la schermata
   const [buttonArrowDirection, setButtonArrowDirection] = useState<
     "up" | "down"
   >("up");
 
+  // Graphql
+  const {data, error, loading} = useGetFootprintsByUserQuery({
+    variables: {userId: user.id},
+  });
+
+  // Animazione:
   const borderRadius = interpolate(y, {
     inputRange: [HEADER_DELTA - 50, HEADER_DELTA],
     outputRange: [15, 0],
@@ -67,13 +81,40 @@ export const Content: React.FC<ContentProps> = ({y, user}) => {
       setButtonArrowDirection("up");
   };
 
+  const renderCards = () => {
+    if (!user) return null;
+    return (
+      <>
+        {/** FOLLOWERS */}
+        {user.followers.length > 0 && (
+          <FollowerCard followers={user.followers} userId={user.id} />
+        )}
+        {/** MAPPA */}
+        <MapCard
+          user={user}
+          footprints={data?.getFootprintsByUser}
+          loading={loading || !!error}
+        />
+        {/** FOOTPRINT */}
+        <FootprintsCard footprints={data?.getFootprintsByUser} />
+      </>
+    );
+  };
+
   return (
     <Animated.ScrollView
       ref={scrollView}
       onScroll={onScroll}
       contentContainerStyle={{paddingTop: MAX_HEADER_HEIGHT}}
       showsVerticalScrollIndicator={false}
-      scrollEventThrottle={1}>
+      scrollEventThrottle={1}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={refresh}
+          colors={[Colors.primary]}
+        />
+      }>
       <Animated.View
         style={[
           styles.container,
@@ -90,11 +131,7 @@ export const Content: React.FC<ContentProps> = ({y, user}) => {
             <Icon name="chevron-up" color={Colors.darkGrey} size={22} />
           </Animated.View>
         </TouchableHighlight>
-        {user.followers.length > 0 && (
-          <FollowerCard followers={user.followers} />
-        )}
-        <MapCard userId={user.id} />
-        <FootprintsCard />
+        {renderCards()}
       </Animated.View>
     </Animated.ScrollView>
   );

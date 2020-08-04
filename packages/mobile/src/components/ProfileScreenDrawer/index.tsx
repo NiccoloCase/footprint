@@ -8,7 +8,7 @@ import {
 } from "@react-navigation/drawer";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import {Colors} from "../../styles";
-import {store} from "../../store";
+import {logout} from "../../utils/logout";
 
 const BORDER_COLOR = "#eee";
 const BORDER_WIDTH = 3;
@@ -16,10 +16,6 @@ const BORDER_WIDTH = 3;
 export const ProfileScreenDrawerContent: React.FC<DrawerContentComponentProps> = (
   props,
 ) => {
-  const logout = () => {
-    store.getActions().auth.logout();
-  };
-
   return (
     <View style={styles.conatiner}>
       <DrawerContentScrollView {...props}>

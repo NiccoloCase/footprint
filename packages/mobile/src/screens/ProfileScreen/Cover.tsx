@@ -8,7 +8,10 @@ import {
   PROIFLE_IMAGE_MAX_RADIUS,
 } from "./dimensions";
 import {Colors} from "../../styles";
-import {TouchableHighlight} from "react-native-gesture-handler";
+import {
+  TouchableHighlight,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 import {abbreviateNumber} from "../../utils/abbreviateNumber";
 import {
   User,
@@ -16,6 +19,7 @@ import {
   useUnfollowUserMutation,
 } from "../../generated/graphql";
 import Snackbar from "react-native-snackbar";
+import {useNavigation} from "@react-navigation/native";
 
 const {interpolate, Extrapolate} = Animated;
 
@@ -31,6 +35,8 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
   const [followers, setFollowers] = useState(user.followersCount);
   const [followUser] = useFollowUserMutation();
   const [unfollowUser] = useUnfollowUserMutation();
+
+  const navigation = useNavigation();
 
   const scale = interpolate(y, {
     inputRange: [-MAX_HEADER_HEIGHT, 0],
@@ -74,6 +80,7 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
           ...StyleSheet.absoluteFillObject,
           resizeMode: "cover",
         }}
+        key={profileImage}
         source={{uri: profileImage}}
       />
       {/* BLUR OVERLAY */}
@@ -88,6 +95,7 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
         <Image
           resizeMode="cover"
           source={{uri: profileImage}}
+          key={profileImage}
           style={styles.avatar}
         />
         <Animated.Text style={[styles.username]}>{username}</Animated.Text>
@@ -105,17 +113,28 @@ export const Cover: React.FC<CoverProps> = ({y, opacity, user, personal}) => {
       )}
       <View style={styles.infoBox}>
         {/*FOLLOWERS*/}
-        <View style={styles.counterBox}>
+        <TouchableOpacity
+          style={styles.counterBox}
+          onPress={() =>
+            navigation.navigate("FollowersScreen", {userId: user.id})
+          }>
           <Text style={styles.count}>{abbreviateNumber(followers)}</Text>
           <Text style={styles.countTitle}>Follower</Text>
-        </View>
+        </TouchableOpacity>
         <View style={[styles.divider, {borderRightWidth: 1}]} />
 
         {/*FOLLOWING*/}
-        <View style={styles.counterBox}>
+        <TouchableOpacity
+          style={styles.counterBox}
+          onPress={() =>
+            navigation.navigate("FollowersScreen", {
+              userId: user.id,
+              following: true,
+            })
+          }>
           <Text style={styles.count}>{abbreviateNumber(followingCount)}</Text>
           <Text style={styles.countTitle}>Seguiti</Text>
-        </View>
+        </TouchableOpacity>
         <View style={[styles.divider, {borderLeftWidth: 1}]} />
 
         {/*FOOTPRINT*/}

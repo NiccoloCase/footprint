@@ -3,17 +3,20 @@ import {StyleProp, ViewStyle} from "react-native";
 import {Marker} from "./Marker";
 import Mapbox from "@react-native-mapbox-gl/maps";
 import {calculateCenter} from "../../utils/geocode";
+import {UserHomeMarker} from "./UserHomeMarker";
 
 const {MapView: Map, Camera, UserLocation} = Mapbox;
 
 interface MapViewProps {
   containerStyle?: StyleProp<ViewStyle>;
   annotations?: {coordinates: number[]}[];
+  userHome?: number[];
 }
 
 export const MapView: React.FC<MapViewProps> = ({
   containerStyle,
   annotations,
+  userHome,
 }) => {
   const renderAnnotations = () => {
     if (!annotations) return;
@@ -36,7 +39,7 @@ export const MapView: React.FC<MapViewProps> = ({
   const centerCoordinate =
     annotations && annotations.length > 0
       ? calculateCenter(annotations.map((a) => a.coordinates))
-      : [11.255814, 43.769562]; // TODO: user home
+      : userHome || [11.255814, 43.769562];
 
   return (
     <Map
@@ -45,6 +48,7 @@ export const MapView: React.FC<MapViewProps> = ({
       compassEnabled={false}>
       <Camera zoomLevel={8} centerCoordinate={centerCoordinate} />
       <UserLocation />
+      {userHome && <UserHomeMarker coordinates={userHome} />}
       {renderAnnotations()}
     </Map>
   );

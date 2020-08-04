@@ -1,4 +1,9 @@
-import { AuthType, Location, PointLocation } from '../graphql';
+import {
+  AuthType,
+  Location,
+  PointLocation,
+  PaginationOptions,
+} from '../graphql';
 
 export class IsEmailAlreadyUsedDTO {
   email: string;
@@ -28,4 +33,14 @@ export class EditProfileDTO {
   email?: string;
   profileImage?: string;
   location?: PointLocation;
+}
+
+export class EditPasswordDTO {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export class SearchUserDTO {
+  query: string;
+  pagination?: PaginationOptions;
 }

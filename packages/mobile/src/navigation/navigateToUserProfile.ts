@@ -1,13 +1,14 @@
 import {CommonActions, useNavigation} from "@react-navigation/native";
+import {store} from "../store";
 
 export const navigateToUserProfile = (
   userId?: string,
 ): CommonActions.Action => {
+  const ownId = store.getState().auth.userId;
+
   if (!userId || userId === ownId) return CommonActions.navigate("MyProfile");
   else return CommonActions.navigate("Profile", {id: userId});
 };
-
-const ownId = "io";
 
 /**
  * Restituisce una funzione che se chiamata reindirizza l'utente nella schermata

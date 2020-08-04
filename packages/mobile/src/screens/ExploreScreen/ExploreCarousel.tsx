@@ -77,14 +77,15 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
    * @param index
    */
   const goToFootprint = (index: number) => () => {
-    if (!footprints) return;
-    const {id, title, author} = footprints[index];
+    if (footprints && footprints.length > 0) {
+      const {id, title, author} = footprints[index];
 
-    navigation.navigate("Footprint", {
-      title,
-      id,
-      authorUsername: author.username,
-    });
+      navigation.navigate("Footprint", {
+        title,
+        id,
+        authorUsername: author.username,
+      });
+    }
   };
 
   const renderItem = ({item, index}: {item: Footprint; index: number}) => {

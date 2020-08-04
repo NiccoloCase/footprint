@@ -1,7 +1,6 @@
-import React, {useState, ReactNode} from "react";
+import React from "react";
 import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
 import {Colors} from "../../../styles";
-import Animated from "react-native-reanimated";
 
 interface CardProps {
   title?: string;
@@ -16,7 +15,7 @@ export const Card: React.FC<CardProps> = (props) => {
   };
 
   return (
-    <Animated.View style={styles.card}>
+    <View style={styles.card}>
       <View style={styles.inline}>
         <Text style={[styles.text, styles.sectionTitle]}>{props.title}</Text>
         {props.buttonText && (
@@ -26,7 +25,7 @@ export const Card: React.FC<CardProps> = (props) => {
         )}
       </View>
       {props.children}
-    </Animated.View>
+    </View>
   );
 };
 

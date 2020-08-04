@@ -12,12 +12,7 @@ query Me {
       coordinates
       locationName
     }
-    followers {
-      id
-      username
-      profileImage
-    }
-    following {
+    followers(pagination: {limit: 10}) {
       id
       username
       profileImage
@@ -38,12 +33,7 @@ query getUserById($id: ID!, $isFollowedBy: ID) {
       coordinates
       locationName
     }
-    followers {
-      id
-      username
-      profileImage
-    }
-    following {
+    followers(pagination: {limit: 10}) {
       id
       username
       profileImage
@@ -51,8 +41,32 @@ query getUserById($id: ID!, $isFollowedBy: ID) {
   }
 }
 
+query GetFollowers($userId: ID!, $pagination: PaginationOptions) {
+  getFollowers(userId: $userId, pagination: $pagination) {
+    id
+    username
+    profileImage
+  }
+}
+
+query GetFollowing($userId: ID!, $pagination: PaginationOptions) {
+  getFollowing(userId: $userId, pagination: $pagination) {
+    id
+    username
+    profileImage
+  }
+}
+
 query IsEmailAlreadyUsed($email: String!) {
   isEmailAlreadyUsed(email: $email)
+}
+
+query SearchUser($query: String!, $pagination: PaginationOptions) {
+  searchUser(query: $query, pagination: $pagination) {
+    id
+    username
+    profileImage
+  }
 }
 
 query IsUsernameAlreadyUsed($username: String!) {
@@ -115,5 +129,11 @@ mutation EditProfile(
   ) {
     success
     isEmailConfirmationRequired
+  }
+}
+
+mutation EditPassword($oldPassword: String!, $newPassword: String!) {
+  editPassword(oldPassword: $oldPassword, newPassword: $newPassword) {
+    success
   }
 }

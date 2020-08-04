@@ -33,7 +33,9 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     (async () => {
       if (GPSPosition) {
         const {longitude, latitude} = GPSPosition;
-        const data = await getPlaceNameFromCoordinates(longitude, latitude);
+        const data = await getPlaceNameFromCoordinates(longitude, latitude, {
+          superficialResearch: true,
+        });
         const names = data.map((place) => place.place_name);
 
         setRestults([...results, ...data]);
