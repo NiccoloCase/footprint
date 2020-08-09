@@ -13,7 +13,7 @@ interface PlaceAutocompleteOptions {
 export const placeAutocomplete = async (
   query: string,
   options: PlaceAutocompleteOptions = {},
-): Promise<any[]> => {
+): Promise<any[] | null> => {
   let url = `${MAPBOX_API_URL}/mapbox.places/${query}.json?access_token=${config.MAPBOX_ACCESS_TOKEN}`;
 
   if (options.superficialResearch) {
@@ -23,8 +23,6 @@ export const placeAutocomplete = async (
 
   const res = await fetch(url);
   const data = await res.json();
-
-  if (!data.features) throw new Error("An error has occurred");
 
   return data.features;
 };

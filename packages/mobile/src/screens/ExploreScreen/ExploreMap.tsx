@@ -12,6 +12,7 @@ const {MapView, Camera, UserLocation} = Mapbox;
 interface ExploreMapProps {
   containerStyle?: StyleProp<ViewStyle>;
   location?: LocationState;
+  setLocation: (location: LocationState) => void;
   footprints: Footprint[] | null;
   currentFootprint: number;
   setCurrentFootprint: (index: number) => void;
@@ -20,6 +21,7 @@ interface ExploreMapProps {
 export const ExploreMap: React.FC<ExploreMapProps> = ({
   containerStyle,
   location,
+  setLocation,
   footprints,
   currentFootprint,
   setCurrentFootprint,
@@ -48,6 +50,9 @@ export const ExploreMap: React.FC<ExploreMapProps> = ({
     // muove e basta
     else camera.current.flyTo(location.coordinates, animationDuration);
   }, [location]);
+
+  const onRegionWillChange = (feature: any) =>
+    setLocation({...location, coordinates: feature.geometry.coordinates});
 
   const renderAnnotations = () => {
     if (!footprints) return;
@@ -82,7 +87,8 @@ export const ExploreMap: React.FC<ExploreMapProps> = ({
     <MapView
       style={[{flex: 1}, containerStyle]}
       styleURL={Mapbox.StyleURL.Light}
-      compassEnabled={false}>
+      compassEnabled={false}
+      onRegionWillChange={onRegionWillChange}>
       <Camera
         ref={camera as any}
         zoomLevel={5 /** TODO */}

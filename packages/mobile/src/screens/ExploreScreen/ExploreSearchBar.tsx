@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useRef} from "react";
 import {
   View,
   StyleSheet,
@@ -7,18 +7,23 @@ import {
   Text,
   TouchableHighlight,
   TouchableWithoutFeedback,
-  ScrollView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import {useTimingTransition, mix} from "react-native-redash";
 import {Spacing, Colors} from "../../styles";
-import Animated, {Easing} from "react-native-reanimated";
+import Animated, {Easing, cos} from "react-native-reanimated";
 import {placeAutocomplete, PlaceTypes} from "../../utils/geocode";
 import {LocationState} from ".";
+import {SearchUserDocument, User} from "../../generated/graphql";
+import Swiper from "react-native-swiper";
+import {ScrollView} from "react-native-gesture-handler";
+import {useLazyQuery} from "../../graphql/useLazyQuery";
+import {useNavigateToUserProfile} from "../../navigation/navigateToUserProfile";
 
-const MAX_HEIGHT = 500;
-const RESULT_ITEM_HEIGHT = 55;
+const RESULT_ITEM_HEIGHT = 57;
+const TAB_HEADER_HEIGHT = 65;
 
 interface ExploreSearchProps {
   setLocation: (location: LocationState) => void;
@@ -32,46 +37,104 @@ interface ExploreSearchResult {
   placeType: PlaceTypes;
 }
 
+interface ISearchResults {
+  geo: ExploreSearchResult[];
+  user: User[];
+}
+
+type SerachTypes = "geo" | "user";
+
 export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
   setLocation,
   showFootprints,
   setShowFootprints,
 }) => {
-  const [prevShowFootprints, setPrevShowFootprints] = useState<boolean>();
+  // Navigazione
+  const navigateToUser = useNavigateToUserProfile();
+  // Tipo di ricerca
+  const [searchType, setSearchType] = useState<SerachTypes>("geo");
+  // Valore della barra di ricerca
   const [value, setValue] = useState("");
-  const [results, setResults] = useState<ExploreSearchResult[]>([]);
-  const [showResults, setShowResults] = useState(true);
+  // Ricerca un utente tramite l'username
+  const searchUser = useLazyQuery(SearchUserDocument);
+  // Risultati della ricerca
+  const [results, setResults] = useState<ISearchResults>({geo: [], user: []});
+
+  // Se mostare i risultati
+  const [showResults, setShowResults] = useState(false);
+  // Se mostarre i footprtint
+  const [prevShowFootprints, setPrevShowFootprints] = useState<boolean>();
+
   const inputRef = useRef<TextInput | null>(null);
+  const swiperRef = useRef<Swiper | null>(null);
 
   // Animazione deli risultati:
-  const transition = useTimingTransition(showResults, {
+  const opacity = useTimingTransition(showResults, {
     duration: 250,
     easing: Easing.inOut(Easing.ease),
   });
-  const boxHeight = mix(transition, 0, RESULT_ITEM_HEIGHT * results.length);
 
-  const onChangeText = async (newValue: string) => {
+  /**
+   * Funzione chiamata quando il testo della serachBar cambia -> esegue la ricerca
+   * @param query
+   */
+  const onChangeText = (query: string) => {
     // Aggiorna lo stato
-    setValue(newValue);
+    setValue(query);
 
-    if (!newValue || newValue.length === 0) return setShowResults(false);
+    // Se la barra di ricerca è vuota elimina le ricerche
+    if (!query || query.length === 0) {
+      setShowResults(false);
+      //    setSearchType("geo");
+      return;
+    }
 
-    // Esegue ricerca
-    try {
-      const results = await placeAutocomplete(value);
+    // RICERCA GEOGRAFICA
+    placeAutocomplete(value)
+      .then((data) => {
+        const formattedResults: ExploreSearchResult[] = data
+          ? data.map((r) => ({
+              text: r.place_name,
+              coordinates: r.center,
+              placeType: r.place_type[0],
+            }))
+          : [];
 
-      const formattedResults: ExploreSearchResult[] = results.map((r) => ({
-        text: r.place_name,
-        coordinates: r.center,
-        placeType: r.place_type[0],
-      }));
+        // Mostra i risultati
+        setResults({...results, geo: formattedResults});
 
-      // Mostra i risultati
-      setResults(formattedResults);
+        if (!showResults && formattedResults.length > 0) {
+          //if (results[searchType].length === 0) setSearchTypeAndSwipe("geo");
+          setShowResults(true);
+        }
+      })
+      .catch((err) => console.log(err));
 
-      if (formattedResults.length > 0) setShowResults(true);
-      else setShowResults(false);
-    } catch (err) {}
+    // RICERCA DEGLI UTENTI
+    searchUser({query})
+      .then(({data}) => {
+        const formattedResults = data ? data.searchUser : [];
+        // Mostra i risultati
+        setResults({...results, user: formattedResults});
+
+        if (!showResults && formattedResults.length > 0) {
+          //if (results[searchType].length === 0) setSearchTypeAndSwipe("user");
+          setShowResults(true);
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const setSearchTypeAndSwipe = (newType: SerachTypes) => {
+    if (swiperRef.current) {
+      switch (newType) {
+        case "geo":
+          swiperRef.current.scrollTo(0);
+        case "user":
+          swiperRef.current.scrollTo(1);
+      }
+    }
+    setSearchType(newType);
   };
 
   /**
@@ -88,8 +151,8 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
    * Funzione chiamata quando viene preumto uno dei risultati
    * @param index Index del risultato
    */
-  const onResultPress = (index: number) => {
-    const result = results[index];
+  const onGeoResultPress = (index: number) => () => {
+    const result = results.geo[index];
     setValue(result.text);
     setShowResults(false);
     // abbassa la tastiera deselezionano l'input
@@ -111,6 +174,12 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
     }
 
     setLocation({coordinates, zoom});
+  };
+
+  const onIndexChanged = (index: number) => {
+    console.log({index});
+    if (index === 0 && searchType !== "geo") setSearchType("geo");
+    else if (index === 1 && searchType !== "user") setSearchType("user");
   };
 
   /**
@@ -140,21 +209,73 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
     setShowResults(false);
   };
 
+  const renderNotFoundView = () => (
+    <View style={styles.notFoundWrapper}>
+      <Text style={styles.notFound}>Non ci sono risultati</Text>
+    </View>
+  );
+
   /**
-   * Renderizza i risultati della ricerca
+   * Renderizza i risultati della ricerca geografica
    */
-  const renderResults = () =>
-    results.map((result, index) => (
-      <TouchableHighlight
-        key={index}
-        underlayColor="#eee"
-        style={{paddingHorizontal: 15}}
-        onPress={() => onResultPress(index)}>
-        <View style={styles.resultBox}>
-          <Text style={styles.resultText}>{result.text}</Text>
-        </View>
-      </TouchableHighlight>
-    ));
+  const renderGeoResults = () =>
+    results.geo.length > 0 ? (
+      <ScrollView keyboardShouldPersistTaps="handled">
+        {results.geo.map((result, index) => (
+          <TouchableHighlight
+            key={index}
+            underlayColor="#eee"
+            style={{paddingHorizontal: 15}}
+            onPress={onGeoResultPress(index)}>
+            <View
+              style={[
+                styles.resultBox,
+                {
+                  borderColor:
+                    results.geo.length - 1 === index ? "transparent" : "#eee",
+                },
+              ]}>
+              <Text style={styles.resultText}>{result.text}</Text>
+            </View>
+          </TouchableHighlight>
+        ))}
+      </ScrollView>
+    ) : (
+      renderNotFoundView()
+    );
+
+  /**
+   * Renderizza i risultati della ricerca degli utenti
+   */
+  const renderUsersResults = () =>
+    results.user.length > 0 ? (
+      <ScrollView keyboardShouldPersistTaps="handled">
+        {results.user.map((result, index) => (
+          <TouchableHighlight
+            key={index}
+            underlayColor="#eee"
+            style={{paddingHorizontal: 15}}
+            onPress={() => navigateToUser(result.id)}>
+            <View
+              style={[
+                styles.resultBox,
+                {
+                  borderColor:
+                    results.user.length - 1 === index ? "transparent" : "#eee",
+                },
+              ]}>
+              <Image
+                source={{uri: result.profileImage}}
+                style={styles.avatar}
+              />
+              <Text style={styles.resultText}>{result.username}</Text>
+            </View>
+          </TouchableHighlight>
+        ))}
+      </ScrollView>
+    ) : (
+      renderNotFoundView()
+    );
 
   return (
     <>
@@ -165,7 +286,7 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
           <View style={{flex: 1}} />
         </TouchableWithoutFeedback>
       </View>
-      {/** SERACH BAR: */}
+      {/** SERACH BAR */}
       <View style={styles.container}>
         <View style={styles.searchBarWrapper}>
           <TextInput
@@ -212,11 +333,52 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
           </TouchableHighlight>
         </View>
         {/** RISUTLTATI DELLLA RICERCA: */}
-        <ScrollView style={{marginTop: 22}} keyboardShouldPersistTaps="always">
-          <Animated.View style={[styles.resultsContainer, {height: boxHeight}]}>
-            {renderResults()}
-          </Animated.View>
-        </ScrollView>
+        <Animated.View
+          pointerEvents={showResults ? "auto" : "none"}
+          style={[
+            styles.resultsContainer,
+            {
+              opacity,
+            },
+          ]}>
+          {/** TABS */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => setSearchTypeAndSwipe("geo")}>
+              <Text
+                style={[
+                  styles.headerTabLabel,
+                  {
+                    borderBottomColor:
+                      searchType === "geo" ? Colors.primary : "transparent",
+                  },
+                ]}>
+                Luoghi
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setSearchTypeAndSwipe("user")}>
+              <Text
+                style={[
+                  styles.headerTabLabel,
+                  {
+                    borderBottomColor:
+                      searchType === "user" ? Colors.primary : "transparent",
+                  },
+                ]}>
+                Persone
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Swiper
+            ref={swiperRef}
+            showsPagination={false}
+            loop={false}
+            onIndexChanged={onIndexChanged}
+            index={searchType === "geo" ? 0 : 1}>
+            {renderGeoResults()}
+            {renderUsersResults()}
+          </Swiper>
+        </Animated.View>
       </View>
     </>
   );
@@ -224,11 +386,12 @@ export const ExploreSearchBar: React.FC<ExploreSearchProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    //  backgroundColor: "orange",
+    // backgroundColor: "orange",
     position: "absolute",
     left: 0,
     right: 0,
-    maxHeight: MAX_HEIGHT,
+    top: 0,
+    bottom: 15,
     marginHorizontal: Spacing.screenHorizontalPadding,
   },
   searchBarWrapper: {
@@ -254,9 +417,9 @@ const styles = StyleSheet.create({
   },
   resultsContainer: {
     backgroundColor: "#fff",
+    flex: 1,
     borderRadius: 5,
-    overflow: "hidden",
-    // ombra:
+    marginTop: 30,
     shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.5,
     shadowRadius: 5,
@@ -264,18 +427,24 @@ const styles = StyleSheet.create({
   },
   resultBox: {
     height: RESULT_ITEM_HEIGHT,
-    justifyContent: "center",
-    borderColor: "#eee",
+    alignItems: "center",
+    flexDirection: "row",
     borderBottomWidth: 1,
   },
   resultText: {
     fontSize: 16,
     color: Colors.darkGrey,
   },
+  avatar: {
+    backgroundColor: Colors.mediumGrey,
+    width: 37,
+    height: 37,
+    borderRadius: 37 / 2,
+    marginRight: 15,
+  },
   buttonText: {
     color: "#808080",
     fontWeight: "bold",
-    //color: Colors.darkGrey,
   },
   button: {
     flexDirection: "row",
@@ -290,5 +459,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 5,
+  },
+  header: {
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: 15,
+    height: TAB_HEADER_HEIGHT,
+  },
+  headerTabLabel: {
+    color: Colors.darkGrey,
+    fontSize: 17,
+    fontWeight: "bold",
+    marginRight: 25,
+    borderBottomWidth: 2,
+  },
+  notFound: {
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  notFoundWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

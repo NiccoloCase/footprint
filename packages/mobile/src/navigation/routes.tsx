@@ -252,7 +252,7 @@ const Tabs = createBottomTabNavigator<BottomTabParamList>();
 
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="MyProfile"
+    initialRouteName="Explore"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,

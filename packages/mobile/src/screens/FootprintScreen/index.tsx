@@ -52,7 +52,7 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
   navigation,
 }) => {
   const {id, title, image} = route.params;
-  console.log(id);
+
   // Animazione:
   const [
     translationX,

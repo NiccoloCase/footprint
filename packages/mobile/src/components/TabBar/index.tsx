@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import {BottomTabBarProps} from "@react-navigation/bottom-tabs";
 import posed from "react-native-pose";
-import {Colors} from "../../styles";
+import {Colors, Spacing} from "../../styles";
 
 const windowWidth = Dimensions.get("window").width;
 const paddingHorizontal = 15;
@@ -99,7 +99,7 @@ export const TabBar: React.FC<BottomTabBarProps> = (props) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    height: 60,
+    height: Spacing.bottomTabBarHeight,
     elevation: 2,
     alignItems: "center",
     backgroundColor: "#fff",

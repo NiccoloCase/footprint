@@ -14,7 +14,6 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import Animated, {Easing} from "react-native-reanimated";
 import {useTimingTransition, mix} from "react-native-redash";
 import {Footprint} from "../../generated/graphql";
-import {MainHeader} from "../../components/Header";
 import {getDistanceFromUser} from "../../utils/geocode";
 import {useNavigation} from "@react-navigation/native";
 import {TouchableWithoutFeedback} from "react-native-gesture-handler";
@@ -30,7 +29,7 @@ const INITIAL_INDEX = 0;
 interface ExploreCarouselProps {
   showFootprints: boolean;
   setShowFootprints: (vale: boolean) => void;
-  footprints: Footprint[] | null;
+  footprints?: Footprint[];
   setCurrentFootprint: (index: number) => void;
   currentFootprint: number;
 }
@@ -99,14 +98,9 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
         key={index}>
         <TouchableWithoutFeedback onPress={goToFootprint(index)}>
           <SharedElement id={`footprint.${item.id}.image`}>
-            <Image
-              source={{
-                uri:
-                  /* item.media  */
-                  "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595854452/static/photo-1552752399-22aa8f97ade0_fqkui9.jpg",
-              }}
-              style={styles.cardImage}
-            />
+            {item.media && (
+              <Image source={{uri: item.media}} style={styles.cardImage} />
+            )}
           </SharedElement>
         </TouchableWithoutFeedback>
         <View style={styles.content}>
