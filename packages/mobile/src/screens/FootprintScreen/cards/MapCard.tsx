@@ -1,38 +1,92 @@
 import React from "react";
 import {View, StyleSheet, Text} from "react-native";
-import {MapView} from "../../../components/MapView";
+import {MapView} from "../../../components/map";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {Card} from "./Card";
 import {getDistanceFromUser} from "../../../utils/geocode";
 import {Colors} from "../../../styles";
+import {Spinner} from "../../../components/Spinner";
+import {useNavigation} from "@react-navigation/native";
 
-export const MapCard: React.FC = () => {
-  const distance = getDistanceFromUser(23, 32);
+interface MapCardProps {
+  location?: {
+    coordinates: number[];
+    locationName: string;
+  };
+}
+
+export const MapCard: React.FC<MapCardProps> = ({location}) => {
+  const navigation = useNavigation();
+
+  const distance = location
+    ? getDistanceFromUser(location.coordinates[1], location.coordinates[0])
+    : null;
+
+  const annotations = location
+    ? [{coordinates: location.coordinates}]
+    : undefined;
 
   return (
-    <Card title="Posizione" buttonText="Espandi">
+    <Card
+      title="Posizione"
+      buttonText="Espandi"
+      containerStyle={styles.container}
+      onButtonPress={() => navigation.navigate("MapScreen", {annotations})}>
       <View style={styles.info}>
-        <Icon name="map-marker-alt" color={Colors.primary} size={18} />
+        <Icon
+          name="map-marker-alt"
+          style={styles.icon}
+          color={Colors.primary}
+          size={25}
+        />
+
         <View>
-          <Text style={[styles.text, styles.location]} numberOfLines={2}>
-            {/* item.locationName || */ "Firenze"}
+          <Text
+            style={[
+              styles.text,
+              styles.location,
+              !location?.locationName
+                ? {
+                    backgroundColor: "#ddd",
+                    width: 150,
+                  }
+                : undefined,
+            ]}
+            numberOfLines={2}>
+            {location?.locationName}
           </Text>
-          {distance && (
-            <Text style={[styles.text, styles.distance]} numberOfLines={1}>
-              {distance.formattedDistance}
-            </Text>
-          )}
+
+          <Text
+            style={[
+              styles.text,
+              styles.distance,
+              !distance
+                ? {
+                    backgroundColor: "#ddd",
+                    width: 120,
+                  }
+                : undefined,
+            ]}
+            numberOfLines={1}>
+            {distance?.formattedDistance}
+          </Text>
         </View>
       </View>
 
       <View style={styles.map}>
-        <MapView containerStyle={{borderRadius: 10}} />
+        <MapView
+          containerStyle={{borderRadius: 10}}
+          annotations={annotations}
+        />
       </View>
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginTop: 10,
+  },
   info: {
     flexDirection: "row",
     marginVertical: 10,
@@ -45,7 +99,6 @@ const styles = StyleSheet.create({
     color: "#707070",
   },
   location: {
-    marginLeft: 5,
     marginBottom: 5,
   },
   distance: {
@@ -55,5 +108,9 @@ const styles = StyleSheet.create({
   inline: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  icon: {
+    alignSelf: "center",
+    marginRight: 10,
   },
 });

@@ -14,7 +14,6 @@ import {
   useGetNewsFeedQuery,
   NewsFeedItem,
   useMarkFeedItemAsSeenMutation,
-  Footprint,
 } from "../../generated/graphql";
 import {Spinner} from "../../components/Spinner";
 import {ScrollView} from "react-native-gesture-handler";
@@ -27,7 +26,7 @@ export const HomeScreen: React.FC = () => {
   // Se il feed si sta venendo aggiornato
   const [refreshing, setRefreshing] = useState(false);
   // GRAPHQL
-  const {data, loading, fetchMore, refetch, error} = useGetNewsFeedQuery({
+  const {data, loading, fetchMore, refetch} = useGetNewsFeedQuery({
     variables: {pagination: {limit: 10}},
     notifyOnNetworkStatusChange: true,
   });
@@ -127,6 +126,7 @@ export const HomeScreen: React.FC = () => {
         authorId={item.footprint.authorId}
         title={item.footprint.title}
         username={item.footprint.author.username || "nicco"}
+        locationName={item.footprint.location.locationName}
         image={
           index === 0
             ? "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020013/sample.jpg"

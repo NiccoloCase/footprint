@@ -8,7 +8,7 @@ import { Model, Types } from 'mongoose';
 import { ICommentBucketModel, IComment } from './comments.schema';
 import { FootprintsService } from '../footprints/footprints.service';
 
-const COMMENTS_PER_BUCKET = 100;
+const COMMENTS_PER_BUCKET = 5;
 
 @Injectable()
 export class CommentsService {

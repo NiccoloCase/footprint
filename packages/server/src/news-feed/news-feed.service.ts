@@ -53,18 +53,24 @@ export class NewsFeedService {
    * @param footprint
    */
   async broadcastFootprint(footprint: IFootprint): Promise<void> {
-    const { authorId } = footprint;
+    const { authorId, id } = footprint;
     try {
       // recupera i followers dell'autore del footprint
       const follows = await this.friendshipService.getAllFollowersId(authorId);
 
-      // crea tanti elementi quanti sono gli utenti ai quali deve essere trasmesso
+      // Crea tanti elementi quanti sono gli utenti ai quali deve essere diffuso
       // il footprint
-      let newFeedItems = follows.map(follow => {
+      const newFeedItems = follows.map(follow => {
         return {
           ownerId: follow.user,
-          footprint: footprint.id,
+          footprint: id,
         };
+      });
+
+      // Aggiunge il Footprint al feed dello stesso autore
+      newFeedItems.unshift({
+        ownerId: authorId,
+        footprint: id,
       });
 
       // salva tutti gli elementi

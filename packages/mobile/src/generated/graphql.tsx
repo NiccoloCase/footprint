@@ -476,7 +476,7 @@ export type GetNearFootprintsQuery = (
     & Pick<Footprint, 'id' | 'title' | 'media'>
     & { location: (
       { __typename?: 'Location' }
-      & Pick<Location, 'coordinates'>
+      & Pick<Location, 'coordinates' | 'locationName'>
     ), author: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username' | 'profileImage'>
@@ -499,7 +499,7 @@ export type GetNewsFeedQuery = (
       & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId'>
       & { location: (
         { __typename?: 'Location' }
-        & Pick<Location, 'coordinates'>
+        & Pick<Location, 'coordinates' | 'locationName'>
       ), author: (
         { __typename?: 'User' }
         & Pick<User, 'username' | 'profileImage'>
@@ -523,6 +523,26 @@ export type GetFootprintsByUserQuery = (
       & Pick<Location, 'coordinates' | 'locationName'>
     ) }
   )> }
+);
+
+export type GetFootprintsByIdQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type GetFootprintsByIdQuery = (
+  { __typename?: 'Query' }
+  & { getFootprintById: (
+    { __typename?: 'Footprint' }
+    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount'>
+    & { location: (
+      { __typename?: 'Location' }
+      & Pick<Location, 'coordinates' | 'locationName'>
+    ), author: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username' | 'profileImage'>
+    ) }
+  ) }
 );
 
 export type MarkFeedItemAsSeenMutationVariables = Exact<{
@@ -1011,6 +1031,7 @@ export const GetNearFootprintsDocument = gql`
     media
     location {
       coordinates
+      locationName
     }
     author {
       id
@@ -1059,6 +1080,7 @@ export const GetNewsFeedDocument = gql`
       media
       location {
         coordinates
+        locationName
       }
       authorId
       author {
@@ -1136,6 +1158,52 @@ export function useGetFootprintsByUserLazyQuery(baseOptions?: ApolloReactHooks.L
 export type GetFootprintsByUserQueryHookResult = ReturnType<typeof useGetFootprintsByUserQuery>;
 export type GetFootprintsByUserLazyQueryHookResult = ReturnType<typeof useGetFootprintsByUserLazyQuery>;
 export type GetFootprintsByUserQueryResult = ApolloReactCommon.QueryResult<GetFootprintsByUserQuery, GetFootprintsByUserQueryVariables>;
+export const GetFootprintsByIdDocument = gql`
+    query GetFootprintsById($id: ID!) {
+  getFootprintById(id: $id) {
+    id
+    title
+    body
+    media
+    likesCount
+    location {
+      coordinates
+      locationName
+    }
+    author {
+      id
+      username
+      profileImage
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFootprintsByIdQuery__
+ *
+ * To run a query within a React component, call `useGetFootprintsByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFootprintsByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFootprintsByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetFootprintsByIdQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetFootprintsByIdQuery, GetFootprintsByIdQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetFootprintsByIdQuery, GetFootprintsByIdQueryVariables>(GetFootprintsByIdDocument, baseOptions);
+      }
+export function useGetFootprintsByIdLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetFootprintsByIdQuery, GetFootprintsByIdQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetFootprintsByIdQuery, GetFootprintsByIdQueryVariables>(GetFootprintsByIdDocument, baseOptions);
+        }
+export type GetFootprintsByIdQueryHookResult = ReturnType<typeof useGetFootprintsByIdQuery>;
+export type GetFootprintsByIdLazyQueryHookResult = ReturnType<typeof useGetFootprintsByIdLazyQuery>;
+export type GetFootprintsByIdQueryResult = ApolloReactCommon.QueryResult<GetFootprintsByIdQuery, GetFootprintsByIdQueryVariables>;
 export const MarkFeedItemAsSeenDocument = gql`
     mutation MarkFeedItemAsSeen($id: ID!) {
   markFeedItemAsSeen(id: $id) {

@@ -65,9 +65,11 @@ const MediaPickerModal: React.FC<MedaPickerModalProps> = ({
       case "footprint":
         imageWidth = 1080;
         imageHeight = 1920;
+        break;
       case "avatar":
         imageWidth = 800;
         imageHeight = 800;
+        break;
     }
 
     // apre il picker

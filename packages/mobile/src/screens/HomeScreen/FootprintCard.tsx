@@ -26,6 +26,7 @@ interface FootprintCardProps {
   username: string;
   authorId: string;
   profilePicture: string;
+  locationName: string;
   likesCount?: number;
 }
 
@@ -37,6 +38,7 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
   profilePicture,
   authorId,
   username,
+  locationName,
   likesCount,
 }) => {
   const [opacity, setOpacity] = useState(1);
@@ -57,9 +59,10 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
   const goToFootprint = () => {
     navigation.navigate("Footprint", {
       title,
+      image,
       id: footprintId,
       authorUsername: username,
-      image,
+      authorProfileImage: profilePicture,
     });
   };
 
@@ -78,32 +81,40 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
           <View style={styles.inline}>
             <EntypoIcon name="location-pin" color="#fff" size={15} />
             <Text style={[styles.text, {marginLeft: 3}]} numberOfLines={1}>
-              City of Florence, Italy
+              {locationName}
             </Text>
           </View>
         </View>
 
         {/** TITOLO */}
-        <Text style={styles.title} numberOfLines={3}>
-          {title}
-        </Text>
+        <SharedElement id={`footprint.${footprintId}.title`}>
+          <Text style={styles.title} numberOfLines={3}>
+            {title}
+          </Text>
+        </SharedElement>
 
-        {/** Bottone per andare al footprint */}
+        {/** USERNAME*/}
         <View style={styles.footer}>
           <View style={styles.user}>
             <TouchableWithoutFeedback
               onPress={() => navigateToProfile(authorId)}>
-              <Image
-                style={styles.profilePicture}
-                source={{uri: profilePicture}}
-              />
+              <SharedElement id={`footprint.${footprintId}.profileImage`}>
+                <Image
+                  style={styles.profilePicture}
+                  source={{uri: profilePicture}}
+                />
+              </SharedElement>
             </TouchableWithoutFeedback>
             <View style={{justifyContent: "space-between"}}>
               <TouchableWithoutFeedback
                 onPress={() => navigateToProfile(authorId)}>
-                <Text style={[styles.text, styles.username]}>{username}</Text>
+                <SharedElement id={`footprint.${footprintId}.username`}>
+                  <Text style={[styles.text, styles.username]}>{username}</Text>
+                </SharedElement>
               </TouchableWithoutFeedback>
-              <Text style={[styles.text, {color: "#ddd"}]}>34 min fa</Text>
+              <SharedElement id={`footprint.${footprintId}.data`}>
+                <Text style={[styles.text, {color: "#ddd"}]}>34 min fa</Text>
+              </SharedElement>
             </View>
           </View>
 

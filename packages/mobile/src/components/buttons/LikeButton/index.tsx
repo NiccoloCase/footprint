@@ -9,6 +9,7 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native";
+import {abbreviateNumber} from "../../../utils/abbreviateNumber";
 
 interface LikeButtonProps {
   onPress?: (isLiked: boolean) => void;
@@ -35,7 +36,7 @@ export const LikeButton: React.FC<LikeButtonProps> = (props) => {
     <View style={[styles.wrapper, props.containerStyle]}>
       {likesCount > 0 && (
         <TouchableNativeFeedback>
-          <Text style={styles.text}>{likesCount}</Text>
+          <Text style={styles.text}>{abbreviateNumber(likesCount)}</Text>
         </TouchableNativeFeedback>
       )}
       <TouchableOpacity style={styles.button} onPress={handlePress}>

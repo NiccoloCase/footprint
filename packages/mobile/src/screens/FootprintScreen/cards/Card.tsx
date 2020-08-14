@@ -1,5 +1,12 @@
 import React from "react";
-import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import {Colors} from "../../../styles";
 import Animated from "react-native-reanimated";
 
@@ -7,6 +14,7 @@ interface CardProps {
   title?: string;
   buttonText?: string;
   onButtonPress?: () => void;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 export const Card: React.FC<CardProps> = (props) => {
@@ -16,7 +24,7 @@ export const Card: React.FC<CardProps> = (props) => {
   };
 
   return (
-    <Animated.View style={styles.card}>
+    <Animated.View style={[styles.card, props.containerStyle]}>
       <View style={styles.inline}>
         <Text style={[styles.text, styles.sectionTitle]}>{props.title}</Text>
         <TouchableOpacity onPress={onPress}>

@@ -39,7 +39,7 @@ export const MapView: React.FC<MapViewProps> = ({
   const centerCoordinate =
     annotations && annotations.length > 0
       ? calculateCenter(annotations.map((a) => a.coordinates))
-      : userHome || [11.255814, 43.769562];
+      : userHome;
 
   return (
     <Map

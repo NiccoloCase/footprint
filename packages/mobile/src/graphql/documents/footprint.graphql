@@ -5,6 +5,7 @@ query GetNearFootprints($lng: Float!, $lat: Float!, $maxDistance: Float!) {
     media
     location {
       coordinates
+      locationName
     }
     author {
       id
@@ -24,6 +25,7 @@ query GetNewsFeed($pagination: PaginationOptions) {
       media
       location {
         coordinates
+        locationName
       }
       authorId
       author {
@@ -44,6 +46,25 @@ query GetFootprintsByUser($userId: ID!) {
     location {
       coordinates
       locationName
+    }
+  }
+}
+
+query GetFootprintsById($id: ID!) {
+  getFootprintById(id: $id) {
+    id
+    title
+    body
+    media
+    likesCount
+    location {
+      coordinates
+      locationName
+    }
+    author {
+      id
+      username
+      profileImage
     }
   }
 }

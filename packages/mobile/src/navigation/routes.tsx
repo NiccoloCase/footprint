@@ -39,6 +39,7 @@ import {MapScreen} from "../screens/MapScreen";
 import {EditProfileScreen} from "../screens/EditProfile";
 import {EditPasswordScreen} from "../screens/authScreens/EditPassword";
 import {FollowersScreen} from "../screens/FollowersScreen";
+import {CommentsScreen} from "../screens/CommentsScreen";
 
 const defaultScreenOptions: StackNavigationOptions = {
   headerTitleStyle: {alignSelf: "center", fontWeight: "bold"},
@@ -252,7 +253,7 @@ const Tabs = createBottomTabNavigator<BottomTabParamList>();
 
 const TabsScreen = () => (
   <Tabs.Navigator
-    initialRouteName="Explore"
+    initialRouteName="Home"
     tabBar={TabBar}
     tabBarOptions={{
       activeTintColor: Colors.primary,
@@ -307,6 +308,8 @@ export type AppStackParamList = {
     id: string;
     title: string;
     image: string;
+    authorUsername: string;
+    authorProfileImage: string;
   };
   Profile: {id: string};
   Image: {uri: string};
@@ -317,6 +320,10 @@ export type AppStackParamList = {
     userId: string;
     following?: boolean;
   };
+  CommentsScreen: {
+    contentId: string;
+    textInputValue?: string;
+  };
 };
 const AppStack = createSharedElementStackNavigator<AppStackParamList>();
 const AppStackScreen = () => (
@@ -325,13 +332,11 @@ const AppStackScreen = () => (
     <AppStack.Screen
       name="Footprint"
       component={FootprintScreen}
-      options={(navigation) => ({
+      options={() => ({
         headerBackTitleVisible: false,
-        //   gestureEnabled: false,
         cardStyleInterpolator: ({current: {progress}}) => ({
           cardStyle: {opacity: progress},
         }),
-        cardStyle: {backgroundColor: "transparent"},
       })}
       sharedElementsConfig={({params}) => {
         return [
@@ -341,6 +346,13 @@ const AppStackScreen = () => (
             resize: "clip",
             align: "center-top",
           },
+          {
+            id: `footprint.${params.id}.title`,
+            animation: "move",
+          },
+          {id: `footprint.${params.id}.profileImage`},
+          {id: `footprint.${params.id}.data`},
+          {id: `footprint.${params.id}.username`},
         ];
       }}
     />
@@ -403,7 +415,6 @@ const AppStackScreen = () => (
             id: `followers.card.${userId}.title`,
             animation: "move",
             resize: "stretch",
-            // align: "center-top",
           },
           {
             id: `followers.card.${userId}.link`,
@@ -411,6 +422,42 @@ const AppStackScreen = () => (
           },
           {
             id: `followers.card.${userId}.content`,
+            animation: "fade-out",
+          },
+        ];
+      }}
+    />
+    <AppStack.Screen
+      name="CommentsScreen"
+      component={CommentsScreen}
+      options={() => ({
+        headerBackTitleVisible: false,
+        cardStyleInterpolator: ({current: {progress}}) => ({
+          cardStyle: {opacity: progress},
+        }),
+        cardStyle: {backgroundColor: "transparent"},
+      })}
+      sharedElementsConfig={({params}) => {
+        const {contentId} = params;
+        return [
+          {
+            id: `comments.card.${contentId}`,
+            animation: "move",
+            resize: "stretch",
+            align: "center-top",
+          },
+          {
+            id: `comments.card.${contentId}.title`,
+            animation: "move",
+            resize: "stretch",
+          },
+          {
+            id: `comments.card.${contentId}.inputBox`,
+            animation: "move",
+            resize: "stretch",
+          },
+          {
+            id: `comments.card.${contentId}.content`,
             animation: "fade-out",
           },
         ];
