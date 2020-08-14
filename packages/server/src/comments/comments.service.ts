@@ -7,8 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ICommentBucketModel, IComment } from './comments.schema';
 import { FootprintsService } from '../footprints/footprints.service';
-
-const COMMENTS_PER_BUCKET = 5;
+import { constants } from '@footprint/config';
 
 @Injectable()
 export class CommentsService {
@@ -95,7 +94,7 @@ export class CommentsService {
     }
 
     // Controlla se il bucket è pieno
-    if (lastBucket.commentsCount >= COMMENTS_PER_BUCKET)
+    if (lastBucket.commentsCount >= constants.COMMENTS_PER_BUCKET)
       // Crea un nuovo bucket
       return this.createNewBucket(newComment, contentId, lastBucket.page + 1);
 

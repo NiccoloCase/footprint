@@ -1,4 +1,4 @@
-export const ValidationConfig = {
+export const validationConfig = {
   user: {
     email: {
       length: { max: 320 },

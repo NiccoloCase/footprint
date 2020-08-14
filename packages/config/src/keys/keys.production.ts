@@ -1,7 +1,7 @@
-import { IConfig } from "../config.type";
+import { IConfigKeys } from "./keys.type";
 import { RecursivePartial } from "@footprint/common";
 
-export const productionKeys: RecursivePartial<IConfig> = {
+export const productionKeys: RecursivePartial<IConfigKeys> = {
   IS_PRODUCTION: true,
   server: {
     PORT: Number(process.env.PORT!),

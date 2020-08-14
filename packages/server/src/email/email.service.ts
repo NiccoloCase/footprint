@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ProcessResult } from '../graphql';
-import config from '@footprint/config';
+import { keys } from '@footprint/config';
 
 @Injectable()
 export class EmailService {
@@ -18,7 +18,7 @@ export class EmailService {
     try {
       await this.mailerService.sendMail({
         to,
-        subject: `${config.APP_NAME} - Attiva il tuo account`,
+        subject: `${keys.APP_NAME} - Attiva il tuo account`,
         text: `Dobbiamo solo verificare il tuo indirizzo email per attivare il tuo account. Riporta il codice sottostante nell'applicazione per procedere: ${token}`,
         template: 'confirmationEmail',
         context: { token, username },
@@ -41,7 +41,7 @@ export class EmailService {
     try {
       await this.mailerService.sendMail({
         to,
-        subject: `${config.APP_NAME} - Password dimenticata`,
+        subject: `${keys.APP_NAME} - Password dimenticata`,
         text: `Ciao ${username}! Ci risulta che stai cercando di cambiare la password del tuo account. Ti basterà riportare questo codice nell'applicazione nell'applicazione: ${token}`,
         template: 'forgotPasswordEmail',
         context: { token, username },

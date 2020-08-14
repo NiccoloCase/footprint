@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { RefreshTokenPayload } from './auth.types';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
-import config from '@footprint/config';
+import { keys } from '@footprint/config';
 import { RefreshTokenDTO } from './auth.dto';
 
 @Controller('auth')
@@ -30,7 +30,7 @@ export class AuthController {
       // verifica il refresh token
       const { userId, tokenVersion } = verify(
         token,
-        config.auth.REFRESH_TOKEN_SECRET,
+        keys.auth.REFRESH_TOKEN_SECRET,
       ) as RefreshTokenPayload;
 
       // cerca l'utente associato al token

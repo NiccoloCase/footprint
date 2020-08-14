@@ -5,8 +5,7 @@ import {
   IsEmailAlreadyUsedDocument,
   IsUsernameAlreadyUsedDocument,
 } from "../../../generated/graphql";
-import {ValidationConfig} from "@footprint/common";
-
+import {validationConfig} from "@footprint/config";
 /**
  * Schema di validazione del form per modifcare il profilo
  */
@@ -14,7 +13,7 @@ export const EditProfileFormValidationSchema = Yup.object().shape({
   // EMAIL
   email: Yup.string()
     .email("Email non valida")
-    .max(ValidationConfig.user.email.length.max, "L'email è troppo lunga")
+    .max(validationConfig.user.email.length.max, "L'email è troppo lunga")
     // Controlla che l'email non sia già utilizzata
     .test("unique-email", "L'email è già utilizzata", function (email: string) {
       if (!!email)
@@ -29,9 +28,9 @@ export const EditProfileFormValidationSchema = Yup.object().shape({
     }),
   // USERNAME
   username: Yup.string()
-    .min(ValidationConfig.user.username.length.min, "L'username è troppo corto")
-    .max(ValidationConfig.user.username.length.max, "L'username è troppo lungo")
-    .matches(ValidationConfig.user.username.regex, "Formarto non consentito")
+    .min(validationConfig.user.username.length.min, "L'username è troppo corto")
+    .max(validationConfig.user.username.length.max, "L'username è troppo lungo")
+    .matches(validationConfig.user.username.regex, "Formarto non consentito")
     // Controlla che non sia già utilizzato
     .test("unique-username", "L'username non è disponibile", function (
       username: string,

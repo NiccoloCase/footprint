@@ -5,17 +5,17 @@ import {GoogleSignin} from "@react-native-community/google-signin";
 import {StoreProvider} from "easy-peasy";
 import {Navigation} from "./navigation";
 import {ApolloProvider} from "./graphql";
-import config from "@footprint/config";
+import {keys} from "@footprint/config";
 import {store} from "./store";
 
 // Avvia la registrazione della posizione dell'utente
 store.getActions().geo.startRecordingLocation();
 // Inizializza le mappe
-MapboxGL.setAccessToken(config.MAPBOX_ACCESS_TOKEN);
+MapboxGL.setAccessToken(keys.MAPBOX_ACCESS_TOKEN);
 // Inizializza l'autenticazione con google
 GoogleSignin.configure({
   offlineAccess: false,
-  webClientId: config.googleOAuth.WEB_CLIENT_ID,
+  webClientId: keys.googleOAuth.WEB_CLIENT_ID,
 });
 
 const App = () => {

@@ -10,7 +10,7 @@ import {TokenRefreshLink} from "apollo-link-token-refresh";
 import {ApolloLink} from "apollo-link";
 import jwtDecode from "jwt-decode";
 import Snackbar from "react-native-snackbar";
-import config from "@footprint/config";
+import {keys} from "@footprint/config";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
 import {API_URL} from "../utils/api";
 import {store} from "../store";
@@ -84,7 +84,7 @@ const errorLink = onError(({graphQLErrors, networkError}) => {
 });
 
 export const client = new ApolloClient({
-  connectToDevTools: !config.IS_PRODUCTION,
+  connectToDevTools: !keys.IS_PRODUCTION,
   link: ApolloLink.from([
     tokenRefreshLink as any,
     authLink,

@@ -1,5 +1,5 @@
 import {MAPBOX_API_URL} from "../api";
-import config from "@footprint/config";
+import {keys} from "@footprint/config";
 
 interface GetPlaceNameFromCoordinatesOptions {
   superficialResearch?: boolean;
@@ -10,7 +10,7 @@ export const getPlaceNameFromCoordinates = async (
   latitude: number,
   options: GetPlaceNameFromCoordinatesOptions = {},
 ): Promise<any[]> => {
-  let url = `${MAPBOX_API_URL}/mapbox.places/${longitude},${latitude}.json?access_token=${config.MAPBOX_ACCESS_TOKEN}`;
+  let url = `${MAPBOX_API_URL}/mapbox.places/${longitude},${latitude}.json?access_token=${keys.MAPBOX_ACCESS_TOKEN}`;
 
   if (options.superficialResearch) {
     const types = "country,region";

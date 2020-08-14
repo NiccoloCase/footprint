@@ -1,4 +1,4 @@
-import config from "@footprint/config";
+import {keys} from "@footprint/config";
 import {MAPBOX_API_URL} from "../api";
 
 interface PlaceAutocompleteOptions {
@@ -14,7 +14,7 @@ export const placeAutocomplete = async (
   query: string,
   options: PlaceAutocompleteOptions = {},
 ): Promise<any[] | null> => {
-  let url = `${MAPBOX_API_URL}/mapbox.places/${query}.json?access_token=${config.MAPBOX_ACCESS_TOKEN}`;
+  let url = `${MAPBOX_API_URL}/mapbox.places/${query}.json?access_token=${keys.MAPBOX_ACCESS_TOKEN}`;
 
   if (options.superficialResearch) {
     const types = "country,region";

@@ -1,4 +1,4 @@
-export interface IConfig {
+export interface IConfigKeys {
   /** Nome dell'applicazione */
   APP_NAME: string;
   /** Se l'istanza è in produzione */

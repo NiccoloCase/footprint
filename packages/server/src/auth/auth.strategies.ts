@@ -7,8 +7,7 @@ import {
 } from 'passport-jwt';
 import { UsersService } from '../users/users.service';
 import { AccessTokenPayload, GoogleStrategyResult } from './auth.types';
-import config from '@footprint/config';
-import { AuthType } from '../graphql';
+import { keys } from '@footprint/config';
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
 
 /**
@@ -19,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(passportJwtStrategy, 'jwt') {
   constructor(private userService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.auth.ACCESS_TOKEN_SECRET,
+      secretOrKey: keys.auth.ACCESS_TOKEN_SECRET,
     });
   }
 
@@ -49,8 +48,8 @@ export class GoogleStrategy extends PassportStrategy(
 ) {
   constructor(private readonly userService: UsersService) {
     super({
-      clientID: config.googleOAuth.WEB_CLIENT_ID,
-      clientSecret: config.googleOAuth.WEB_CLIENT_SECRET,
+      clientID: keys.googleOAuth.WEB_CLIENT_ID,
+      clientSecret: keys.googleOAuth.WEB_CLIENT_SECRET,
     });
   }
 

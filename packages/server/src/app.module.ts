@@ -13,16 +13,16 @@ import { NewsFeedModule } from './news-feed/news-feed.module';
 import { UploaderModule } from './uploader/uploader.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
-import config from '@footprint/config';
+import { keys } from '@footprint/config';
 
 @Module({
   imports: [
     // DATABASE
-    MongooseModule.forRoot(config.database.URI, {
+    MongooseModule.forRoot(keys.database.URI, {
       useNewUrlParser: true,
       useFindAndModify: false,
       useCreateIndex: true,
-      autoIndex: !config.IS_PRODUCTION,
+      autoIndex: !keys.IS_PRODUCTION,
       connectionFactory: connection => {
         connection.plugin(require('mongoose-unique-validator'));
         return connection;
@@ -32,8 +32,8 @@ import config from '@footprint/config';
     GraphQLModule.forRoot({
       typePaths: ['./**/*.graphql'],
       path: '/api/graphql',
-      debug: !config.IS_PRODUCTION,
-      playground: !config.IS_PRODUCTION,
+      debug: !keys.IS_PRODUCTION,
+      playground: !keys.IS_PRODUCTION,
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
       },

@@ -3,23 +3,23 @@ import { join } from 'path';
 import { EmailService } from './email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import config from '@footprint/config';
+import { keys } from '@footprint/config';
 
 @Module({
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: config.emailService.HOST,
-        port: config.emailService.PORT,
+        host: keys.emailService.HOST,
+        port: keys.emailService.PORT,
         ignoreTLS: true,
         secure: false,
         auth: {
-          user: config.emailService.USER,
-          pass: config.emailService.PASSWORD,
+          user: keys.emailService.USER,
+          pass: keys.emailService.PASSWORD,
         },
       },
       defaults: {
-        from: `"${config.APP_NAME}" <${config.emailService.SENDER}>`,
+        from: `"${keys.APP_NAME}" <${keys.emailService.SENDER}>`,
       },
       template: {
         dir: join(__dirname, '..', '..', 'templates'),
@@ -28,7 +28,7 @@ import config from '@footprint/config';
           strict: true,
         },
       },
-      preview: !config.IS_PRODUCTION,
+      preview: !keys.IS_PRODUCTION,
     }),
   ],
   providers: [EmailService],

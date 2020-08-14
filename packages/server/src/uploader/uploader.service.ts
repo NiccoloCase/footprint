@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { GenerateCloudinarySignatureResponse } from './uploader.types';
 import * as cloudinary from 'cloudinary';
-import config from '@footprint/config';
+import { keys } from '@footprint/config';
 
 @Injectable()
 export class UploaderService {
@@ -10,11 +10,11 @@ export class UploaderService {
    */
   generateCloudinarySignature(): GenerateCloudinarySignatureResponse {
     const timestamp = +new Date();
-    const upload_preset = config.cloudinary.UPLOAD_PRESENT;
+    const upload_preset = keys.cloudinary.UPLOAD_PRESENT;
 
     const signature = cloudinary.v2.utils.api_sign_request(
       { timestamp, upload_preset },
-      config.cloudinary.API_SECRET,
+      keys.cloudinary.API_SECRET,
     );
 
     return { timestamp, signature, upload_preset };

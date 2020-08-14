@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import {ValidationConfig} from "@footprint/common";
+import {validationConfig} from "@footprint/config";
 
 /**
  * Schema di validazione del form di login
@@ -8,17 +8,17 @@ export const AddFootprintFormValidationSchema = Yup.object().shape({
   // TITOLO
   title: Yup.string()
     .min(
-      ValidationConfig.footprint.title.length.min,
+      validationConfig.footprint.title.length.min,
       "Il titolo è troppo corto",
     )
     .max(
-      ValidationConfig.footprint.title.length.max,
+      validationConfig.footprint.title.length.max,
       "Il titolo è troppo lungo",
     )
     .required("Questo campo è richiesto"),
   // DESCRIZIONE
   body: Yup.string().max(
-    ValidationConfig.footprint.body.length.max,
+    validationConfig.footprint.body.length.max,
     "La descrizione è troppo lunga",
   ),
   // IMMAGINE

@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 import {isEmpty} from "lodash";
-import {ValidationConfig} from "@footprint/common";
+import {validationConfig} from "@footprint/config";
 
 /**
  * Schema di validazione del form per cambiare password
@@ -9,11 +9,11 @@ export const EditPasswordValidationSchema = Yup.object().shape({
   // PASSWORD
   password: Yup.string()
     .min(
-      ValidationConfig.user.password.length.min,
+      validationConfig.user.password.length.min,
       "La password è troppo corta",
     )
     .max(
-      ValidationConfig.user.password.length.max,
+      validationConfig.user.password.length.max,
       "La password è troppo lunga",
     )
     .required("Questo campo è richiesto"),

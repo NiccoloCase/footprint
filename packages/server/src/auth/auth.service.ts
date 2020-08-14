@@ -10,7 +10,7 @@ import {
   TokenScope,
 } from '../graphql';
 import { AccessTokenPayload, RefreshTokenPayload } from './auth.types';
-import config from '@footprint/config';
+import { keys } from '@footprint/config';
 
 @Injectable()
 export class AuthService {
@@ -26,10 +26,10 @@ export class AuthService {
     const payload: AccessTokenPayload = { userId: id };
 
     // scadenza del token
-    const expiresIn = config.auth.ACCESS_TOKEN_EXPIRATION;
+    const expiresIn = keys.auth.ACCESS_TOKEN_EXPIRATION;
 
     // firma il token
-    const accessToken = jwt.sign(payload, config.auth.ACCESS_TOKEN_SECRET, {
+    const accessToken = jwt.sign(payload, keys.auth.ACCESS_TOKEN_SECRET, {
       expiresIn,
       // TODO:
       //issuer: "",
@@ -53,8 +53,8 @@ export class AuthService {
     };
 
     // firma il token
-    const refrehToken = jwt.sign(payload, config.auth.REFRESH_TOKEN_SECRET, {
-      expiresIn: config.auth.REFRESH_TOKEN_EXPIRATION,
+    const refrehToken = jwt.sign(payload, keys.auth.REFRESH_TOKEN_SECRET, {
+      expiresIn: keys.auth.REFRESH_TOKEN_EXPIRATION,
       // TODO:
       //issuer: "",
       //audience:"",

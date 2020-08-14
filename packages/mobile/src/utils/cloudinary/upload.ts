@@ -1,12 +1,12 @@
 import {ImageSource} from "../types";
 import {API_URL} from "../api";
-import config from "@footprint/config";
+import {keys} from "@footprint/config";
 
 interface UploadImageResult {
   url: string;
 }
 
-const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${config.cloudinary.CLOUD_NAME}/image/upload`;
+const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${keys.cloudinary.CLOUD_NAME}/image/upload`;
 
 /**
  * Carica un immagine nei server di cloudinary
@@ -24,7 +24,7 @@ export const uploadImage = async (
   formData.append("signature", signature);
   formData.append("timestamp", timestamp);
   formData.append("upload_preset", upload_preset);
-  formData.append("api_key", config.cloudinary.API_KEY);
+  formData.append("api_key", keys.cloudinary.API_KEY);
 
   // Invia la richiesta a cloudinary
   const res = await fetch(CLOUDINARY_UPLOAD_URL, {

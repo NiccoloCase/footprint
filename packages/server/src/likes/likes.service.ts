@@ -10,8 +10,7 @@ import { ILikeBucketModel } from './likes.schema';
 import { FootprintsService } from '../footprints/footprints.service';
 import { IFootprint } from '../footprints/footprints.schema';
 import { IUser } from '../users/users.schema';
-
-const LIKES_PER_BUCKET = 3;
+import { constants } from '@footprint/config';
 
 @Injectable()
 export class LikesService {
@@ -97,7 +96,7 @@ export class LikesService {
 
     // Esiste già un bucket:
     // Controlla se questo è pieno
-    if (lastBucket.likesCount >= LIKES_PER_BUCKET)
+    if (lastBucket.likesCount >= constants.LIKES_PER_BUCKET)
       // Il bucket è pieno -> crea un nuovo bucket
       return this.createNewLikeBucket(userId, contentId, lastBucket.page + 1);
 

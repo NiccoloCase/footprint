@@ -1,7 +1,7 @@
-import { IConfig } from "../config.type";
+import { IConfigKeys } from "./keys.type";
 import { RecursivePartial } from "@footprint/common";
 
-export const defaultKeys: RecursivePartial<IConfig> = {
+export const defaultKeys: RecursivePartial<IConfigKeys> = {
   APP_NAME: "Footprint",
   MAPBOX_ACCESS_TOKEN:
     "pk.eyJ1IjoibmljY29jYXNlIiwiYSI6ImNqcG1uem0wdDAxMTQ0MnJ3ZXF4N3dsOWMifQ.4Yq9p3SQ8U23fCF13m-7pw",
