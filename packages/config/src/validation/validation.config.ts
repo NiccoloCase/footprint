@@ -17,4 +17,7 @@ export const validationConfig = {
     },
     body: { length: { max: 150 } },
   },
+  comment: {
+    text: { length: { max: 250 } },
+  },
 };

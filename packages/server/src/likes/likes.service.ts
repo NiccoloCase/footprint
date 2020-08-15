@@ -149,8 +149,11 @@ export class LikesService {
 
     if (!bucket)
       throw new NotFoundException(
-        'You can not remove the like of content that does not exist or that you have not yet liked',
+        'You can not remove the like of a content that does not exist or that you have not yet liked',
       );
+
+    // Se il bucket è vuoto viene eliminato
+    if (bucket.likes.length === 0) await bucket.deleteOne();
 
     // Decrementa il contatore di likes
     try {

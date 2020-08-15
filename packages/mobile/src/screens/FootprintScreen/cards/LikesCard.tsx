@@ -125,8 +125,18 @@ const styles = StyleSheet.create({
     marginTop: 35,
     backgroundColor: "#eee",
     borderRadius: 10,
-    padding: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 20,
     marginBottom: 25,
+    // ombra:
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   inline: {
     flexDirection: "row",
@@ -154,5 +164,6 @@ const styles = StyleSheet.create({
     paddingRight: 25,
     borderRightColor: "#ddd",
     borderRightWidth: 2,
+    alignItems: "center",
   },
 });

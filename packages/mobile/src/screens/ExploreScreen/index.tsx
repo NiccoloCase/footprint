@@ -130,8 +130,6 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = () => {
               !prev.getNearFootprints.some((item) => item.id === footprint.id),
           );
 
-          console.log("NEW FETCH:", {newData, fetchMoreResult});
-
           // Aggiorna la query
           return Object.assign({}, prev, {
             getNearFootprints: [...prev.getNearFootprints, ...newData],

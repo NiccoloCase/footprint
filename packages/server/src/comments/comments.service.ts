@@ -24,7 +24,12 @@ export class CommentsService {
    */
   async findComments(contentId: string, page: number = 0): Promise<IComment[]> {
     try {
-      const bucket = await this.commentModel.findOne({ contentId, page });
+      const bucket = await this.commentModel
+        .findOne({ contentId })
+        .sort('-page')
+        .skip(page)
+        .limit(1);
+
       return bucket ? bucket.comments : [];
     } catch (err) {
       throw new BadRequestException(err);
@@ -143,6 +148,7 @@ export class CommentsService {
     const commentBucket = await this.commentModel.findOneAndUpdate(
       query,
       update,
+      { new: true },
     );
 
     // Se non esiste nessun bucket => o il commento non esiste, o l'utente che ha eseguito
@@ -151,5 +157,8 @@ export class CommentsService {
       throw new BadRequestException(
         'The comment does not exist, or you are not the owner of it',
       );
+
+    // Se il bucket è vuoto viene eliminato
+    if (commentBucket.comments.length === 0) await commentBucket.deleteOne();
   }
 }

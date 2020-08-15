@@ -71,6 +71,7 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
     <View style={styles.container}>
       <StatusBar backgroundColor="#303030" barStyle="light-content" />
       <ScrollView
+        keyboardShouldPersistTaps="always"
         style={styles.scrollView}
         onScroll={(e) => y.setValue(e.nativeEvent.contentOffset.y)}>
         {/** IMMAGINE */}
