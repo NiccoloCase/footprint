@@ -1,7 +1,7 @@
 type NewsFeedItem {
   id: ID!
   ownerId: ID!
-  footprint: Footprint!
+  footprint: Footprint
   createdAt: Date!
   isSeen: Boolean!
 }

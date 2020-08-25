@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState, useRef, useMemo} from "react";
 import {
   View,
   Text,
@@ -31,6 +31,13 @@ export const HomeScreen: React.FC = () => {
     notifyOnNetworkStatusChange: true,
   });
   const [seeFeedItem] = useMarkFeedItemAsSeenMutation();
+
+  // Items del feed
+  // Elimina quelli a cui non è associato nessun footprint
+  const feedItems = useMemo(
+    () => (data ? data.getNewsFeed.filter((item) => !!item.footprint) : []),
+    [data],
+  );
 
   // Funzione chiamata quando viene caricato per la prima volta il feed
   useEffect(() => {
@@ -114,6 +121,7 @@ export const HomeScreen: React.FC = () => {
     item: NewsFeedItem;
     index: number;
   }) => {
+    // Se il footprint è quello visualizzato
     const current = carousel.current
       ? carousel.current.currentIndex === index
       : false;
@@ -127,17 +135,8 @@ export const HomeScreen: React.FC = () => {
         title={item.footprint.title}
         username={item.footprint.author.username || "nicco"}
         locationName={item.footprint.location.locationName}
-        image={
-          index === 0
-            ? "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020013/sample.jpg"
-            : "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595854452/static/photo-1552752399-22aa8f97ade0_fqkui9.jpg"
-          /*      item.footprint.media!*/
-          /* "https://picsum.photos/400/60" + Math.trunc(Math.random() * 10) */
-        }
-        profilePicture={
-          item.footprint.author.profileImage ||
-          "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595020031/static/Alberto_conversi_profile_pic_gcbyuc.jpg"
-        }
+        image={item.footprint.media!}
+        profilePicture={item.footprint.author.profileImage}
         key={index}
       />
     );
@@ -148,11 +147,11 @@ export const HomeScreen: React.FC = () => {
    */
   const renderFeed = () => {
     // Mostra il feed
-    if (data && data.getNewsFeed.length > 0)
+    if (feedItems.length > 0)
       return (
         <Carousel
           ref={carousel}
-          data={data.getNewsFeed as any[]}
+          data={feedItems as any[]}
           renderItem={renderFeedItem}
           sliderWidth={width}
           itemWidth={FEED_CARD_WIDTH}
@@ -162,7 +161,7 @@ export const HomeScreen: React.FC = () => {
         />
       );
     // Il feed è vuoto
-    else if (data && data.getNewsFeed.length === 0)
+    else if (data && feedItems.length === 0)
       // TODO:
       return <Text>Il feed è vuoto</Text>;
     // Il feed st caricando

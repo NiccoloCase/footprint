@@ -30,7 +30,7 @@ export const Card: React.FC<CardProps> = (props) => {
   return (
     <SharedElement id={props.cardId || ""}>
       <Animated.View style={[styles.card, props.containerStyle]}>
-        <View style={styles.inline}>
+        <View style={styles.header}>
           <SharedElement id={props.titleId || ""}>
             <Text style={[styles.text, styles.sectionTitle]}>
               {props.title}
@@ -65,10 +65,11 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 2,
   },
-  inline: {
+  header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 5,
   },
   text: {
     color: "#404040",

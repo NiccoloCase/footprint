@@ -5,7 +5,6 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import {Card} from "./Card";
 import {getDistanceFromUser} from "../../../utils/geocode";
 import {Colors} from "../../../styles";
-import {Spinner} from "../../../components/Spinner";
 import {useNavigation} from "@react-navigation/native";
 
 interface MapCardProps {
@@ -49,6 +48,7 @@ export const MapCard: React.FC<MapCardProps> = ({location}) => {
                 ? {
                     backgroundColor: "#ddd",
                     width: 150,
+                    borderRadius: 4,
                   }
                 : undefined,
             ]}
@@ -64,6 +64,7 @@ export const MapCard: React.FC<MapCardProps> = ({location}) => {
                 ? {
                     backgroundColor: "#ddd",
                     width: 120,
+                    borderRadius: 4,
                   }
                 : undefined,
             ]}

@@ -33,4 +33,6 @@ type Mutation {
     media: String!
     body: String
   ): Footprint!
+  # Elimina un footprint
+  deleteFootprint(id: ID!): ProcessResult!
 }

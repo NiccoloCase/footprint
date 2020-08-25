@@ -7,14 +7,13 @@ import {
   Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { INewsFeedModel } from './news-feed.schema';
 import { IFootprint } from '../footprints/footprints.schema';
 import { FriendshipService } from '../friendship/friendship.service';
 import { FootprintsService } from '../footprints/footprints.service';
 import { NewsFeedItem, PaginationOptions } from '../graphql';
 import { normalizePaginationOptions } from '../shared/pagination';
-import { off } from 'process';
 
 @Injectable()
 export class NewsFeedService {

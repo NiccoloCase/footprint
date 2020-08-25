@@ -13,9 +13,13 @@ export class NewsFeedResolver {
   // RESTITUISCE IL FEED DELL'UTENTE LOGGATO
   @Query()
   @Private()
-  getNewsFeed(@Args() payload: GetNewsFeedDTO, @CurrentUser() user: IUser) {
+  async getNewsFeed(
+    @Args() payload: GetNewsFeedDTO,
+    @CurrentUser() user: IUser,
+  ) {
     const { pagination } = payload;
-    return this.newsFeedService.getNewsFeed(user.id, pagination);
+    const feed = await this.newsFeedService.getNewsFeed(user.id, pagination);
+    return feed;
   }
 
   // SEGNA L'ELEMENTO DEL FEED DELL'UTENTE LOGGATO COME VISTO

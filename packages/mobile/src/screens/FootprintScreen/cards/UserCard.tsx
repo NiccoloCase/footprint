@@ -5,25 +5,22 @@ import {TouchableWithoutFeedback} from "react-native-gesture-handler";
 import {Colors} from "../../../styles";
 import {useNavigateToUserProfile} from "../../../navigation/navigateToUserProfile";
 import {SharedElement} from "react-navigation-shared-element";
+import {timeSince} from "../../../utils/format";
 
 interface UserCardProps {
   footprintId: string;
+  footprintDate?: Date;
   userData: Partial<Pick<User, "username" | "profileImage" | "id">>;
   height: number;
 }
 
 export const UserCard: React.FC<UserCardProps> = ({
   footprintId,
+  footprintDate,
   height,
   userData,
 }) => {
   const navigateToProfile = useNavigateToUserProfile();
-
-  ////////
-  /* const username = "niccolocase";
-  const image =
-    "https://res.cloudinary.com/dgjcj7htv/image/upload/v1595854452/static/photo-1552752399-22aa8f97ade0_fqkui9.jpg"; */
-  ///////////
 
   const {username, profileImage} = userData;
 
@@ -47,7 +44,9 @@ export const UserCard: React.FC<UserCardProps> = ({
             </SharedElement>
           </TouchableWithoutFeedback>
           <SharedElement id={`footprint.${footprintId}.data`}>
-            <Text style={[styles.text, {color: "#606060"}]}>34 min fa</Text>
+            <Text style={[styles.text, {color: "#606060"}]}>
+              {footprintDate ? timeSince(footprintDate) : null}
+            </Text>
           </SharedElement>
         </View>
       </View>
@@ -57,7 +56,6 @@ export const UserCard: React.FC<UserCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "green",
     justifyContent: "center",
   },
   text: {

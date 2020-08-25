@@ -2,10 +2,8 @@ import React, {useState} from "react";
 import {
   View,
   Text,
-  StyleSheet,
   SafeAreaView,
   Image,
-  Dimensions,
   StatusBar,
   TouchableWithoutFeedback,
   ScrollView,
@@ -22,20 +20,17 @@ import {AppStackParamList} from "../../navigation";
 import {StackScreenProps} from "@react-navigation/stack";
 import {SharedElement} from "react-navigation-shared-element";
 import {useGetFootprintsByIdQuery} from "../../generated/graphql";
-import {Spacing} from "../../styles";
+import {Colors} from "../../styles";
+import {MoreMenu} from "./MoreMenu";
+import styles, {IMAGE_HEIGHT, HEADER_HEIGHT, USER_CARD_HEIGHT} from "./styles";
 
 // Cards
 import {UserCard} from "./cards/UserCard";
 import {LikesCard} from "./cards/LikesCard";
 import {MapCard} from "./cards/MapCard";
 import {CommentsCard} from "./cards/CommentsCard";
-
-// Dimensioni:
-const {height} = Dimensions.get("window");
-const USER_CARD_HEIGHT = 75;
-const IMAGE_HEIGHT = height - USER_CARD_HEIGHT - (StatusBar.currentHeight || 0);
-const HEADER_HEIGHT = 55;
-const CLOSE_BUTTON_RADIUS = 30;
+import {Spinner} from "../../components/Spinner";
+import {useStoreState} from "../../store";
 
 type FootprintScreenProps = StackScreenProps<AppStackParamList, "Footprint">;
 
@@ -43,13 +38,18 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
   route,
   navigation,
 }) => {
+  // Id dell'utente loggato
+  const authId = useStoreState((s) => s.auth.userId);
   // Se mostare il titolo sipra l'immagine
   const [showImageContent, setShowImageContent] = useState(true);
 
+  // Navigazione
   const {id, image, authorProfileImage, authorUsername, title} = route.params;
 
   // Graphql
-  const {data} = useGetFootprintsByIdQuery({variables: {id}});
+  const {data, loading} = useGetFootprintsByIdQuery({variables: {id}});
+
+  const footprintMediaUri = image || data?.getFootprintById.media;
 
   // Animazione:
   const y = useValue<number>(0);
@@ -80,7 +80,9 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
           onPressOut={() => setShowImageContent(true)}>
           <View style={styles.imageContainer}>
             <SharedElement id={`footprint.${id}.image`}>
-              <Image style={styles.image} source={{uri: image}} />
+              {footprintMediaUri && (
+                <Image style={styles.image} source={{uri: footprintMediaUri}} />
+              )}
             </SharedElement>
             {/** TITOLO */}
             <Animated.View
@@ -91,12 +93,13 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
             </Animated.View>
           </View>
         </TouchableWithoutFeedback>
-        {/** CONTENUTO */}
+        {/** ------ CONTENUTO ------ */}
         <SafeAreaView style={styles.content}>
-          {/** AUTORE */}
+          {/** AUTORE DEL FOOTPRINT */}
           <UserCard
             footprintId={id}
             height={USER_CARD_HEIGHT}
+            footprintDate={data?.getFootprintById.created_at}
             userData={
               data
                 ? data.getFootprintById.author
@@ -106,6 +109,16 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
                   }
             }
           />
+          {/** DESCRIZIONE DEL FOOTPRINT */}
+          <View style={styles.descriptionWrapper}>
+            {loading ? (
+              <Spinner color={Colors.primary} size={25} />
+            ) : (
+              <Text style={styles.description}>
+                {data?.getFootprintById.body}
+              </Text>
+            )}
+          </View>
           {/** LIKES */}
           <LikesCard
             footprintId={id}
@@ -120,9 +133,8 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
           />
           {/** COMMENTI */}
           <CommentsCard footprintId={id} commentsCount={10} />
-
           {/** MAPPA */}
-          {/* <MapCard location={data?.getFootprintById.location} /> */}
+          {/*    <MapCard location={data?.getFootprintById.location} /> */}
         </SafeAreaView>
       </ScrollView>
 
@@ -137,81 +149,16 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
           numberOfLines={1}>
           {title}
         </Animated.Text>
+        <MoreMenu
+          footprintId={id}
+          own={authId === data?.getFootprintById.author.id}
+        />
         <TouchableOpacity
-          onPress={() => {}}
-          style={[styles.headerButton, {marginRight: 10}]}>
-          <Icon name="share-alt" color="#eee" size={20} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={goBack} style={styles.headerButton}>
+          onPress={goBack}
+          style={[styles.headerButton, {marginLeft: 8}]}>
           <Icon name="times" color="#eee" size={23} />
         </TouchableOpacity>
       </Animated.View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollView: {},
-  imageContainer: {
-    height: IMAGE_HEIGHT,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-    borderBottomRightRadius: 15,
-    borderBottomLeftRadius: 15,
-  },
-  header: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: HEADER_HEIGHT,
-    paddingHorizontal: 10,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    borderBottomRightRadius: 12,
-    borderBottomLeftRadius: 12,
-  },
-  headerButton: {
-    backgroundColor: "rgba(0,0,0,0.15)",
-    width: CLOSE_BUTTON_RADIUS,
-    height: CLOSE_BUTTON_RADIUS,
-    borderRadius: CLOSE_BUTTON_RADIUS / 2,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-    flex: 1,
-    marginLeft: CLOSE_BUTTON_RADIUS + 15,
-    marginRight: 15,
-    textAlign: "center",
-  },
-  titleWrapper: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "flex-end",
-    paddingVertical: 35,
-    paddingHorizontal: 15,
-  },
-  title: {
-    color: "#fefefe",
-    fontWeight: "bold",
-    fontSize: 29,
-    textAlignVertical: "bottom",
-    textShadowColor: "rgba(0, 0, 0, 0.65)",
-    textShadowOffset: {width: -1, height: 1},
-    textShadowRadius: 9,
-  },
-  content: {
-    paddingHorizontal: Spacing.screenHorizontalPadding,
-  },
-});

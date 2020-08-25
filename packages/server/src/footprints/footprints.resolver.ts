@@ -11,7 +11,7 @@ import { FootprintsService } from './footprints.service';
 import { Private } from '../auth/auth.guard';
 import { CurrentUser } from '../users/user.decorator';
 import { IUser } from '../users/users.schema';
-import { Footprint } from '../graphql';
+import { Footprint, ProcessResult } from '../graphql';
 import { UsersService } from '../users/users.service';
 import { NotFoundException } from '@nestjs/common';
 
@@ -21,6 +21,13 @@ export class FootprintsResolver {
     private readonly footprintsService: FootprintsService,
     private readonly userService: UsersService,
   ) {}
+
+  // RECUPERA L'AUTORE DI UN FOOTPRINT
+  @ResolveField('author')
+  author(@Parent() footprint: Footprint) {
+    // TODO -> limitare il doc
+    return this.userService.getUserById(footprint.authorId);
+  }
 
   // RESTITUISCE IL FOOTPRINT ASSOCIATOA UN DETERMINATO ID
   @Query()
@@ -52,10 +59,14 @@ export class FootprintsResolver {
     return await this.footprintsService.createNew(args, user);
   }
 
-  // RECUPERA L'AUTORE DI UN FOOTPRINT
-  @ResolveField('author')
-  author(@Parent() footprint: Footprint) {
-    // TODO -> limitare il doc
-    return this.userService.getUserById(footprint.authorId);
+  // ELIMINA UN FOOTPRINT
+  @Mutation()
+  @Private()
+  async deleteFootprint(
+    @Args('id') id: string,
+    @CurrentUser('id') user: string,
+  ): Promise<ProcessResult> {
+    await this.footprintsService.deleteFootprint(id, user);
+    return { success: true };
   }
 }

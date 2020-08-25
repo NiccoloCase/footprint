@@ -70,6 +70,7 @@ export interface IMutation {
     postComment(contentId: string, text: string): Comment | Promise<Comment>;
     delateComment(contentId: string, id: string): ProcessResult | Promise<ProcessResult>;
     addFootprint(title: string, coordinates: number[], locationName: string, media: string, body?: string): Footprint | Promise<Footprint>;
+    deleteFootprint(id: string): ProcessResult | Promise<ProcessResult>;
     followUser(target: string): ProcessResult | Promise<ProcessResult>;
     unfollowUser(target: string): ProcessResult | Promise<ProcessResult>;
     addLikeToFootprint(footprintId: string): ProcessResult | Promise<ProcessResult>;
@@ -132,7 +133,7 @@ export interface Friendship {
 export interface NewsFeedItem {
     id: string;
     ownerId: string;
-    footprint: Footprint;
+    footprint?: Footprint;
     createdAt: Date;
     isSeen: boolean;
 }

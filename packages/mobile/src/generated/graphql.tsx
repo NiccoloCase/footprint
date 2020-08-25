@@ -57,6 +57,7 @@ export type Mutation = {
   postComment: Comment;
   delateComment: ProcessResult;
   addFootprint: Footprint;
+  deleteFootprint: ProcessResult;
   followUser: ProcessResult;
   unfollowUser: ProcessResult;
   addLikeToFootprint: ProcessResult;
@@ -115,6 +116,11 @@ export type MutationAddFootprintArgs = {
   locationName: Scalars['String'];
   media: Scalars['String'];
   body?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDeleteFootprintArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -473,7 +479,7 @@ export type GetNearFootprintsQuery = (
   { __typename?: 'Query' }
   & { getNearFootprints: Array<(
     { __typename?: 'Footprint' }
-    & Pick<Footprint, 'id' | 'title' | 'media'>
+    & Pick<Footprint, 'id' | 'title' | 'media' | 'created_at'>
     & { location: (
       { __typename?: 'Location' }
       & Pick<Location, 'coordinates' | 'locationName'>
@@ -496,7 +502,7 @@ export type GetNewsFeedQuery = (
     & Pick<NewsFeedItem, 'id' | 'isSeen'>
     & { footprint: (
       { __typename?: 'Footprint' }
-      & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId'>
+      & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId' | 'created_at'>
       & { location: (
         { __typename?: 'Location' }
         & Pick<Location, 'coordinates' | 'locationName'>
@@ -517,7 +523,7 @@ export type GetFootprintsByUserQuery = (
   { __typename?: 'Query' }
   & { getFootprintsByUser: Array<(
     { __typename?: 'Footprint' }
-    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount'>
+    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount' | 'created_at'>
     & { location: (
       { __typename?: 'Location' }
       & Pick<Location, 'coordinates' | 'locationName'>
@@ -534,7 +540,7 @@ export type GetFootprintsByIdQuery = (
   { __typename?: 'Query' }
   & { getFootprintById: (
     { __typename?: 'Footprint' }
-    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount'>
+    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount' | 'created_at'>
     & { location: (
       { __typename?: 'Location' }
       & Pick<Location, 'coordinates' | 'locationName'>
@@ -648,6 +654,19 @@ export type AddFootprintMutation = (
   & { addFootprint: (
     { __typename?: 'Footprint' }
     & Pick<Footprint, 'id'>
+  ) }
+);
+
+export type DeleteFootprintMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DeleteFootprintMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteFootprint: (
+    { __typename?: 'ProcessResult' }
+    & Pick<ProcessResult, 'success'>
   ) }
 );
 
@@ -1038,6 +1057,7 @@ export const GetNearFootprintsDocument = gql`
       username
       profileImage
     }
+    created_at
   }
 }
     `;
@@ -1087,6 +1107,7 @@ export const GetNewsFeedDocument = gql`
         username
         profileImage
       }
+      created_at
     }
   }
 }
@@ -1129,6 +1150,7 @@ export const GetFootprintsByUserDocument = gql`
       coordinates
       locationName
     }
+    created_at
   }
 }
     `;
@@ -1175,6 +1197,7 @@ export const GetFootprintsByIdDocument = gql`
       username
       profileImage
     }
+    created_at
   }
 }
     `;
@@ -1450,6 +1473,38 @@ export function useAddFootprintMutation(baseOptions?: ApolloReactHooks.MutationH
 export type AddFootprintMutationHookResult = ReturnType<typeof useAddFootprintMutation>;
 export type AddFootprintMutationResult = ApolloReactCommon.MutationResult<AddFootprintMutation>;
 export type AddFootprintMutationOptions = ApolloReactCommon.BaseMutationOptions<AddFootprintMutation, AddFootprintMutationVariables>;
+export const DeleteFootprintDocument = gql`
+    mutation DeleteFootprint($id: ID!) {
+  deleteFootprint(id: $id) {
+    success
+  }
+}
+    `;
+export type DeleteFootprintMutationFn = ApolloReactCommon.MutationFunction<DeleteFootprintMutation, DeleteFootprintMutationVariables>;
+
+/**
+ * __useDeleteFootprintMutation__
+ *
+ * To run a mutation, you first call `useDeleteFootprintMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFootprintMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFootprintMutation, { data, loading, error }] = useDeleteFootprintMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteFootprintMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteFootprintMutation, DeleteFootprintMutationVariables>) {
+        return ApolloReactHooks.useMutation<DeleteFootprintMutation, DeleteFootprintMutationVariables>(DeleteFootprintDocument, baseOptions);
+      }
+export type DeleteFootprintMutationHookResult = ReturnType<typeof useDeleteFootprintMutation>;
+export type DeleteFootprintMutationResult = ApolloReactCommon.MutationResult<DeleteFootprintMutation>;
+export type DeleteFootprintMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteFootprintMutation, DeleteFootprintMutationVariables>;
 export const MeDocument = gql`
     query Me {
   whoami {

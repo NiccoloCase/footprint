@@ -3,18 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
-  TouchableOpacity,
   Image,
   TouchableWithoutFeedback,
-  Alert,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome5";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import {LikeButton} from "../../components/buttons";
-import {useNavigation, useIsFocused} from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import {SharedElement} from "react-navigation-shared-element";
-import {Colors} from "../../styles";
 import {useNavigateToUserProfile} from "../../navigation/navigateToUserProfile";
 
 interface FootprintCardProps {

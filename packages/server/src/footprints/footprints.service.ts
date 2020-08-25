@@ -3,6 +3,8 @@ import {
   BadRequestException,
   forwardRef,
   Inject,
+  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { AddFootprintDTO, GetNearFootprintsDTO } from './footprints.dto';
 import { LocationType } from '../graphql';
@@ -132,5 +134,37 @@ export class FootprintsService {
     await this.footprintModel.findByIdAndUpdate(id, {
       $inc: { likesCount: value },
     });
+  }
+
+  /**
+   * Elimina un footprint
+   * @param id ID del footprint
+   * @param clientId ID dell'utente che ha eseguito la richiesta
+   */
+  async deleteFootprint(id: string, clientId: string) {
+    // Cerca il footprint
+    let footprint: IFootprintModel | null;
+    try {
+      footprint = await this.footprintModel.findById(id);
+    } catch (err) {
+      throw new BadRequestException();
+    }
+    // Controlla cje questo esista
+    if (!footprint) throw new NotFoundException('The footprint does not exist');
+    // Controlla che l'utente che ha eseguito la richiesta sia
+    // l'autore del footprint
+    if (String(footprint.authorId) !== String(clientId))
+      throw new UnauthorizedException(
+        'You are not authorized to delete a footprint that is not yours',
+      );
+    // Elimina il footprint dal database
+    await footprint.deleteOne();
+    // Elimina la foto da cloudinary
+    // TODO
+    // La difficoltà risiede nel fatto che si è impossibilitati dal sapere se
+    // una determinata foto è stata "rubata" da un altro footprint. In tal caso,
+    // eliminandola, si eliminerebbe anche la foto originale.
+    // (Possibile soluzione -> refactor della gestione delle risolre caricate =
+    // è necessario salvare un documento contentete url, id, e autore nel database)
   }
 }

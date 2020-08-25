@@ -15,7 +15,7 @@ export const validationConfig = {
     title: {
       length: { min: 3, max: 50 },
     },
-    body: { length: { max: 150 } },
+    body: { length: { max: 250 } },
   },
   comment: {
     text: { length: { max: 250 } },
