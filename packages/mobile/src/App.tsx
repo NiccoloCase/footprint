@@ -1,5 +1,5 @@
 import React from "react";
-import {View, StatusBar} from "react-native";
+import {View, StatusBar, StyleSheet} from "react-native";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import {GoogleSignin} from "@react-native-community/google-signin";
 import {StoreProvider} from "easy-peasy";
@@ -20,7 +20,7 @@ GoogleSignin.configure({
 
 const App = () => {
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.app}>
       <StoreProvider store={store}>
         <ApolloProvider>
           <StatusBar backgroundColor="#fff" barStyle="dark-content" />
@@ -30,5 +30,12 @@ const App = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  app: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+});
 
 export default App;

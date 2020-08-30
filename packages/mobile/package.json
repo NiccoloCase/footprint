@@ -60,6 +60,7 @@
     "react-native-shared-element": "^0.7.0",
     "react-native-snackbar": "^2.2.3",
     "react-native-snap-carousel": "^3.9.1",
+    "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^12.1.0",
     "react-native-swiper": "^1.6.0",
     "react-native-textinput-effects": "^0.6.1",
@@ -147,7 +148,9 @@
       "react-native-shared-element",
       "react-native-shared-element/**",
       "react-native-modal",
-      "react-native-modal/**"
+      "react-native-modal/**",
+      "react-native-splash-screen",
+      "react-native-splash-screen/**"
     ]
   }
 }

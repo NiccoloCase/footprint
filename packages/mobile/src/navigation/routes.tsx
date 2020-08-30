@@ -16,13 +16,13 @@ import {Colors} from "../styles";
 import hexToRgba from "hex-to-rgba";
 import {GetNewsFeedDocument} from "../generated/graphql";
 import {useLazyQuery} from "../graphql/useLazyQuery";
+import NativeSplashScreen from "react-native-splash-screen";
 
 // COMPONENTI
 import {ProfileScreenDrawerContent} from "../components/ProfileScreenDrawer";
 import {TabBar} from "../components/TabBar";
 
 // SCHERMATE
-import {SplashScreen} from "../screens/SplashScreen";
 import {WelcomeScreen} from "../screens/authScreens/Welcome";
 import {SignInScreen} from "../screens/authScreens/SignIn";
 import {SignUpScreen} from "../screens/authScreens/SignUp";
@@ -487,7 +487,6 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
 );
 
 export const Navigation = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const isAuth = useStoreState((state) => state.auth.isAuthenticated);
   const singin = useStoreActions((actions) => actions.auth.singin);
 
@@ -509,12 +508,10 @@ export const Navigation = () => {
           await prefetchFeed({pagination: {limit: 10}});
         }
       } finally {
-        setIsLoading(false);
+        NativeSplashScreen.hide();
       }
     })();
   }, []);
-
-  if (isLoading) return <SplashScreen />;
 
   return (
     <NavigationContainer>

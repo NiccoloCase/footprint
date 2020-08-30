@@ -28,7 +28,7 @@ export interface AuthModel {
 }
 
 const authModel: AuthModel = {
-  isAuthenticated: true, // <------
+  isAuthenticated: false, // <------
   userId: "",
   accessToken: "",
   refreshToken: "",
