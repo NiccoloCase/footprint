@@ -1,5 +1,9 @@
 import { PaginationOptions } from '../graphql';
+import { IsOptional } from 'class-validator';
+import { IsPaginationOptionsObject } from '../shared/validation';
 
 export class GetNewsFeedDTO {
-  pagination: PaginationOptions;
+  @IsOptional()
+  @IsPaginationOptionsObject()
+  pagination?: PaginationOptions;
 }

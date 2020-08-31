@@ -14,6 +14,7 @@ import { UploaderModule } from './uploader/uploader.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
 import { keys } from '@footprint/config';
+import { IsEmailAlreadyUsedConstraint } from './shared/validation';
 
 @Module({
   imports: [

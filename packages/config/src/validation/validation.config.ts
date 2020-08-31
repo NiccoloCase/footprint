@@ -5,7 +5,7 @@ export const validationConfig = {
     },
     username: {
       length: { min: 3, max: 15 },
-      regex: /[a-zA-Z]/,
+      regex: /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,}$/,
     },
     password: {
       length: { min: 3, max: 30 },
@@ -20,4 +20,5 @@ export const validationConfig = {
   comment: {
     text: { length: { max: 250 } },
   },
+  locationName: { length: { max: 200 } },
 };
