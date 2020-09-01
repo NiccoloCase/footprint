@@ -3,10 +3,10 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateNewUserDTO, EditProfileDTO } from './users.dto';
+import { CreateNewUserDTO } from './users.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IUser, IUserModel } from './users.schema';
+import { IUser, IUserDocument, IUserModel } from './users.schema';
 import { AuthType, TokenScope, PaginationOptions } from '../graphql';
 import { TokenService } from '../token/token.service';
 import { EmailService } from '../email/email.service';
@@ -15,7 +15,8 @@ import { normalizePaginationOptions } from '../shared/pagination';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel('User') private readonly userModel: Model<IUserModel>,
+    @InjectModel('User')
+    private readonly userModel: IUserModel & { s: string },
     private readonly tokenService: TokenService,
     private readonly emailService: EmailService,
   ) {}
@@ -23,7 +24,7 @@ export class UsersService {
   /**
    * Restituisce il modello della collezione degli utenti
    */
-  getUserModel(): Model<IUserModel> {
+  getUserModel(): Model<IUserDocument> {
     return this.userModel;
   }
 
@@ -31,9 +32,10 @@ export class UsersService {
    * Restituisce l'utente associato all'ID passato
    * @param id
    */
-  async getUserById(id: string): Promise<IUser> {
+  async getUserById(id: string): Promise<IUserDocument> {
     try {
       const user = await this.userModel.findById(id);
+
       return user;
     } catch (err) {
       throw new BadRequestException(err);
@@ -44,7 +46,7 @@ export class UsersService {
    * Restituisce l'utente associato all'email passato
    * @param email
    */
-  async getUserByEmail(email: string): Promise<IUser | null> {
+  async getUserByEmail(email: string): Promise<IUserDocument | null> {
     try {
       const user = await this.userModel.findOne({ email });
       return user;
@@ -204,7 +206,7 @@ export class UsersService {
   searchUserByUsername = async (
     username: string,
     pagination?: PaginationOptions,
-  ): Promise<IUser[]> => {
+  ): Promise<IUserDocument[]> => {
     const { limit, offset } = normalizePaginationOptions(pagination);
 
     const users = await this.userModel

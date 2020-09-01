@@ -118,17 +118,21 @@ export class UsersResolver {
   // RESTITUISCE UN UTENTE TRAMITE L'ID
   @Query()
   async getUserById(@Args('id') id: string) {
-    // TODO -> rimuovere i dati sensibili
     const user = await this.usersService.getUserById(id);
-
-    return user;
+    // Rimuove i dati sensibili
+    return user.scope('public');
   }
 
   // CERCA UN UTENTE TRAMITE IL NOME
   @Query()
-  searchUser(@Args() payload: SearchUserDTO) {
+  async searchUser(@Args() payload: SearchUserDTO) {
     const { query, pagination } = payload;
-    return this.usersService.searchUserByUsername(query, pagination);
+    const user = await this.usersService.searchUserByUsername(
+      query,
+      pagination,
+    );
+    // Rimuove i dati sensibili
+    return user.map(user => user.scope('public'));
   }
 
   // MODIFICA IL PROFILO

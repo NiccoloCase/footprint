@@ -1,8 +1,14 @@
-import { Schema, Document, HookNextFunction } from 'mongoose';
+import { Schema, Document, HookNextFunction, Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { AuthType } from '../graphql';
-import { PointSchema } from '../shared/mongoose';
+import {
+  PointSchema,
+  ScopedDocsPlugin,
+  ScopedDocsModel,
+  ScopedDocsSchema,
+} from '../shared/mongoose';
 import { assetURLs } from '@footprint/common';
+import { UsersService } from './users.service';
 
 const mongooseHidden = require('mongoose-hidden')();
 
@@ -20,12 +26,16 @@ export interface IUser {
   followersCount: number;
   followingCount: number;
   footprintsCount: number;
-
-  /** Compara la password dell'utente con la password passata */
-  comparePassword: (password: string) => Promise<boolean>;
 }
 
-export type IUserModel = Document & IUser;
+export type IUserDocument = Document &
+  IUser &
+  ScopedDocsModel<IUser> & {
+    /** Compara la password dell'utente con la password passata */
+    comparePassword: (password: string) => Promise<boolean>;
+  };
+
+export type IUserModel = Model<IUserDocument> & ScopedDocsSchema<IUser>;
 
 // SCHEMA DEL DATABASE
 export const UserSchema = new Schema({
@@ -41,16 +51,22 @@ export const UserSchema = new Schema({
     required: true,
     unique: true,
     lowercase: true,
+    scope: 'private',
   },
   // Metodo utilizzato per la creazione dell'account
   authType: {
     type: String,
     required: true,
     enum: ['LOCAL', 'GOOGLE'],
+    scope: 'private',
   },
   // Versione dei token di aggiornamento
   // Cambia ogni volta che i token sono revocati
-  refreshTokenVersion: { type: Number, default: 0 },
+  refreshTokenVersion: {
+    type: Number,
+    default: 0,
+    hide: true,
+  },
   // Password dell'account (se locale)
   localPassword: {
     type: String,
@@ -73,7 +89,7 @@ export const UserSchema = new Schema({
     type: PointSchema,
     required: true,
   },
-  googleID: { type: String },
+  googleID: { type: String, scope: 'private' },
   // URL dell'immagine del profilo
   profileImage: {
     type: String,
@@ -97,10 +113,11 @@ UserSchema.index({ googleID: 1 });
 
 // Plugin
 UserSchema.plugin(mongooseHidden);
+UserSchema.plugin(ScopedDocsPlugin<IUser>());
 
 // Salva l'hash della password al posto del semplice testo
 UserSchema.pre('save', async function(
-  this: IUserModel,
+  this: IUserDocument,
   next: HookNextFunction,
 ) {
   // genera l'hash della password solo se è stata modificata o è nuova
@@ -120,15 +137,8 @@ UserSchema.pre('save', async function(
  * @param password
  */
 UserSchema.methods.comparePassword = async function(
-  this: IUserModel,
+  this: IUserDocument,
   password: string,
 ): Promise<boolean> {
   return await bcrypt.compare(password, this.localPassword);
 };
-
-/* UserSchema.methods.toJSON = function(this: IUserModel) {
-  var obj: IUser = this.toObject();
-  delete obj.localPassword;
-  return obj;
-};
- */

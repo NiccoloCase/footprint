@@ -11,7 +11,7 @@ import { LocationType } from '../graphql';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IFootprintModel, IFootprint } from './footprints.schema';
-import { IUserModel, IUser } from '../users/users.schema';
+import { IUser, IUserModel } from '../users/users.schema';
 import { NewsFeedService } from '../news-feed/news-feed.service';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class FootprintsService {
     @InjectModel('Footprint')
     private readonly footprintModel: Model<IFootprintModel>,
     @InjectModel('User')
-    private readonly userModel: Model<IUserModel>,
+    private readonly userModel: IUserModel,
     @Inject(forwardRef(() => NewsFeedService))
     private readonly newsFeedService: NewsFeedService,
   ) {}

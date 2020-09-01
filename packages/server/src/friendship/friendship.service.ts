@@ -9,11 +9,10 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IFriendshipModel } from './friendship.schema';
-import { IUserModel, IUser } from '../users/users.schema';
+import { IUser, IUserModel } from '../users/users.schema';
 import { PaginationOptions, Friendship } from '../graphql';
 import { normalizePaginationOptions } from '../shared/pagination';
 import { NewsFeedService } from '../news-feed/news-feed.service';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class FriendshipService {
@@ -21,7 +20,7 @@ export class FriendshipService {
     @InjectModel('Friendship')
     private readonly friendshipModel: Model<IFriendshipModel>,
     @InjectModel('User')
-    private readonly userModel: Model<IUserModel>,
+    private readonly userModel: IUserModel,
     @Inject(forwardRef(() => NewsFeedService))
     private readonly newsFeedService: NewsFeedService,
   ) {}
@@ -42,8 +41,13 @@ export class FriendshipService {
       .skip(offset)
       .limit(limit)
       .populate('user');
+
     if (docs.length === 0) return [];
-    const followers: IUser[] = docs.map(doc => doc.user) as any;
+
+    const followers: IUser[] = docs.map(doc =>
+      this.userModel.scope(doc.user as any, 'public'),
+    ) as any;
+
     return followers;
   }
 
@@ -75,7 +79,9 @@ export class FriendshipService {
       .populate('user');
 
     if (docs.length === 0) return [];
-    const following: IUser[] = docs.map(doc => doc.target) as any;
+    const following: IUser[] = docs.map(doc =>
+      this.userModel.scope(doc.target as any, 'private'),
+    ) as any;
     return following;
   }
 

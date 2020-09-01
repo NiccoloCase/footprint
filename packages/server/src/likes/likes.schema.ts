@@ -1,5 +1,4 @@
 import { Schema, Document, Types } from 'mongoose';
-import { IUser } from '../users/users.schema';
 
 export interface ILikeBucket {
   contentId: string;
