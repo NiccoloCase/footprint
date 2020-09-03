@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { LikesResolver } from './likes.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -14,8 +14,9 @@ import { FootprintsModule } from '../footprints/footprints.module';
         schema: LikeBucketSchema,
       },
     ]),
-    FootprintsModule,
+    forwardRef(() => FootprintsModule),
   ],
   providers: [LikesService, LikesResolver],
+  exports: [LikesService],
 })
 export class LikesModule {}

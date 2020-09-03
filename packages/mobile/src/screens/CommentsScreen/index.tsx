@@ -28,7 +28,7 @@ import {Spinner} from "../../components/Spinner";
 import Snackbar from "react-native-snackbar";
 import {constants} from "@footprint/config";
 import {CommentCard} from "./CommentCard";
-import {usePostComment} from "../../utils/usePostComment";
+import {usePostComment} from "../../utils/hooks";
 import {useFormik} from "formik";
 import {PostCommentValidationSchema} from "../../utils/validation";
 import {ErrorBadge} from "../../components/badges";

@@ -122,6 +122,7 @@ export interface Footprint {
     location: Location;
     created_at: Date;
     likesCount: number;
+    isLikedBy?: boolean;
 }
 
 export interface Friendship {

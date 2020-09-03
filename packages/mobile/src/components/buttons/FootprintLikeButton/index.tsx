@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import {
   View,
@@ -10,36 +10,32 @@ import {
   ViewStyle,
 } from "react-native";
 import {abbreviateNumber} from "../../../utils/abbreviateNumber";
+import {useFootprintLikes} from "../../../utils/hooks";
 
 interface LikeButtonProps {
   onPress?: (isLiked: boolean) => void;
-  likesCount?: number;
+  isLiked?: boolean;
+  likesCount: number;
   containerStyle?: StyleProp<ViewStyle>;
+  footprintId: string;
+  footprintAuthor: string;
 }
 
-export const LikeButton: React.FC<LikeButtonProps> = (props) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(props.likesCount || 0);
-
-  const handlePress = () => {
-    // chiama il callback
-    if (typeof props.onPress === "function") props.onPress(!isLiked);
-
-    // aggiorna il numero di likes
-    setLikesCount(likesCount + (!isLiked ? 1 : -1));
-
-    // aggiorna lo stato del bottone
-    setIsLiked(!isLiked);
-  };
+export const FootprintLikeButton: React.FC<LikeButtonProps> = (props) => {
+  const [isLiked, handlePress] = useFootprintLikes(
+    props.footprintId,
+    props.footprintAuthor,
+    props.isLiked,
+  );
 
   return (
     <View style={[styles.wrapper, props.containerStyle]}>
-      {likesCount > 0 && (
+      {props.likesCount > 0 && (
         <TouchableNativeFeedback>
-          <Text style={styles.text}>{abbreviateNumber(likesCount)}</Text>
+          <Text style={styles.text}>{abbreviateNumber(props.likesCount)}</Text>
         </TouchableNativeFeedback>
       )}
-      <TouchableOpacity style={styles.button} onPress={handlePress}>
+      <TouchableOpacity onPress={handlePress}>
         <AntDesignIcon
           name={isLiked ? "heart" : "hearto"}
           color="#fff"
@@ -60,5 +56,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
   },
-  button: {},
 });

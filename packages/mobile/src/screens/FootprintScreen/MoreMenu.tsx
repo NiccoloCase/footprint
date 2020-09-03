@@ -19,7 +19,7 @@ interface MoreMenuProps {
 }
 export const MoreMenu: React.FC<MoreMenuProps> = ({own, footprintId}) => {
   // se il popup per confermare l'eliminazione del footprint è aperto
-  const [isDelteModalOpen, setIsDelteModalOpen] = useState(true);
+  const [isDelteModalOpen, setIsDelteModalOpen] = useState(false);
 
   const menuRef = useRef<Menu | null>(null);
   // grapqh

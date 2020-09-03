@@ -37,7 +37,7 @@ export const ScopedDocsPlugin = <T>() => (schema: Schema) => {
     const doc =
       // Controlla se il valore passato è un oggetto o un modello
       (modelOrDoc as any).constructor.name === 'model'
-        ? (modelOrDoc as Document).toObject()
+        ? (modelOrDoc as Document).toObject({ virtuals: true })
         : modelOrDoc;
 
     // Elima i campi privati

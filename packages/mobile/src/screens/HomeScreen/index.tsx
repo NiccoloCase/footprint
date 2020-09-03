@@ -17,6 +17,8 @@ import {
 } from "../../generated/graphql";
 import {Spinner} from "../../components/Spinner";
 import {ScrollView} from "react-native-gesture-handler";
+import {useStoreState} from "../../store";
+import {cos} from "react-native-reanimated";
 
 const {width} = Dimensions.get("screen");
 const FEED_CARD_WIDTH = (width * 90) / 100;
@@ -25,9 +27,12 @@ export const HomeScreen: React.FC = () => {
   const carousel = useRef<Carousel<NewsFeedItem> | null>(null);
   // Se il feed si sta venendo aggiornato
   const [refreshing, setRefreshing] = useState(false);
+  // Utente autenticato
+  const loggesUser = useStoreState((s) => s.auth.userId);
+
   // GRAPHQL
   const {data, loading, fetchMore, refetch} = useGetNewsFeedQuery({
-    variables: {pagination: {limit: 10}},
+    variables: {pagination: {limit: 10}, isLikedBy: loggesUser},
     notifyOnNetworkStatusChange: true,
   });
   const [seeFeedItem] = useMarkFeedItemAsSeenMutation();
@@ -128,19 +133,23 @@ export const HomeScreen: React.FC = () => {
 
     return (
       <FootprintCard
+        key={index}
         current={current}
         feedId={item.id}
-        footprintId={item.footprint.id}
-        authorId={item.footprint.authorId}
-        title={item.footprint.title}
-        username={item.footprint.author.username || "nicco"}
-        locationName={item.footprint.location.locationName}
-        image={item.footprint.media!}
-        profilePicture={item.footprint.author.profileImage}
-        key={index}
+        footprintId={item.footprint!.id}
+        authorId={item.footprint!.authorId}
+        title={item.footprint!.title}
+        username={item.footprint!.author.username || "nicco"}
+        locationName={item.footprint!.location.locationName}
+        image={item.footprint!.media!}
+        profilePicture={item.footprint!.author.profileImage}
+        userHasLiked={!!item.footprint!.isLikedBy}
+        likesCount={item.footprint!.likesCount}
       />
     );
   };
+
+  // if (feedItems[0]) console.log(feedItems[0].footprint!.isLikedBy);
 
   /**
    * Renderizza il feed

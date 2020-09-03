@@ -289,6 +289,12 @@ export type Footprint = {
   location: Location;
   created_at: Scalars['Date'];
   likesCount: Scalars['Int'];
+  isLikedBy?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type FootprintIsLikedByArgs = {
+  userId?: Maybe<Scalars['ID']>;
 };
 
 export type Friendship = {
@@ -302,7 +308,7 @@ export type NewsFeedItem = {
   __typename?: 'NewsFeedItem';
   id: Scalars['ID'];
   ownerId: Scalars['ID'];
-  footprint: Footprint;
+  footprint?: Maybe<Footprint>;
   createdAt: Scalars['Date'];
   isSeen: Scalars['Boolean'];
 };
@@ -492,6 +498,7 @@ export type GetNearFootprintsQuery = (
 
 export type GetNewsFeedQueryVariables = Exact<{
   pagination?: Maybe<PaginationOptions>;
+  isLikedBy?: Maybe<Scalars['ID']>;
 }>;
 
 
@@ -500,9 +507,9 @@ export type GetNewsFeedQuery = (
   & { getNewsFeed: Array<(
     { __typename?: 'NewsFeedItem' }
     & Pick<NewsFeedItem, 'id' | 'isSeen'>
-    & { footprint: (
+    & { footprint?: Maybe<(
       { __typename?: 'Footprint' }
-      & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId' | 'created_at'>
+      & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId' | 'created_at' | 'likesCount' | 'isLikedBy'>
       & { location: (
         { __typename?: 'Location' }
         & Pick<Location, 'coordinates' | 'locationName'>
@@ -510,7 +517,7 @@ export type GetNewsFeedQuery = (
         { __typename?: 'User' }
         & Pick<User, 'username' | 'profileImage'>
       ) }
-    ) }
+    )> }
   )> }
 );
 
@@ -533,6 +540,7 @@ export type GetFootprintsByUserQuery = (
 
 export type GetFootprintsByIdQueryVariables = Exact<{
   id: Scalars['ID'];
+  isLikedBy?: Maybe<Scalars['ID']>;
 }>;
 
 
@@ -540,7 +548,7 @@ export type GetFootprintsByIdQuery = (
   { __typename?: 'Query' }
   & { getFootprintById: (
     { __typename?: 'Footprint' }
-    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount' | 'created_at'>
+    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount' | 'created_at' | 'isLikedBy'>
     & { location: (
       { __typename?: 'Location' }
       & Pick<Location, 'coordinates' | 'locationName'>
@@ -1090,7 +1098,7 @@ export type GetNearFootprintsQueryHookResult = ReturnType<typeof useGetNearFootp
 export type GetNearFootprintsLazyQueryHookResult = ReturnType<typeof useGetNearFootprintsLazyQuery>;
 export type GetNearFootprintsQueryResult = ApolloReactCommon.QueryResult<GetNearFootprintsQuery, GetNearFootprintsQueryVariables>;
 export const GetNewsFeedDocument = gql`
-    query GetNewsFeed($pagination: PaginationOptions) {
+    query GetNewsFeed($pagination: PaginationOptions, $isLikedBy: ID) {
   getNewsFeed(pagination: $pagination) {
     id
     isSeen
@@ -1108,6 +1116,8 @@ export const GetNewsFeedDocument = gql`
         profileImage
       }
       created_at
+      likesCount
+      isLikedBy(userId: $isLikedBy)
     }
   }
 }
@@ -1126,6 +1136,7 @@ export const GetNewsFeedDocument = gql`
  * const { data, loading, error } = useGetNewsFeedQuery({
  *   variables: {
  *      pagination: // value for 'pagination'
+ *      isLikedBy: // value for 'isLikedBy'
  *   },
  * });
  */
@@ -1181,7 +1192,7 @@ export type GetFootprintsByUserQueryHookResult = ReturnType<typeof useGetFootpri
 export type GetFootprintsByUserLazyQueryHookResult = ReturnType<typeof useGetFootprintsByUserLazyQuery>;
 export type GetFootprintsByUserQueryResult = ApolloReactCommon.QueryResult<GetFootprintsByUserQuery, GetFootprintsByUserQueryVariables>;
 export const GetFootprintsByIdDocument = gql`
-    query GetFootprintsById($id: ID!) {
+    query GetFootprintsById($id: ID!, $isLikedBy: ID) {
   getFootprintById(id: $id) {
     id
     title
@@ -1198,6 +1209,7 @@ export const GetFootprintsByIdDocument = gql`
       profileImage
     }
     created_at
+    isLikedBy(userId: $isLikedBy)
   }
 }
     `;
@@ -1215,6 +1227,7 @@ export const GetFootprintsByIdDocument = gql`
  * const { data, loading, error } = useGetFootprintsByIdQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      isLikedBy: // value for 'isLikedBy'
  *   },
  * });
  */

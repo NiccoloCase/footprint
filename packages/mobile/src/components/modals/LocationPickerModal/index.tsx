@@ -1,14 +1,10 @@
-import React, {useState, useEffect, useMemo} from "react";
+import React, {useState, useEffect} from "react";
 import {SelectModal} from "../SelectModal";
 import {
   placeAutocomplete,
   getPlaceNameFromCoordinates,
 } from "../../../utils/geocode";
-import {
-  Location,
-  LocationType,
-  PointLocation,
-} from "../../../generated/graphql";
+import {PointLocation} from "../../../generated/graphql";
 import {useStoreState} from "../../../store";
 
 interface LocationPickerModalProps {
@@ -52,8 +48,11 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     const data = await placeAutocomplete(query, {
       superficialResearch: true,
     });
-    setRestults(data);
-    return data.map((place) => place.place_name);
+
+    const results = data || [];
+
+    setRestults(results);
+    return results.map((place) => place.place_name);
   };
 
   const onSelected = (locationName: string) => {

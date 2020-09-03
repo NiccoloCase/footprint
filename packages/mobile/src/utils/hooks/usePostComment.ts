@@ -2,8 +2,7 @@ import {
   usePostCommentMutation,
   GetCommentsDocument,
   PostCommentMutation,
-} from "../generated/graphql";
-import Snackbar from "react-native-snackbar";
+} from "../../generated/graphql";
 import {ExecutionResult} from "apollo-link";
 
 /**

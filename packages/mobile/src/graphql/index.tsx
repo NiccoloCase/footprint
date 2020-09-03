@@ -16,7 +16,7 @@ import {API_URL} from "../utils/api";
 import {store} from "../store";
 import {Colors} from "../styles";
 
-const cache = new InMemoryCache();
+const cache = new InMemoryCache({dataIdFromObject: (object) => object.id});
 
 const httpLink = new HttpLink({uri: API_URL + "/graphql"});
 

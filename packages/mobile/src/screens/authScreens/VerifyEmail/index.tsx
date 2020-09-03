@@ -15,7 +15,7 @@ import {
 } from "../../../generated/graphql";
 import {store} from "../../../store";
 import Snackbar from "react-native-snackbar";
-import {useEmailTimer} from "../../../utils/useEmailTimer";
+import {useEmailTimer} from "../../../utils/hooks";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {Colors, Spacing} from "../../../styles";
 import {AuthHeader} from "../../../components/Header/AuthHeader";

@@ -64,6 +64,7 @@ export class LikesService {
       content = await this.footprintService.findFootprintById(contentId);
       if (!content) throw new Error();
     } catch (err) {
+      console.error(err);
       throw new NotFoundException('Content not found');
     }
 
@@ -82,33 +83,36 @@ export class LikesService {
       const bucket = await this.likeModel.findOne(query);
       if (bucket) throw new Error();
     } catch (err) {
+      console.error(err);
       throw new BadRequestException('You already liked this content');
     }
 
-    // Otiene il bucket piu recente
-    const lastBucket = await this.likeModel
-      .findOne({ contentId })
-      .sort('-page')
-      .limit(1);
-
-    // Non esiste ancora nessun bucket -> ne crea uno nuovo
-    if (!lastBucket) return this.createNewLikeBucket(userId, contentId);
-
-    // Esiste già un bucket:
-    // Controlla se questo è pieno
-    if (lastBucket.likesCount >= constants.LIKES_PER_BUCKET)
-      // Il bucket è pieno -> crea un nuovo bucket
-      return this.createNewLikeBucket(userId, contentId, lastBucket.page + 1);
-
-    // Inserisce l'utente nella lista di likes
-    lastBucket.likes.unshift(userId);
-    // Incrementa il contatore dei likes del bucket
-    lastBucket.likesCount += 1;
-
     // Salva il bucket
     try {
-      await lastBucket.save();
+      // Otiene il bucket piu recente
+      const lastBucket = await this.likeModel
+        .findOne({ contentId })
+        .sort('-page')
+        .limit(1);
+
+      // Non esiste ancora nessun bucket -> ne crea uno nuovo
+      if (!lastBucket) this.createNewLikeBucket(userId, contentId);
+      // Esiste già un bucket:
+      // Controlla se questo è pieno
+      else if (lastBucket.likesCount >= constants.LIKES_PER_BUCKET)
+        // Il bucket è pieno -> crea un nuovo bucket
+        this.createNewLikeBucket(userId, contentId, lastBucket.page + 1);
+      // Aggiunge il like al bucket
+      else {
+        // Inserisce l'utente nella lista di likes
+        lastBucket.likes.unshift(userId);
+        // Incrementa il contatore dei likes del bucket
+        lastBucket.likesCount += 1;
+        // Salva il bucket
+        await lastBucket.save();
+      }
     } catch (err) {
+      console.error(err);
       throw new BadRequestException(err);
     }
 
@@ -142,7 +146,9 @@ export class LikesService {
         $inc: { likesCount: -1 },
       };
 
-      bucket = await this.likeModel.findOneAndUpdate(query, update);
+      bucket = await this.likeModel.findOneAndUpdate(query, update, {
+        new: true,
+      });
     } catch (err) {
       throw new BadRequestException(err);
     }
@@ -152,14 +158,34 @@ export class LikesService {
         'You can not remove the like of a content that does not exist or that you have not yet liked',
       );
 
-    // Se il bucket è vuoto viene eliminato
-    if (bucket.likes.length === 0) await bucket.deleteOne();
-
-    // Decrementa il contatore di likes
     try {
-      this.footprintService.increaseLikeCounter(contentId, -1);
+      // Se il bucket è vuoto viene eliminato
+      if (bucket.likes.length === 0) await bucket.deleteOne();
+      // Decremeneta il contatore di likes
+      await this.footprintService.increaseLikeCounter(contentId, -1);
     } catch (err) {
-      throw new BadRequestException(err);
+      throw new InternalServerErrorException();
     }
+  }
+
+  /**
+   * restituisce se l'uetnet passato ha messo un like al contentuo
+   * passato come secondo argomento
+   * @param userId ID dell'utente
+   * @param contentId ID del contenuto
+   */
+  async isContentLikedByUser(
+    userId: string,
+    contentId: string,
+  ): Promise<Boolean> {
+    // Controlla l'esistenza di un bucket con l'ID dell'uetente passato all'interno
+    // dell'array di likes
+    const query: any = {
+      contentId,
+      likes: Types.ObjectId(userId),
+    };
+
+    const bucket = await this.likeModel.findOne(query);
+    return !!bucket;
   }
 }

@@ -16,7 +16,7 @@ query GetNearFootprints($lng: Float!, $lat: Float!, $maxDistance: Float!) {
   }
 }
 
-query GetNewsFeed($pagination: PaginationOptions) {
+query GetNewsFeed($pagination: PaginationOptions, $isLikedBy: ID) {
   getNewsFeed(pagination: $pagination) {
     id
     isSeen
@@ -34,6 +34,8 @@ query GetNewsFeed($pagination: PaginationOptions) {
         profileImage
       }
       created_at
+      likesCount
+      isLikedBy(userId: $isLikedBy)
     }
   }
 }
@@ -53,7 +55,7 @@ query GetFootprintsByUser($userId: ID!) {
   }
 }
 
-query GetFootprintsById($id: ID!) {
+query GetFootprintsById($id: ID!, $isLikedBy: ID) {
   getFootprintById(id: $id) {
     id
     title
@@ -70,6 +72,7 @@ query GetFootprintsById($id: ID!) {
       profileImage
     }
     created_at
+    isLikedBy(userId: $isLikedBy)
   }
 }
 

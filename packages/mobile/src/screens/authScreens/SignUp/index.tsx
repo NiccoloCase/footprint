@@ -46,7 +46,7 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
   navigation,
 }) => {
   // Index della schermata corrente
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
 
   // Funzione di submit
   const [onSubmit, {loading}] = useSubmitSignUp(

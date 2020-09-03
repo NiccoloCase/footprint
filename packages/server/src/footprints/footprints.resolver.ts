@@ -13,13 +13,15 @@ import { CurrentUser } from '../users/user.decorator';
 import { IUser } from '../users/users.schema';
 import { Footprint, ProcessResult } from '../graphql';
 import { UsersService } from '../users/users.service';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { LikesService } from '../likes/likes.service';
 
 @Resolver('Footprint')
 export class FootprintsResolver {
   constructor(
     private readonly footprintsService: FootprintsService,
     private readonly userService: UsersService,
+    private readonly likesService: LikesService,
   ) {}
 
   // RECUPERA L'AUTORE DI UN FOOTPRINT
@@ -27,6 +29,26 @@ export class FootprintsResolver {
   author(@Parent() footprint: Footprint) {
     // TODO -> limitare il doc
     return this.userService.getUserById(footprint.authorId);
+  }
+
+  // RESTITUISCE SE L'UTENTE PASSATO HA MESSO LIKE AL FOOPRINT
+  @ResolveField('isLikedBy')
+  async isLikedBy(
+    @Parent() footprint: Footprint,
+    @Args('userId') userId: string,
+  ) {
+    if (!userId) return null;
+    else if (footprint.authorId === userId) return null;
+
+    try {
+      const isLiked = await this.likesService.isContentLikedByUser(
+        userId,
+        footprint.id,
+      );
+      return isLiked;
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
   }
 
   // RESTITUISCE IL FOOTPRINT ASSOCIATOA UN DETERMINATO ID

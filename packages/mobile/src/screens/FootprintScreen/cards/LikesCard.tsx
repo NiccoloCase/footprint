@@ -1,44 +1,44 @@
-import React, {useState} from "react";
+import React from "react";
 import {View, Text, StyleSheet, Image} from "react-native";
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import {ScrollView, TouchableOpacity} from "react-native-gesture-handler";
 import {User} from "../../../generated/graphql";
-import {useNavigation} from "@react-navigation/native";
 import {SharedElement} from "react-navigation-shared-element";
 import {Colors} from "../../../styles";
 import {useNavigateToUserProfile} from "../../../navigation/navigateToUserProfile";
 import {abbreviateNumber} from "../../../utils/abbreviateNumber";
+import {useNavigation} from "@react-navigation/native";
+import {useFootprintLikes} from "../../../utils/hooks";
 
 const AVATAR_RADIUS = 28;
 
 interface LikesCardProps {
   footprintId: string;
+  footprintAuthor: string;
+  isAlredyLiked?: boolean;
   likes: Pick<User, "username" | "id" | "profileImage">[];
   likesCount: number;
 }
 
 export const LikesCard: React.FC<LikesCardProps> = ({
-  footprintId,
   likes,
-  likesCount: defaultLikesCount,
+  footprintId,
+  footprintAuthor,
+  likesCount,
+  isAlredyLiked,
 }) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(defaultLikesCount);
+  const [isLiked, handleButtonPress] = useFootprintLikes(
+    footprintId,
+    footprintAuthor,
+    isAlredyLiked,
+  );
 
   // Navigazione:
   const navigateToProfile = useNavigateToUserProfile();
   const navigation = useNavigation();
 
   const goToFollowersScreen = () => {
-    // navigation.navigate("FollowersScreen", {userId});
-  };
-
-  const handleButtonPress = () => {
-    // aggiorna il numero di likes
-    setLikesCount(likesCount + (!isLiked ? 1 : -1));
-
-    // aggiorna lo stato del bottone
-    setIsLiked(!isLiked);
+    // navigation.navigate("FollowersScreen", {userId}); <--------- TODO
   };
 
   const renderAvatar = (
@@ -75,7 +75,9 @@ export const LikesCard: React.FC<LikesCardProps> = ({
         </View>
         <View style={styles.inline}>
           <View style={styles.likeButtonWrapper}>
-            <TouchableOpacity onPress={handleButtonPress}>
+            <TouchableOpacity
+              onPress={handleButtonPress}
+              style={styles.likeButton}>
               <AntDesignIcon
                 name={isLiked ? "heart" : "hearto"}
                 color={Colors.primary}
@@ -164,6 +166,8 @@ const styles = StyleSheet.create({
     paddingRight: 25,
     borderRightColor: "#ddd",
     borderRightWidth: 2,
+  },
+  likeButton: {
     alignItems: "center",
   },
 });

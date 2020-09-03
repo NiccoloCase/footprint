@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import EntypoIcon from "react-native-vector-icons/Entypo";
-import {LikeButton} from "../../components/buttons";
+import {FootprintLikeButton} from "../../components/buttons";
 import {useNavigation} from "@react-navigation/native";
 import {SharedElement} from "react-navigation-shared-element";
 import {useNavigateToUserProfile} from "../../navigation/navigateToUserProfile";
@@ -22,7 +22,8 @@ interface FootprintCardProps {
   authorId: string;
   profilePicture: string;
   locationName: string;
-  likesCount?: number;
+  likesCount: number;
+  userHasLiked?: boolean;
 }
 
 export const FootprintCard: React.FC<FootprintCardProps> = ({
@@ -35,6 +36,7 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
   username,
   locationName,
   likesCount,
+  userHasLiked,
 }) => {
   const [opacity, setOpacity] = useState(1);
   const navigateToProfile = useNavigateToUserProfile();
@@ -51,6 +53,9 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
     };
   }, [navigation]);
 
+  /**
+   * Porta l'utente alla schermta del footprint
+   */
   const goToFootprint = () => {
     navigation.navigate("Footprint", {
       title,
@@ -114,8 +119,11 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
           </View>
 
           {/** LIKE BUTTON  */}
-          <LikeButton
+          <FootprintLikeButton
             likesCount={likesCount}
+            footprintId={footprintId}
+            footprintAuthor={authorId}
+            isLiked={userHasLiked}
             containerStyle={{marginRight: 6}}
           />
         </View>

@@ -15,7 +15,7 @@ import {abbreviateNumber} from "../../../utils/abbreviateNumber";
 import {Card} from "./Card";
 import {Spinner} from "../../../components/Spinner";
 import Snackbar from "react-native-snackbar";
-import {usePostComment} from "../../../utils/usePostComment";
+import {usePostComment} from "../../../utils/hooks";
 import {useFormik} from "formik";
 import {PostCommentFormValues} from "../../CommentsScreen";
 import {PostCommentValidationSchema} from "../../../utils/validation";

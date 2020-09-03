@@ -42,12 +42,15 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
   const authId = useStoreState((s) => s.auth.userId);
   // Se mostare il titolo sipra l'immagine
   const [showImageContent, setShowImageContent] = useState(true);
-
+  // Utente autenticato
+  const loggedUser = useStoreState((s) => s.auth.userId);
   // Navigazione
   const {id, image, authorProfileImage, authorUsername, title} = route.params;
 
   // Graphql
-  const {data, loading} = useGetFootprintsByIdQuery({variables: {id}});
+  const {data, loading} = useGetFootprintsByIdQuery({
+    variables: {id, isLikedBy: loggedUser},
+  });
 
   const footprintMediaUri = image || data?.getFootprintById.media;
 
@@ -120,17 +123,22 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
             )}
           </View>
           {/** LIKES */}
-          <LikesCard
-            footprintId={id}
-            likesCount={100}
-            likes={[
-              {
-                username: "nicco",
-                profileImage: authorProfileImage,
-                id: "1pid+pdoo",
-              },
-            ]}
-          />
+          {data && (
+            <LikesCard
+              footprintId={id}
+              footprintAuthor={data.getFootprintById.author.id || ""}
+              isAlredyLiked={!!data.getFootprintById.isLikedBy}
+              likesCount={data.getFootprintById.likesCount}
+              likes={[
+                // TODO <-----------
+                {
+                  username: "nicco",
+                  profileImage: authorProfileImage,
+                  id: "1pid+pdoo",
+                },
+              ]}
+            />
+          )}
           {/** COMMENTI */}
           <CommentsCard footprintId={id} commentsCount={10} />
           {/** MAPPA */}

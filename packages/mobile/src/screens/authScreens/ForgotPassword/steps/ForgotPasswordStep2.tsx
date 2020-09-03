@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import {CodeInput} from "../../../../components/inputs";
-import {useEmailTimer} from "../../../../utils/useEmailTimer";
+import {useEmailTimer} from "../../../../utils/hooks";
 import {
   useForgotPasswordMutation,
   useChangePasswordWithTokenMutation,

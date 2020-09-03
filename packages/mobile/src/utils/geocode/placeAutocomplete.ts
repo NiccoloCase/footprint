@@ -21,8 +21,14 @@ export const placeAutocomplete = async (
     url += `&types=${types}`;
   }
 
-  const res = await fetch(url);
-  const data = await res.json();
+  try {
+    const res = await fetch(url);
 
-  return data.features;
+    const data = await res.json();
+
+    return data.features;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 };
