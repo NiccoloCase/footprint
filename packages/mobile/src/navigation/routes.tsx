@@ -23,6 +23,7 @@ import {ProfileScreenDrawerContent} from "../components/ProfileScreenDrawer";
 import {TabBar} from "../components/TabBar";
 
 // SCHERMATE
+import {SplashScreen} from "../screens/SplashScreen";
 import {WelcomeScreen} from "../screens/authScreens/Welcome";
 import {SignInScreen} from "../screens/authScreens/SignIn";
 import {SignUpScreen} from "../screens/authScreens/SignUp";
@@ -487,6 +488,7 @@ const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
 );
 
 export const Navigation = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const isAuth = useStoreState((state) => state.auth.isAuthenticated);
   const singin = useStoreActions((actions) => actions.auth.singin);
 
@@ -509,9 +511,12 @@ export const Navigation = () => {
         }
       } finally {
         NativeSplashScreen.hide();
+        setIsLoading(false);
       }
     })();
   }, []);
+
+  if (isLoading) return <SplashScreen />;
 
   return (
     <NavigationContainer>
