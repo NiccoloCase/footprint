@@ -77,12 +77,14 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
    */
   const goToFootprint = (index: number) => () => {
     if (footprints && footprints.length > 0) {
-      const {id, title, author} = footprints[index];
+      const {id, title, author, media} = footprints[index];
 
       navigation.navigate("Footprint", {
-        title,
         id,
+        title,
+        image: media,
         authorUsername: author.username,
+        authorProfileImage: author.profileImage,
       });
     }
   };
@@ -105,17 +107,21 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
         </TouchableWithoutFeedback>
         <View style={styles.content}>
           <View style={styles.contentWrapper}>
-            <Text style={[styles.text, styles.username]} numberOfLines={1}>
-              {item.author.username}
-            </Text>
-            <Text style={[styles.text, styles.title]} numberOfLines={4}>
-              {item.title}
-            </Text>
+            <SharedElement id={`footprint.${item.id}.username`}>
+              <Text style={[styles.text, styles.username]} numberOfLines={1}>
+                {item.author.username}
+              </Text>
+            </SharedElement>
+            <SharedElement id={`footprint.${item.id}.title`}>
+              <Text style={[styles.text, styles.title]} numberOfLines={4}>
+                {item.title}
+              </Text>
+            </SharedElement>
             <View style={{flexDirection: "row"}}>
               <Icon name="map-marker-alt" color={Colors.primary} size={18} />
               <View>
                 <Text style={[styles.text, styles.location]} numberOfLines={2}>
-                  {/* item.locationName || */ "Firenze"}
+                  {item.location.locationName}
                 </Text>
                 {distance && (
                   <Text
@@ -127,11 +133,6 @@ export const ExploreCarousel: React.FC<ExploreCarouselProps> = ({
               </View>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.goIcon}
-            onPress={goToFootprint(index)}>
-            <AntDesignIcon name="arrowright" color={Colors.primary} size={28} />
-          </TouchableOpacity>
         </View>
       </Animated.View>
     );
@@ -160,7 +161,6 @@ const styles = StyleSheet.create({
     bottom: 15,
   },
   card: {
-    // backgroundColor: "blue",
     flexDirection: "row",
   },
 
@@ -198,9 +198,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: Colors.darkGrey,
-  },
-  goIcon: {
-    alignSelf: "flex-end",
   },
   location: {
     marginLeft: 5,

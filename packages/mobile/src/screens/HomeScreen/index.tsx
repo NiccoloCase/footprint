@@ -74,7 +74,7 @@ export const HomeScreen: React.FC = () => {
 
     // Se l'elemento visualizzato è il penltimo chiama l'API
     // per altri footprints
-    if (!loading && index >= feed.length - 2 && !areThereNoMoreItems) {
+    if (!loading && index >= feed.length - 3 && !areThereNoMoreItems) {
       try {
         if (fetchMore)
           await fetchMore({
@@ -152,7 +152,7 @@ export const HomeScreen: React.FC = () => {
         footprintId={item.footprint!.id}
         authorId={item.footprint!.authorId}
         title={item.footprint!.title}
-        username={item.footprint!.author.username || "nicco"}
+        username={item.footprint!.author.username}
         locationName={item.footprint!.location.locationName}
         image={item.footprint!.media!}
         profilePicture={item.footprint!.author.profileImage}
