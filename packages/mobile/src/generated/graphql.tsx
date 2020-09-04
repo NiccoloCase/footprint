@@ -662,6 +662,10 @@ export type AddFootprintMutation = (
   & { addFootprint: (
     { __typename?: 'Footprint' }
     & Pick<Footprint, 'id'>
+    & { author: (
+      { __typename?: 'User' }
+      & Pick<User, 'username' | 'profileImage'>
+    ) }
   ) }
 );
 
@@ -1454,6 +1458,10 @@ export const AddFootprintDocument = gql`
     mutation AddFootprint($title: String!, $body: String!, $coordinates: [Float!]!, $media: String!, $locationName: String!) {
   addFootprint(title: $title, body: $body, coordinates: $coordinates, media: $media, locationName: $locationName) {
     id
+    author {
+      username
+      profileImage
+    }
   }
 }
     `;

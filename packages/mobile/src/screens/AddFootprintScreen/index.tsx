@@ -1,20 +1,16 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   KeyboardAvoidingView,
 } from "react-native";
 import {Spacing, Colors} from "../../styles";
-import {uploadImage} from "../../utils/cloudinary";
 import {SolidInput, TextArea} from "../../components/inputs";
 import {useFormik, FormikHelpers} from "formik";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import EntypoIcon from "react-native-vector-icons/Entypo";
-import rgba from "hex-to-rgba";
 import {useStoreState, useStoreActions} from "../../store";
 import {getPlaceNameFromCoordinates} from "../../utils/geocode";
 import {MediaPickerModal, SelectModal} from "../../components/modals";
@@ -25,12 +21,13 @@ import {AddFootprintFormValidationSchema} from "../../utils/validation";
 import {ScrollView} from "react-native-gesture-handler";
 import {ErrorBadge} from "../../components/badges";
 import {useAddFootprintMutation} from "../../generated/graphql";
-import Snackbar from "react-native-snackbar";
-import {Spinner} from "../../components/Spinner";
+import {SubmitButton} from "../../components/buttons";
+import {usePostComment} from "../../utils/hooks";
+import {usePostFootprint} from "./usePostFootprint";
 
 type AddFootprintScreenProps = StackScreenProps<AppStackParamList, "Home">;
 
-interface AddFootprintFormValues {
+export interface AddFootprintFormValues {
   title: string;
   body: string;
   media?: ImageSource;
@@ -43,16 +40,17 @@ export const AddFootprintScreen: React.FC<AddFootprintScreenProps> = ({
 }) => {
   // URL dell'immagine caricata nei server
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-
-  // posizione
+  // Posizione
   const GPSposition = useStoreState((s) => s.geo.userPosition);
   const GPSError = useStoreState((s) => s.geo.error);
   const fetchGPSPosition = useStoreActions((a) => a.geo.fetchPosition);
   const [locationNames, setLocationNames] = useState<string[]>([]);
   const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
+  // Modal per selezionare una foto
+  const [isPickerModalOpen, setIsPickerModalOpen] = useState(false);
 
-  // GRAPHQL
-  const [postFootprint] = useAddFootprintMutation();
+  // Posta il footprint
+  const onSubmit = usePostFootprint(uploadedImage, setUploadedImage);
 
   // FORM
   const formik = useFormik<AddFootprintFormValues>({
@@ -91,9 +89,6 @@ export const AddFootprintScreen: React.FC<AddFootprintScreenProps> = ({
     })();
   }, [GPSposition]);
 
-  // MODAL per selezionare una foto
-  const [isPickerModalOpen, setIsPickerModalOpen] = useState(false);
-
   /**
    * Visualizza l'immagine a schermo intero
    */
@@ -114,54 +109,6 @@ export const AddFootprintScreen: React.FC<AddFootprintScreenProps> = ({
     // imposta la nuova immagine
     setFieldValue("media", media);
   };
-
-  /**
-   * Crea un nuovo footprint
-   */
-  async function onSubmit(
-    values: AddFootprintFormValues,
-    {resetForm}: FormikHelpers<AddFootprintFormValues>,
-  ) {
-    const {title, body, media, coordinates, locationName} = values;
-    if (!media || !coordinates) return;
-
-    try {
-      let mediaURL: string;
-      // Controlla se è già stata caricata un'immagine
-      if (uploadedImage) {
-        mediaURL = uploadedImage;
-      } else {
-        // Carica l'immagine nel server
-        const {url} = await uploadImage(media);
-        // Salva l'immagine caricata nello stato
-        setUploadedImage(url);
-        mediaURL = url;
-      }
-
-      const {data, errors} = await postFootprint({
-        variables: {title, body, media: mediaURL, coordinates, locationName},
-      });
-
-      if (!data || !data.addFootprint.id || errors) throw new Error();
-
-      // Resetta il form
-      resetForm();
-
-      // Porta l'utete alla schermata del footprint
-      navigation.navigate("Footprint", {
-        id: data.addFootprint.id,
-        title,
-        image: mediaURL,
-      });
-    } catch (err) {
-      Snackbar.show({
-        text:
-          "Non è stato possibile pubblicare il footprint. Riprova più tardi",
-        duration: Snackbar.LENGTH_LONG,
-        backgroundColor: Colors.primary,
-      });
-    }
-  }
 
   const {
     values,
@@ -282,24 +229,12 @@ export const AddFootprintScreen: React.FC<AddFootprintScreenProps> = ({
               </View>
             </View>
             {/** BOTTONE DI SUBMIT */}
-            <View>
-              <TouchableHighlight
-                disabled={isSubmitting || (!GPSError && !GPSposition)}
-                style={styles.submitButtonWrapper}
-                underlayColor={rgba(Colors.primary, 0.6)}
-                onPress={formik.handleSubmit as any}>
-                <View style={styles.submitButton}>
-                  <Text style={styles.submitButtonText}>Pubblica</Text>
-                  {isSubmitting ? (
-                    <View>
-                      <Spinner color={Colors.primary} size={25} />
-                    </View>
-                  ) : (
-                    <EntypoIcon name="plus" color={Colors.primary} size={25} />
-                  )}
-                </View>
-              </TouchableHighlight>
-            </View>
+            <SubmitButton
+              title="Posta il footprint"
+              isLoading={isSubmitting}
+              onPress={formik.handleSubmit as any}
+              disabled={isSubmitting || (!GPSError && !GPSposition)}
+            />
           </SafeAreaView>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -328,7 +263,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: Spacing.screenHorizontalPadding,
-    paddingVertical: 30,
+    paddingTop: 30,
+    paddingBottom: 10,
     justifyContent: "space-around",
   },
   inline: {
@@ -349,23 +285,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     marginRight: 15,
-  },
-  submitButtonWrapper: {
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: rgba(Colors.primary, 0.4),
-    justifyContent: "center",
-  },
-  submitButton: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  submitButtonText: {
-    fontSize: 17,
-    color: Colors.primary,
-    fontWeight: "bold",
-    marginHorizontal: 15,
   },
   positionErrorMessage: {
     color: Colors.darkGrey,

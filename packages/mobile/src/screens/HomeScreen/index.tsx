@@ -22,7 +22,7 @@ import {LIKES_PER_BUCKET} from "@footprint/config/dist/constants";
 
 const {width} = Dimensions.get("screen");
 const FEED_CARD_WIDTH = (width * 90) / 100;
-const ITEMS_PER_BUCKET = 10;
+export const FEED_ITEMS_PER_QUERY = 10;
 
 export const HomeScreen: React.FC = () => {
   const carousel = useRef<Carousel<NewsFeedItem> | null>(null);
@@ -35,7 +35,10 @@ export const HomeScreen: React.FC = () => {
 
   // GRAPHQL
   const {data, loading, fetchMore, refetch} = useGetNewsFeedQuery({
-    variables: {pagination: {limit: ITEMS_PER_BUCKET}, isLikedBy: loggesUser},
+    variables: {
+      pagination: {limit: FEED_ITEMS_PER_QUERY},
+      isLikedBy: loggesUser,
+    },
     notifyOnNetworkStatusChange: true,
   });
   const [seeFeedItem] = useMarkFeedItemAsSeenMutation();
@@ -76,7 +79,7 @@ export const HomeScreen: React.FC = () => {
         if (fetchMore)
           await fetchMore({
             variables: {
-              pagination: {offset: feed.length, limit: ITEMS_PER_BUCKET},
+              pagination: {offset: feed.length, limit: FEED_ITEMS_PER_QUERY},
             },
             updateQuery: (prev, {fetchMoreResult}) => {
               if (!fetchMoreResult) return prev;

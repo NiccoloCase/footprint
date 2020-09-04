@@ -86,26 +86,36 @@ const MediaPickerModal: React.FC<MedaPickerModalProps> = ({
       closeOnPressMask={true}
       onClose={onClose}
       onOpen={onOpen}
+      height={300}
       customStyles={{container: styles.container}}>
       <Text style={styles.title}>Scegli foto</Text>
 
       <View style={styles.buttonsWrapper}>
         <TouchableHighlight
-          underlayColor="#eee"
+          underlayColor="#f6f6f6"
           style={styles.button}
           onPress={handlePickPhoto("library")}>
           <View style={styles.buttonWrapper}>
-            <Text style={styles.buttonText}>Seleziona dalla galleria</Text>
             <Icon name="photo" size={25} color={TEXT_COLOR} />
+            <Text style={styles.buttonText}>Seleziona dalla galleria</Text>
           </View>
         </TouchableHighlight>
         <TouchableHighlight
-          underlayColor="#eee"
-          style={[styles.button, styles.buttonOutile]}
+          underlayColor="#f6f6f6"
+          style={styles.button}
           onPress={handlePickPhoto("camera")}>
           <View style={styles.buttonWrapper}>
-            <Text style={styles.buttonText}>Scatta una foto</Text>
             <Icon name="add-a-photo" size={25} color={TEXT_COLOR} />
+            <Text style={styles.buttonText}>Scatta una foto</Text>
+          </View>
+        </TouchableHighlight>
+
+        <TouchableHighlight
+          underlayColor="#eee"
+          onPress={onClose}
+          style={[styles.button, {backgroundColor: "#f6f6f6"}]}>
+          <View style={styles.buttonWrapper}>
+            <Text style={styles.closeText}>Chiudi</Text>
           </View>
         </TouchableHighlight>
       </View>
@@ -122,7 +132,7 @@ const styles = StyleSheet.create({
     color: Colors.darkGrey,
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 26,
+    fontSize: 24,
     paddingVertical: 10,
   },
   buttonsWrapper: {
@@ -130,15 +140,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   button: {
-    backgroundColor: "#f6f6f6",
     paddingVertical: 15,
     paddingHorizontal: 5,
     borderRadius: 10,
-  },
-  buttonOutile: {
-    borderColor: "#eee",
-    borderWidth: 4,
-    backgroundColor: "transparent",
   },
   buttonWrapper: {
     flexDirection: "row",
@@ -147,7 +151,12 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: TEXT_COLOR,
-    marginRight: 15,
+    marginLeft: 10,
+    fontSize: 18,
+  },
+  closeText: {
+    fontWeight: "bold",
+    color: Colors.darkGrey,
     fontSize: 18,
   },
 });

@@ -141,6 +141,10 @@ mutation AddFootprint(
     locationName: $locationName
   ) {
     id
+    author {
+      username
+      profileImage
+    }
   }
 }
 
