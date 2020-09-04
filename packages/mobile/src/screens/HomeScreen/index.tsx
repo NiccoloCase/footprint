@@ -18,21 +18,24 @@ import {
 import {Spinner} from "../../components/Spinner";
 import {ScrollView} from "react-native-gesture-handler";
 import {useStoreState} from "../../store";
-import {cos} from "react-native-reanimated";
+import {LIKES_PER_BUCKET} from "@footprint/config/dist/constants";
 
 const {width} = Dimensions.get("screen");
 const FEED_CARD_WIDTH = (width * 90) / 100;
+const ITEMS_PER_BUCKET = 10;
 
 export const HomeScreen: React.FC = () => {
   const carousel = useRef<Carousel<NewsFeedItem> | null>(null);
   // Se il feed si sta venendo aggiornato
   const [refreshing, setRefreshing] = useState(false);
+  // Se non ci sono più elementi nel feed
+  const [areThereNoMoreItems, setAreThereNoMoreItems] = useState(false);
   // Utente autenticato
   const loggesUser = useStoreState((s) => s.auth.userId);
 
   // GRAPHQL
   const {data, loading, fetchMore, refetch} = useGetNewsFeedQuery({
-    variables: {pagination: {limit: 10}, isLikedBy: loggesUser},
+    variables: {pagination: {limit: ITEMS_PER_BUCKET}, isLikedBy: loggesUser},
     notifyOnNetworkStatusChange: true,
   });
   const [seeFeedItem] = useMarkFeedItemAsSeenMutation();
@@ -47,10 +50,11 @@ export const HomeScreen: React.FC = () => {
   // Funzione chiamata quando viene caricato per la prima volta il feed
   useEffect(() => {
     if (!loading && refreshing) setRefreshing(false);
-
-    if (!data) return;
-    const firstFeedItem = data.getNewsFeed[0];
-    markFeedItemAsSeen(firstFeedItem);
+    else if (data) {
+      // Segna come letto il primo elemento del feed
+      const firstFeedItem = data.getNewsFeed[0];
+      if (!firstFeedItem.isSeen) markFeedItemAsSeen(firstFeedItem);
+    }
   }, [loading]);
 
   /**
@@ -67,24 +71,29 @@ export const HomeScreen: React.FC = () => {
 
     // Se l'elemento visualizzato è il penltimo chiama l'API
     // per altri footprints
-    if (!loading && index >= feed.length - 2) {
+    if (!loading && index >= feed.length - 2 && !areThereNoMoreItems) {
       try {
-        await fetchMore({
-          variables: {
-            pagination: {offset: feed.length},
-          },
-          updateQuery: (prev, {fetchMoreResult}) => {
-            if (!fetchMoreResult) return prev;
-            return Object.assign({}, prev, {
-              getNewsFeed: [
-                ...prev.getNewsFeed,
-                ...fetchMoreResult.getNewsFeed,
-              ],
-            });
-          },
-        });
+        if (fetchMore)
+          await fetchMore({
+            variables: {
+              pagination: {offset: feed.length, limit: ITEMS_PER_BUCKET},
+            },
+            updateQuery: (prev, {fetchMoreResult}) => {
+              if (!fetchMoreResult) return prev;
+              // Controlla se sono finiti gli elementi del feed
+              if (fetchMoreResult.getNewsFeed.length < LIKES_PER_BUCKET)
+                setAreThereNoMoreItems(true);
+              // Aggiorna la cache
+              return Object.assign({}, prev, {
+                getNewsFeed: [
+                  ...prev.getNewsFeed,
+                  ...fetchMoreResult.getNewsFeed,
+                ],
+              });
+            },
+          });
       } catch (err) {
-        console.error(err);
+        console.log(err);
       }
     }
   };
@@ -102,7 +111,7 @@ export const HomeScreen: React.FC = () => {
         });
         if (!errors && data) feedItem.isSeen = true;
       } catch (err) {
-        console.error(err);
+        console.log(err);
       }
     }
   };
@@ -114,6 +123,7 @@ export const HomeScreen: React.FC = () => {
     if (loading) return;
     refetch();
     setRefreshing(true);
+    setAreThereNoMoreItems(false);
   };
 
   /**
@@ -145,11 +155,10 @@ export const HomeScreen: React.FC = () => {
         profilePicture={item.footprint!.author.profileImage}
         userHasLiked={!!item.footprint!.isLikedBy}
         likesCount={item.footprint!.likesCount}
+        createdData={item.footprint!.created_at}
       />
     );
   };
-
-  // if (feedItems[0]) console.log(feedItems[0].footprint!.isLikedBy);
 
   /**
    * Renderizza il feed

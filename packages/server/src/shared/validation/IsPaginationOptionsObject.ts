@@ -4,12 +4,9 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
   ValidationArguments,
-  isLongitude,
-  isLatitude,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { Location, PaginationOptions } from '../../graphql';
-import { validationConfig } from '@footprint/config';
+import { PaginationOptions } from '../../graphql';
 
 /**
  * Controlla che l'oggetto passato sia del tipo delle opzioni dell'impaginazione
@@ -24,11 +21,11 @@ export class IsPaginationOptionsObjectConstraint
 
     // Limita
     const { limit } = payload;
-    if (limit < 0) return false;
+    if (limit && (typeof limit !== 'number' || limit < 0)) return false;
 
     // Offset
     const { offset } = payload;
-    if (offset > 0) return false;
+    if (offset && (typeof offset !== 'number' || offset < 0)) return false;
 
     return true;
   }

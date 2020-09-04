@@ -11,6 +11,7 @@ import {FootprintLikeButton} from "../../components/buttons";
 import {useNavigation} from "@react-navigation/native";
 import {SharedElement} from "react-navigation-shared-element";
 import {useNavigateToUserProfile} from "../../navigation/navigateToUserProfile";
+import {timeSince} from "../../utils/format";
 
 interface FootprintCardProps {
   current: boolean;
@@ -24,6 +25,7 @@ interface FootprintCardProps {
   locationName: string;
   likesCount: number;
   userHasLiked?: boolean;
+  createdData: Date | number | string;
 }
 
 export const FootprintCard: React.FC<FootprintCardProps> = ({
@@ -37,6 +39,7 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
   locationName,
   likesCount,
   userHasLiked,
+  createdData,
 }) => {
   const [opacity, setOpacity] = useState(1);
   const navigateToProfile = useNavigateToUserProfile();
@@ -113,7 +116,9 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
                 </SharedElement>
               </TouchableWithoutFeedback>
               <SharedElement id={`footprint.${footprintId}.data`}>
-                <Text style={[styles.text, {color: "#ddd"}]}>34 min fa</Text>
+                <Text style={[styles.text, {color: "#ddd"}]}>
+                  {timeSince(createdData)}
+                </Text>
               </SharedElement>
             </View>
           </View>

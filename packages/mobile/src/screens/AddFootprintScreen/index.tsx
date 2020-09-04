@@ -148,7 +148,6 @@ export const AddFootprintScreen: React.FC<AddFootprintScreenProps> = ({
       resetForm();
 
       // Porta l'utete alla schermata del footprint
-      //  TODO
       navigation.navigate("Footprint", {
         id: data.addFootprint.id,
         title,
