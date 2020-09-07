@@ -7,10 +7,15 @@
     ],
     "nohoist": [
       "**/react",
-      "**/react/**"
+      "**/react/**",
+      "**/react-native",
+      "**/react-native/**"
     ]
   },
-  "scripts": {},
+  "scripts": {
+    "postinstall": "yarn run build:server",
+    "build:server": "lerna run build --scope={@footprint/config,@footprint/common,@footprint/server}"
+  },
   "devDependencies": {
     "lerna": "^3.20.2"
   }
