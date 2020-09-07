@@ -15,10 +15,6 @@ export interface IConfigKeys {
     /** URI di conessione al server */
     URI: string;
   };
-  webApp: {
-    /** Dominio della webapp */
-    DOMAIN: string;
-  };
   /** Autorizzazione tramite google */
   googleOAuth: {
     WEB_CLIENT_ID: string;

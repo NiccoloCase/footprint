@@ -14,7 +14,7 @@ import { UploaderModule } from './uploader/uploader.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
 import { keys } from '@footprint/config';
-import { IsEmailAlreadyUsedConstraint } from './shared/validation';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -52,5 +52,6 @@ import { IsEmailAlreadyUsedConstraint } from './shared/validation';
     CommentsModule,
     LikesModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
