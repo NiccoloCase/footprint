@@ -8,7 +8,9 @@ import {
   FlatList,
   ListRenderItemInfo,
   RefreshControl,
+  Image,
 } from "react-native";
+import LottieView from "lottie-react-native";
 import {Spacing, Colors} from "../../styles";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -24,7 +26,7 @@ import {
 import {useStoreState} from "../../store";
 import {StackScreenProps} from "@react-navigation/stack";
 import {AppStackParamList} from "../../navigation";
-import {Spinner} from "../../components/Spinner";
+import {Spinner, LogoSpinner} from "../../components/Spinner";
 import Snackbar from "react-native-snackbar";
 import {constants} from "@footprint/config";
 import {CommentCard} from "./CommentCard";
@@ -193,9 +195,11 @@ export const CommentsScreen: React.FC<CommentsScreenProps> = ({route}) => {
    * Ricarica i commenti
    */
   const onRefresh = () => {
-    setIsRefreshing(true);
-    setAreCommentsGone(false);
-    refetch();
+    try {
+      setIsRefreshing(true);
+      setAreCommentsGone(false);
+      refetch();
+    } catch (err) {}
   };
 
   /**
@@ -233,21 +237,37 @@ export const CommentsScreen: React.FC<CommentsScreenProps> = ({route}) => {
 
   const renderContent = () => {
     if (error)
-      // TODO
+      // SCHEMRATA DI ERRORE
       return (
         <View style={styles.center}>
-          <Text style={styles.text}>Si è verificato un errore</Text>
+          <LottieView
+            source={require("../../assets/lottie/pc-error.json")}
+            resizeMode="cover"
+            style={{width: 230, height: 230}}
+            autoPlay
+            loop
+          />
+          <Text style={styles.message}>Si è verificato un errore!</Text>
+          <TouchableOpacity style={styles.reloadButton} onPress={onRefresh}>
+            <Text style={styles.reloadButtonText}>Riprova</Text>
+            <Icon name="redo" color="#fff" size={20} />
+          </TouchableOpacity>
         </View>
       );
+    // NON CI SONO COMMENTI
     else if (data && data.getComments.length === 0)
-      // TODO
       return (
         <View style={styles.center}>
-          <Text style={styles.text}>
+          <Image
+            source={require("../../assets/images/tv.png")}
+            style={styles.noCommentsImage}
+          />
+          <Text style={styles.message}>
             Non ci sono ancora commenti.{"\n"}Postane uno te per primo!
           </Text>
         </View>
       );
+    // MOSTRA I COMMENTI
     else if (data)
       return (
         <FlatList
@@ -267,10 +287,11 @@ export const CommentsScreen: React.FC<CommentsScreenProps> = ({route}) => {
           ListFooterComponent={renderFooter}
         />
       );
+    // SCHRMATA DI CARICAMENTO
     else
       return (
         <View style={styles.center}>
-          <Spinner color={Colors.primary} />
+          <LogoSpinner />
         </View>
       );
   };
@@ -339,13 +360,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.screenHorizontalPadding,
     paddingVertical: 15,
-  },
-  text: {
-    color: Colors.darkGrey,
-    fontWeight: "bold",
-    fontSize: 15,
-    lineHeight: 25,
-    textAlign: "center",
   },
   card: {
     height: "100%",
@@ -450,5 +464,32 @@ const styles = StyleSheet.create({
   commentFooter: {
     marginTop: 7,
     justifyContent: "flex-end",
+  },
+  // Scharmata di errore
+  reloadButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  reloadButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 18,
+    marginRight: 15,
+  },
+  message: {
+    color: Colors.darkGrey,
+    fontWeight: "bold",
+    fontSize: 18,
+    textAlign: "center",
+  },
+  noCommentsImage: {
+    height: 200,
+    width: 270,
+    marginBottom: 25,
   },
 });

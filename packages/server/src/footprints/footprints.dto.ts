@@ -2,8 +2,8 @@ import {
   Length,
   IsLongitude,
   IsLatitude,
-  IsPositive,
   IsOptional,
+  Min,
 } from 'class-validator';
 import { validationConfig } from '@footprint/config';
 import { IsCoordinatesArray } from '../shared/validation';
@@ -38,10 +38,10 @@ export class GetNearFootprintsDTO {
   lat: number;
   // DISTANZA MINIMA
   @IsOptional()
-  @IsPositive()
+  @Min(0)
   minDistance?: number;
   // DISTANZA MASSIMA
   @IsOptional()
-  @IsPositive()
+  @Min(0)
   maxDistance?: number;
 }

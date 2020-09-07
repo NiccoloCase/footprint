@@ -1,7 +1,8 @@
-import { IsPositive } from 'class-validator';
+import { Min, IsOptional } from 'class-validator';
 
 export class GetLikesDTO {
   footprintId: string;
-  @IsPositive()
+  @IsOptional()
+  @Min(0)
   page?: number;
 }

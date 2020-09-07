@@ -2,24 +2,28 @@ import React, {useEffect, useState, useRef, useMemo} from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Dimensions,
   SafeAreaView,
   RefreshControl,
+  Image,
+  StyleSheet,
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
-import {Spacing, Colors} from "../../styles";
+import {Colors, Spacing} from "../../styles";
 import {FootprintCard} from "./FootprintCard";
 import {
   useGetNewsFeedQuery,
   NewsFeedItem,
   useMarkFeedItemAsSeenMutation,
 } from "../../generated/graphql";
-import {Spinner} from "../../components/Spinner";
-import {ScrollView} from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import {LogoSpinner} from "../../components/Spinner";
+import {ScrollView, TouchableOpacity} from "react-native-gesture-handler";
+import LottieView from "lottie-react-native";
 import {useStoreState} from "../../store";
-import {LIKES_PER_BUCKET} from "@footprint/config/dist/constants";
+import {constants} from "@footprint/config";
 
+const {LIKES_PER_BUCKET} = constants;
 const {width} = Dimensions.get("screen");
 const FEED_CARD_WIDTH = (width * 90) / 100;
 export const FEED_ITEMS_PER_QUERY = 10;
@@ -167,8 +171,26 @@ export const HomeScreen: React.FC = () => {
    * Renderizza il feed
    */
   const renderFeed = () => {
+    // Il feed sta caricando
+    if (loading)
+      return (
+        <View style={styles.centered}>
+          <LogoSpinner />
+        </View>
+      );
+    // Il feed è vuoto
+    else if (data && feedItems.length === 0)
+      return (
+        <View style={styles.centered}>
+          <Image
+            source={require("../../assets/images/tv.png")}
+            style={{height: 200, width: 270}}
+          />
+          <Text style={styles.message}>Non ci sono ancora footprint!</Text>
+        </View>
+      );
     // Mostra il feed
-    if (feedItems.length > 0)
+    else if (data)
       return (
         <Carousel
           ref={carousel}
@@ -181,26 +203,23 @@ export const HomeScreen: React.FC = () => {
           layout="tinder"
         />
       );
-    // Il feed è vuoto
-    else if (data && feedItems.length === 0)
-      // TODO:
-      return <Text>Il feed è vuoto</Text>;
-    // Il feed st caricando
-    else if (loading)
-      return (
-        <View
-          style={{
-            backgroundColor: "#eee",
-            height: "100%",
-            width: FEED_CARD_WIDTH,
-            borderRadius: 10,
-          }}>
-          <Spinner color={Colors.primary} />
-        </View>
-      );
     // Si è verificatro un errore
-    // TODO:
-    else return <Text>Errore</Text>;
+    return (
+      <View style={styles.centered}>
+        <LottieView
+          source={require("../../assets/lottie/pc-error.json")}
+          resizeMode="cover"
+          style={{width: 230, height: 230}}
+          autoPlay
+          loop
+        />
+        <Text style={styles.message}>Si è verificato un errore!</Text>
+        <TouchableOpacity style={styles.reloadButton} onPress={onRefresh}>
+          <Text style={styles.reloadButtonText}>Riprova</Text>
+          <Icon name="redo" color="#fff" size={20} />
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   return (
@@ -231,5 +250,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 20,
     paddingHorizontal: Spacing.screenHorizontalPadding,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  message: {
+    color: Colors.darkGrey,
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  reloadButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  reloadButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 18,
+    marginRight: 15,
   },
 });

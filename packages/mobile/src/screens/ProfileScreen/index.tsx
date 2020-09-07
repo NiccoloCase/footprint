@@ -1,12 +1,14 @@
 import React, {useState} from "react";
 import {SafeAreaView, StatusBar, View, StyleSheet, Text} from "react-native";
 import Animated from "react-native-reanimated";
+import LottieView from "lottie-react-native";
 import {StackScreenProps} from "@react-navigation/stack";
 import {useFocusEffect} from "@react-navigation/native";
+import Icon from "react-native-vector-icons/FontAwesome5";
 import {MyProfileDrawerParamList, AppStackParamList} from "../../navigation";
 import {HEADER_DELTA} from "./dimensions";
 import {MeDocument, GetUserByIdDocument, User} from "../../generated/graphql";
-import {Spinner} from "../../components/Spinner";
+import {LogoSpinner} from "../../components/Spinner";
 import {Colors} from "../../styles";
 import {useStoreState} from "../../store";
 
@@ -15,6 +17,7 @@ import {Content} from "./Content";
 import {Header} from "./Header";
 import {Cover} from "./Cover";
 import {client} from "../../graphql";
+import {TouchableOpacity} from "react-native-gesture-handler";
 
 const {Value, interpolate, Extrapolate} = Animated;
 
@@ -107,21 +110,26 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
       );
     }
     // SCHERMATA DI ERRORE
-    // todo
     else if (errorOccurred) {
       return (
-        <View style={styles.loadingContainer}>
+        <View style={styles.container}>
           <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-          <Text>Si è verificato un errore. Riporva più tardi</Text>
+          <LottieView
+            source={require("../../assets/lottie/pc-error.json")}
+            resizeMode="cover"
+            style={{width: 230, height: 230}}
+            autoPlay
+            loop
+          />
+          <Text style={styles.message}>Si è verificato un errore!</Text>
         </View>
       );
     }
     // SCHERMATA DI CARICAMENTO
     else
       return (
-        <View style={styles.loadingContainer}>
-          <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-          <Spinner color={Colors.primary} size={40} />
+        <View style={styles.container}>
+          <LogoSpinner />
         </View>
       );
   };
@@ -130,10 +138,15 @@ export const ProfileScreen: React.FC<SearchScreenProps> = ({route}) => {
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: {
+  container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#fff",
+  },
+  message: {
+    color: Colors.darkGrey,
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

@@ -12,6 +12,7 @@ import {Spinner} from "../../components/Spinner";
 import {User} from "../../generated/graphql";
 import {useNavigateToUserProfile} from "../../navigation/navigateToUserProfile";
 import {Colors} from "../../styles";
+import LottieView from "lottie-react-native";
 
 const AVATAR_RADIUS = 30;
 
@@ -81,12 +82,28 @@ export const FollowersScreenContent: React.FC<FollowersScreenContentProps> = ({
           : "non segue ancora nessuno"
       }`}</Text>
     );
-  // TODO ERROR
-  else if (error) return <Spinner color={Colors.primary} />;
+  else if (error)
+    return (
+      <View style={styles.container}>
+        <LottieView
+          source={require("../../assets/lottie/pc-error.json")}
+          resizeMode="cover"
+          style={{width: 230, height: 230}}
+          autoPlay
+          loop
+        />
+        <Text style={styles.errorMessage}>Si è verificato un errore!</Text>
+      </View>
+    );
   else return <Spinner color={Colors.primary} />;
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   content: {
     marginTop: 25,
   },
@@ -117,5 +134,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "center",
     textAlignVertical: "center",
+  },
+  errorMessage: {
+    color: Colors.darkGrey,
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

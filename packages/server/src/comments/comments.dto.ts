@@ -1,4 +1,4 @@
-import { Length, IsPositive } from 'class-validator';
+import { Length, Min, IsOptional, IsInt } from 'class-validator';
 import { validationConfig } from '@footprint/config';
 
 export class PostCommentDTO {
@@ -14,6 +14,8 @@ export interface DeleteCommentDTO {
 
 export class GetCommentsDTO {
   contentId: string;
-  @IsPositive()
+  @IsInt()
+  @Min(0)
+  @IsOptional()
   page: number;
 }
