@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {TouchableOpacity} from "react-native";
+import {TouchableOpacity, StatusBar} from "react-native";
 import {NavigationContainer} from "@react-navigation/native";
 import {
   createStackNavigator,
@@ -11,7 +11,7 @@ import {createDrawerNavigator} from "@react-navigation/drawer";
 import {MainHeader} from "../components/Header";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import {fetchAccessToken} from "../utils/fetchAccessToken";
-import {useStoreActions, useStoreState} from "../store";
+import {useStoreActions, useStoreState, store} from "../store";
 import {Colors} from "../styles";
 import hexToRgba from "hex-to-rgba";
 import {GetNewsFeedDocument} from "../generated/graphql";
@@ -29,7 +29,7 @@ import {SignInScreen} from "../screens/authScreens/SignIn";
 import {SignUpScreen} from "../screens/authScreens/SignUp";
 import {VerifyEmail} from "../screens/authScreens/VerifyEmail";
 import {ForgotPasswordScreen} from "../screens/authScreens/ForgotPassword";
-import {HomeScreen} from "../screens/HomeScreen";
+import {HomeScreen, FEED_ITEMS_PER_QUERY} from "../screens/HomeScreen";
 import {AddFootprintScreen} from "../screens/AddFootprintScreen";
 import {ExploreScreen} from "../screens/ExploreScreen";
 import {ProfileScreen} from "../screens/ProfileScreen";
@@ -475,17 +475,23 @@ export type RootStackParamList = {
 const RootStack = createStackNavigator<RootStackParamList>();
 const RootStackScreen: React.FC<{isAutheticated: boolean}> = ({
   isAutheticated,
-}) => (
-  <RootStack.Navigator
-    headerMode="none"
-    screenOptions={{animationEnabled: false}}>
-    {isAutheticated ? (
-      <RootStack.Screen name="App" component={AppStackScreen} />
-    ) : (
-      <RootStack.Screen name="Auth" component={AuthStackScreen} />
-    )}
-  </RootStack.Navigator>
-);
+}) => {
+  useEffect(() => {
+    NativeSplashScreen.hide();
+  }, []);
+
+  return (
+    <RootStack.Navigator
+      headerMode="none"
+      screenOptions={{animationEnabled: false}}>
+      {isAutheticated ? (
+        <RootStack.Screen name="App" component={AppStackScreen} />
+      ) : (
+        <RootStack.Screen name="Auth" component={AuthStackScreen} />
+      )}
+    </RootStack.Navigator>
+  );
+};
 
 export const Navigation = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -504,23 +510,29 @@ export const Navigation = () => {
         if (data && data.success && data.tokens) {
           // Imposta il nuovo token di accesso e quello di aggiornamento
           const {accessToken, refreshToken} = data.tokens;
-          singin({accessToken, refreshToken});
+          await singin({accessToken, refreshToken});
 
           // Richiede il feed per salvarlo nella cache
-          await prefetchFeed({pagination: {limit: 10}});
+          const {userId} = store.getState().auth;
+          await prefetchFeed({
+            pagination: {limit: FEED_ITEMS_PER_QUERY},
+            isLikedBy: userId,
+          });
         }
+      } catch (err) {
+        console.log(err);
       } finally {
-        NativeSplashScreen.hide();
         setIsLoading(false);
       }
     })();
   }, []);
 
   if (isLoading) return <SplashScreen />;
-
-  return (
-    <NavigationContainer>
-      <RootStackScreen isAutheticated={isAuth} />
-    </NavigationContainer>
-  );
+  else
+    return (
+      <NavigationContainer>
+        <RootStackScreen isAutheticated={isAuth} />
+        <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+      </NavigationContainer>
+    );
 };
