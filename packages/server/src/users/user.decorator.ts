@@ -17,6 +17,6 @@ export const CurrentUser = createParamDecorator((data: string, arg: any) => {
   // HTTP context
   else req = arg;
 
-  if (isEmpty(req.user)) return null;
-  return data ? req.user[data] : req.user;
+  if (isEmpty((req as any).user)) return null;
+  return data ? (req as any).user[data] : (req as any).user;
 });
