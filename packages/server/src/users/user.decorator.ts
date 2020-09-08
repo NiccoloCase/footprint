@@ -1,15 +1,12 @@
 import { createParamDecorator } from '@nestjs/common';
-import { Express, Request } from 'express';
+import { Request } from 'express';
 import { isEmpty, isArray } from 'lodash';
-import { IUser } from './users.schema';
 
 /**
  * Restituisce l'oggetto dell'utente se autenticato
  */
 
-export const CurrentUser = createParamDecorator((data: string, arg: any):
-  | IUser
-  | Express.User => {
+export const CurrentUser = createParamDecorator((data: string, arg: any) => {
   let req: Request;
 
   // GRAPHQL contxt
