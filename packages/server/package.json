@@ -46,7 +46,8 @@
     "passport-jwt": "^4.0.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.3.3",
+    "ts-node": "^7.0.1"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",
@@ -66,7 +67,6 @@
     "prettier": "^1.15.3",
     "supertest": "^3.4.1",
     "ts-jest": "^23.10.5",
-    "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.7.0",
     "tslint": "5.12.1",
     "typescript": "^3.2.4"
