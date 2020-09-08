@@ -19,6 +19,4 @@ const secretKeys: RecursivePartial<IConfigKeys> = (function (env) {
   }
 })(process.env.NODE_ENV);
 
-const k = merge(defaultKeys, secretKeys) as IConfigKeys;
-console.log(k);
-export const keys = k;
+export const keys = merge(defaultKeys, secretKeys) as IConfigKeys;
