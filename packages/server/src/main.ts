@@ -13,7 +13,7 @@ async function bootstrap() {
   // Validazione
   app.useGlobalPipes(CustumValidationPipe);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  console.log(keys.server.PORT);
+
   await app.listen(keys.server.PORT);
 }
 bootstrap();
