@@ -2,7 +2,7 @@ import { Controller, Post, Req, Res, Body } from '@nestjs/common';
 import { verify } from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { RefreshTokenPayload } from './auth.types';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { keys } from '@footprint/config';
 import { RefreshTokenDTO } from './auth.dto';

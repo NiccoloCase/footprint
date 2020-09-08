@@ -16,7 +16,6 @@ import { CurrentUser } from '../users/user.decorator';
 import { IUser } from '../users/users.schema';
 import { BadRequestException, UseGuards } from '@nestjs/common';
 import { GoogleStrategyResult } from './auth.types';
-import { type } from 'os';
 
 @Resolver('Auth')
 export class AuthResolver {
