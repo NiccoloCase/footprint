@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import {
   getExecutionContextType,
   ExecutionContextType,
-} from 'src/shared/executionContext';
+} from '../shared/executionContext';
 
 /**
  * Percorso privato.
