@@ -4,9 +4,12 @@ import {keys} from "@footprint/config";
 /**
  * URL dell'API del server
  */
-export const API_URL = keys.IS_PRODUCTION
-  ? keys.server.API_URL
-  : `http://${Platform.OS === "android" ? "10.0.2.2" : "localhost"}:5000/api`;
+export const API_URL =
+  keys.IS_PRODUCTION || !__DEV__
+    ? // API per la produzione
+      keys.server.API_URL
+    : // API per lo sviluppo
+      `http://${Platform.OS === "android" ? "10.0.2.2" : "localhost"}:5000/api`;
 
 /**
  * URL dell'API di Mapbox

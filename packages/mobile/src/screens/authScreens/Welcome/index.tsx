@@ -17,7 +17,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
       </ImageBackground>
       <View style={styles.wrapper}>
         <Text style={styles.title}>Ciao!</Text>
-
+        <Text style={styles.title}>{__DEV__ + ""}</Text>
         <TouchableNativeFeedback
           style={[styles.button, styles.loginButton]}
           onPress={() => navigation.push("SignIn")}>
