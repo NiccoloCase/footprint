@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {TouchableOpacity, StatusBar} from "react-native";
+import {TouchableOpacity} from "react-native";
 import {NavigationContainer} from "@react-navigation/native";
 import {
   createStackNavigator,
@@ -532,7 +532,6 @@ export const Navigation = () => {
     return (
       <NavigationContainer>
         <RootStackScreen isAutheticated={isAuth} />
-        <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       </NavigationContainer>
     );
 };

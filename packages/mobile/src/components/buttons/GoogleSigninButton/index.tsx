@@ -24,10 +24,12 @@ interface GoogleSigninButtonProps {
   /** Testo del bottone */
   label?: string;
   /**
-   * Funziona che viene chiamata quando l'operazione
+   * Funzione che viene chiamata quando l'operazione
    * si concliude con successo
    */
   onSuccess?: () => void;
+  /** Bottone custom */
+  button?: (onClick: () => void) => React.ReactNode;
 }
 
 export const GoogleSigninButton: React.FC<GoogleSigninButtonProps> = (
@@ -179,15 +181,21 @@ export const GoogleSigninButton: React.FC<GoogleSigninButtonProps> = (
   return (
     <>
       {/** BOTTONE */}
-      <View>
-        <TouchableOpacity style={styles.googleButton} onPress={handleSubmit}>
-          <Image
-            source={require("../../../assets/images/google-logo.png")}
-            style={styles.googleLogo}
-          />
-          <Text style={styles.text}>{props.label || "Accedi con Google"}</Text>
-        </TouchableOpacity>
-      </View>
+      {props.button ? (
+        props.button(handleSubmit)
+      ) : (
+        <View>
+          <TouchableOpacity style={styles.googleButton} onPress={handleSubmit}>
+            <Image
+              source={require("../../../assets/images/google-logo.png")}
+              style={styles.googleLogo}
+            />
+            <Text style={styles.text}>
+              {props.label || "Accedi con Google"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
       {/** POP-UP */}
       <RBSheet
         ref={refModal}
@@ -221,11 +229,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 10,
     backgroundColor: "#EAEEF4",
-    /*hadowColor: "rgba(171, 180, 189, 0.35)",
-    shadowOffset: {width: 0, height: 10},
-    shadowOpacity: 1,
-    shadowRadius: 40,
-    elevation: 3,*/
   },
   googleLogo: {
     width: 16,
