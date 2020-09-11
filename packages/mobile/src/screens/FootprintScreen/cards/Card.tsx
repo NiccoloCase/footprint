@@ -51,19 +51,10 @@ export const Card: React.FC<CardProps> = (props) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#eee",
-    borderRadius: 10,
+    borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 20,
-    marginBottom: 25,
-    // ombra:
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    marginBottom: 10,
   },
   header: {
     flexDirection: "row",

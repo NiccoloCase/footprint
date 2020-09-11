@@ -45,7 +45,8 @@ export const MapView: React.FC<MapViewProps> = ({
     <Map
       style={[{flex: 1}, containerStyle]}
       styleURL={Mapbox.StyleURL.Light}
-      compassEnabled={false}>
+      compassEnabled={false}
+      logoEnabled={false}>
       <Camera zoomLevel={8} centerCoordinate={centerCoordinate} />
       <UserLocation />
       {userHome && <UserHomeMarker coordinates={userHome} />}

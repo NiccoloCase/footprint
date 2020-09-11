@@ -2,8 +2,6 @@ import {useState, useEffect} from "react";
 import {
   useAddLikeToFootprintMutation,
   useRemoveFootprintLikeMutation,
-  AddLikeToFootprintDocument,
-  GetFootprintsByIdDocument,
   Footprint,
 } from "../../generated/graphql";
 import {useStoreState} from "../../store";
@@ -14,7 +12,7 @@ import {client} from "../../graphql";
 
 export const useFootprintLikes = (
   footprintId: string,
-  footprintAuthor: string,
+  footprintAuthor?: string,
   isAlreadyLiked: boolean = false,
 ): [boolean, () => void] => {
   // Se l'utente ha già messo like al footprint
@@ -30,6 +28,7 @@ export const useFootprintLikes = (
   }, [isAlreadyLiked]);
 
   const handleLikeButtonPress = () => {
+    if (!footprintAuthor) return;
     // Controlla che l'utente non stia cercando di mettere un like
     // a un suo footprint
     if (loggedUser === footprintAuthor)

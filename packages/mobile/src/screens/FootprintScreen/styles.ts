@@ -51,8 +51,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     flex: 1,
-    marginLeft: CLOSE_BUTTON_RADIUS + 15,
-    marginRight: 15,
     textAlign: "center",
   },
   titleWrapper: {

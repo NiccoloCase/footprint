@@ -11,6 +11,7 @@ export interface IFootprint {
   media: string;
   created_at?: string;
   likesCount?: number;
+  commentsCount?: number;
 }
 
 export type IFootprintModel = Document & IFootprint;
@@ -46,6 +47,8 @@ export const FootprintSchema = new Schema({
   },
   // Numero di likes
   likesCount: { type: Number, default: 0 },
+  // Numero di commenti
+  commentsCount: { type: Number, default: 0 },
 });
 
 FootprintSchema.index({ authorId: 1 });

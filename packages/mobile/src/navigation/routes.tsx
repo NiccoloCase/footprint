@@ -351,6 +351,10 @@ const AppStackScreen = () => (
             id: `footprint.${params.id}.title`,
             animation: "move",
           },
+          {
+            id: `comments.card.${params.id}.counters`,
+            animation: "fade-in",
+          },
           {id: `footprint.${params.id}.profileImage`},
           {id: `footprint.${params.id}.data`},
           {id: `footprint.${params.id}.username`},
@@ -459,6 +463,10 @@ const AppStackScreen = () => (
           },
           {
             id: `comments.card.${contentId}.content`,
+            animation: "fade-out",
+          },
+          {
+            id: `comments.card.${contentId}.link`,
             animation: "fade-out",
           },
         ];

@@ -8,6 +8,7 @@ type Footprint {
   location: Location!
   created_at: Date!
   likesCount: Int!
+  commentsCount: Int!
   # Se l'utente associato all'ID passato ha messso mi piace al footprint
   isLikedBy(userId: ID): Boolean
 }

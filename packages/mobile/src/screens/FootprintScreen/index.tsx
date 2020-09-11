@@ -25,8 +25,7 @@ import {MoreMenu} from "./MoreMenu";
 import styles, {IMAGE_HEIGHT, HEADER_HEIGHT, USER_CARD_HEIGHT} from "./styles";
 
 // Cards
-import {UserCard} from "./cards/UserCard";
-import {LikesCard} from "./cards/LikesCard";
+import {Footer} from "./Footer";
 import {MapCard} from "./cards/MapCard";
 import {CommentsCard} from "./cards/CommentsCard";
 import {Spinner} from "../../components/Spinner";
@@ -96,11 +95,12 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
             </Animated.View>
           </View>
         </TouchableWithoutFeedback>
-        {/** ------ CONTENUTO ------ */}
         <SafeAreaView style={styles.content}>
-          {/** AUTORE DEL FOOTPRINT */}
-          <UserCard
+          {/** FOOTER */}
+          <Footer
             footprintId={id}
+            footprintAuthor={data?.getFootprintById.author.id}
+            isAlredyLiked={!!data?.getFootprintById.isLikedBy}
             height={USER_CARD_HEIGHT}
             footprintDate={data?.getFootprintById.created_at}
             userData={
@@ -111,7 +111,10 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
                     profileImage: authorProfileImage,
                   }
             }
+            likesCount={data?.getFootprintById.likesCount}
+            commentsCount={data?.getFootprintById.commentsCount}
           />
+
           {/** DESCRIZIONE DEL FOOTPRINT */}
           <View style={styles.descriptionWrapper}>
             {loading ? (
@@ -122,27 +125,15 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
               </Text>
             )}
           </View>
-          {/** LIKES */}
-          {data && (
-            <LikesCard
-              footprintId={id}
-              footprintAuthor={data.getFootprintById.author.id || ""}
-              isAlredyLiked={!!data.getFootprintById.isLikedBy}
-              likesCount={data.getFootprintById.likesCount}
-              likes={[
-                // TODO <-----------
-                {
-                  username: "nicco",
-                  profileImage: authorProfileImage,
-                  id: "1pid+pdoo",
-                },
-              ]}
-            />
-          )}
+
           {/** COMMENTI */}
-          <CommentsCard footprintId={id} commentsCount={10} />
+          <CommentsCard
+            footprintId={id}
+            commentsCount={data?.getFootprintById.commentsCount || 0}
+          />
+
           {/** MAPPA */}
-          {/*    <MapCard location={data?.getFootprintById.location} /> */}
+          <MapCard location={data?.getFootprintById.location} />
         </SafeAreaView>
       </ScrollView>
 
@@ -152,6 +143,9 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
           styles.header,
           {backgroundColor: color(48, 48, 48, headerOpacity)},
         ]}>
+        <TouchableOpacity onPress={goBack} style={styles.headerButton}>
+          <Icon name="chevron-left" color="#eee" size={23} />
+        </TouchableOpacity>
         <Animated.Text
           style={[styles.headerTitle, {opacity: headerOpacity}]}
           numberOfLines={1}>
@@ -161,11 +155,6 @@ export const FootprintScreen: React.FC<FootprintScreenProps> = ({
           footprintId={id}
           own={authId === data?.getFootprintById.author.id}
         />
-        <TouchableOpacity
-          onPress={goBack}
-          style={[styles.headerButton, {marginLeft: 8}]}>
-          <Icon name="times" color="#eee" size={23} />
-        </TouchableOpacity>
       </Animated.View>
     </View>
   );

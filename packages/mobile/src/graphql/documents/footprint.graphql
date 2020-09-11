@@ -35,6 +35,7 @@ query GetNewsFeed($pagination: PaginationOptions, $isLikedBy: ID) {
       }
       created_at
       likesCount
+      commentsCount
       isLikedBy(userId: $isLikedBy)
     }
   }
@@ -44,14 +45,15 @@ query GetFootprintsByUser($userId: ID!) {
   getFootprintsByUser(userId: $userId) {
     id
     title
-    body
     media
-    likesCount
+    author {
+      username
+      profileImage
+    }
     location {
       coordinates
       locationName
     }
-    created_at
   }
 }
 
@@ -62,6 +64,7 @@ query GetFootprintsById($id: ID!, $isLikedBy: ID) {
     body
     media
     likesCount
+    commentsCount
     location {
       coordinates
       locationName

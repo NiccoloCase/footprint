@@ -126,13 +126,24 @@ export class FootprintsService {
   }
 
   /**
-   * Incremente diun certo valore il count dei like
+   * Incremente di un certo valore il contatore di like
    * @param id ID del footprint
    * @param value
    */
   async increaseLikeCounter(id: string, value: number): Promise<void> {
     await this.footprintModel.findByIdAndUpdate(id, {
       $inc: { likesCount: value },
+    });
+  }
+
+  /**
+   * Incremente di un certo valore il contatore di commenti
+   * @param id ID del footprint
+   * @param value
+   */
+  async increaseCommentsCounter(id: string, value: number): Promise<void> {
+    await this.footprintModel.findByIdAndUpdate(id, {
+      $inc: { commentsCount: value },
     });
   }
 

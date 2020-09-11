@@ -7,7 +7,10 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import EntypoIcon from "react-native-vector-icons/Entypo";
-import {FootprintLikeButton} from "../../components/buttons";
+import {
+  FootprintLikeButton,
+  FootprintCommentsButton,
+} from "../../components/buttons";
 import {useNavigation} from "@react-navigation/native";
 import {SharedElement} from "react-navigation-shared-element";
 import {useNavigateToUserProfile} from "../../navigation/navigateToUserProfile";
@@ -24,6 +27,7 @@ interface FootprintCardProps {
   profilePicture: string;
   locationName: string;
   likesCount: number;
+  commentsCount: number;
   userHasLiked?: boolean;
   createdData: Date | number | string;
 }
@@ -38,6 +42,7 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
   username,
   locationName,
   likesCount,
+  commentsCount,
   userHasLiked,
   createdData,
 }) => {
@@ -123,13 +128,20 @@ export const FootprintCard: React.FC<FootprintCardProps> = ({
             </View>
           </View>
 
-          {/** LIKE BUTTON  */}
+          {/** LIKES */}
           <FootprintLikeButton
             likesCount={likesCount}
             footprintId={footprintId}
             footprintAuthor={authorId}
             isLiked={userHasLiked}
-            containerStyle={{marginRight: 6}}
+            containerStyle={{marginRight: 15}}
+          />
+
+          {/** COMMENTI */}
+          <FootprintCommentsButton
+            commentsCount={commentsCount}
+            footprintId={footprintId}
+            footprintAuthor={authorId}
           />
         </View>
       </View>

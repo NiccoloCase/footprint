@@ -1,11 +1,9 @@
 import React from "react";
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import {
-  View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  TouchableNativeFeedback,
   StyleProp,
   ViewStyle,
 } from "react-native";
@@ -29,20 +27,18 @@ export const FootprintLikeButton: React.FC<LikeButtonProps> = (props) => {
   );
 
   return (
-    <View style={[styles.wrapper, props.containerStyle]}>
+    <TouchableOpacity
+      onPress={handlePress}
+      style={[styles.wrapper, props.containerStyle]}>
       {props.likesCount > 0 && (
-        <TouchableNativeFeedback>
-          <Text style={styles.text}>{abbreviateNumber(props.likesCount)}</Text>
-        </TouchableNativeFeedback>
+        <Text style={styles.text}>{abbreviateNumber(props.likesCount)}</Text>
       )}
-      <TouchableOpacity onPress={handlePress}>
-        <AntDesignIcon
-          name={isLiked ? "heart" : "hearto"}
-          color="#fff"
-          size={26}
-        />
-      </TouchableOpacity>
-    </View>
+      <AntDesignIcon
+        name={isLiked ? "heart" : "hearto"}
+        color="#fff"
+        size={26}
+      />
+    </TouchableOpacity>
   );
 };
 

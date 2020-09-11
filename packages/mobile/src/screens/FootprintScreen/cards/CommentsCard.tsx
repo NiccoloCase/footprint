@@ -7,7 +7,6 @@ import {
   TextInput,
 } from "react-native";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
 import {useNavigation} from "@react-navigation/native";
 import {SharedElement} from "react-navigation-shared-element";
 import {Colors} from "../../../styles";
@@ -21,6 +20,8 @@ import {PostCommentFormValues} from "../../CommentsScreen";
 import {PostCommentValidationSchema} from "../../../utils/validation";
 import {ErrorBadge} from "../../../components/badges";
 
+const EMOJIS = ["🔥", "😂", "😍", "♥", "👏", "💪", "👍", "😈"];
+
 interface CommentsCardProps {
   footprintId: string;
   commentsCount: number;
@@ -28,37 +29,35 @@ interface CommentsCardProps {
 
 export const CommentsCard: React.FC<CommentsCardProps> = ({
   footprintId,
-  commentsCount: defaultCommentsCount,
+  commentsCount,
 }) => {
   // Form
   const formik = useFormik<PostCommentFormValues>({
     initialValues: {text: ""},
     validationSchema: PostCommentValidationSchema,
-    onSubmit: postComment,
+    onSubmit: submitComment,
   });
-  // Numero di commenti
-  const [commentsCount, setCommentsCount] = useState(defaultCommentsCount);
+
   // Se mostrare il
   const [showSuccessMark, setShowSuccessMark] = useState(false);
   // Navigazione
   const navigation = useNavigation();
-
-  // Graphql
-  const [postCommentMutation] = usePostComment();
+  // Funzione per postare i commenti
+  const [postComment] = usePostComment();
 
   const onChangeTextBoxValue = (text: string) => {
     formik.setFieldValue("text", text);
     if (showSuccessMark) setShowSuccessMark(false);
   };
+
   /**
    * Posta un commento
    */
-  async function postComment({text}: PostCommentFormValues) {
+  async function submitComment({text}: PostCommentFormValues) {
     try {
-      const {data, errors} = await postCommentMutation(footprintId, text);
+      const {data, errors} = await postComment(footprintId, text);
       if (!data || errors) throw new Error();
-      // Auenta il contatore di commenti
-      setCommentsCount(commentsCount + 1);
+
       // Ripulisce la casella di testo
       // Indica che l'operazione ha avuto successo
       setShowSuccessMark(true);
@@ -87,29 +86,27 @@ export const CommentsCard: React.FC<CommentsCardProps> = ({
   return (
     <Card
       title="Commenti"
+      buttonText={
+        commentsCount > 1
+          ? `Vedi i ${abbreviateNumber(commentsCount)} commenti`
+          : "Vai ai commenti"
+      }
+      onButtonPress={goToComments}
       titleId={`comments.card.${footprintId}.title`}
-      cardId={`comments.card.${footprintId}`}>
+      cardId={`comments.card.${footprintId}`}
+      linkId={`comments.card.${footprintId}.link`}>
       <SharedElement id={`comments.card.${footprintId}.content`}>
-        <View style={styles.counter}>
-          <View style={styles.commentButtonWrapper}>
-            <FontAwesomeIcon name="comments-o" size={38} color="#707070" />
-            <Text style={styles.commentsCount}>
-              {abbreviateNumber(commentsCount)}
-            </Text>
-          </View>
-
-          {commentsCount === 0 ? (
-            <Text style={styles.buttonText}>Non ci sono ancora commenti</Text>
-          ) : (
-            <TouchableOpacity style={styles.button} onPress={goToComments}>
-              <Text style={styles.buttonText}>Vai ai commenti</Text>
-              <FeatherIcon
-                name="arrow-right"
-                size={25}
-                color={Colors.primary}
-              />
+        {/** EMOJI */}
+        <View style={styles.emojis}>
+          {EMOJIS.map((emoji, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() =>
+                formik.setFieldValue("text", formik.values.text + emoji)
+              }>
+              <Text style={{fontSize: 25}}>{emoji}</Text>
             </TouchableOpacity>
-          )}
+          ))}
         </View>
       </SharedElement>
       <SharedElement id={`comments.card.${footprintId}.inputBox`}>
@@ -149,19 +146,11 @@ const styles = StyleSheet.create({
   inputBox: {
     marginTop: 20,
     paddingHorizontal: 10,
-    borderRadius: 15,
-    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+    backgroundColor: "#fff",
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
   },
   textInput: {
     paddingVertical: 10,
@@ -199,5 +188,11 @@ const styles = StyleSheet.create({
     color: "#707070",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  emojis: {
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

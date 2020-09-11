@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -71,6 +72,9 @@ export class CommentsService {
     contentId: string,
     text: string,
   ): Promise<IComment> {
+    // Commento che è restituito dalla funzione
+    let returnedComment: IComment;
+
     // Documento del nuovo commento
     const newComment = {
       text,
@@ -93,27 +97,49 @@ export class CommentsService {
       } catch (err) {
         throw new NotFoundException('Content not found');
       }
+      try {
+        // Crea un nuovo bucket
+        returnedComment = await this.createNewBucket(newComment, contentId);
+      } catch (err) {
+        throw new InternalServerErrorException(err);
+      }
+    } else {
+      // Controlla se il bucket è pieno
+      if (lastBucket.commentsCount >= constants.COMMENTS_PER_BUCKET) {
+        try {
+          // Crea un nuovo bucket
+          returnedComment = await this.createNewBucket(
+            newComment,
+            contentId,
+            lastBucket.page + 1,
+          );
+        } catch (err) {
+          throw new InternalServerErrorException();
+        }
+      } else {
+        // Inserisce il nuovo commento nell'ultimo bucket
+        lastBucket.comments.unshift(newComment);
+        // Incrementa il contatore di commenti
+        lastBucket.commentsCount += 1;
 
-      // Crea un nuovo bucket
-      return this.createNewBucket(newComment, contentId);
-    }
+        // Salva il bucket
+        try {
+          await lastBucket.save();
+          returnedComment = lastBucket.comments[0];
+        } catch (err) {
+          throw new BadRequestException(err);
+        }
+      }
 
-    // Controlla se il bucket è pieno
-    if (lastBucket.commentsCount >= constants.COMMENTS_PER_BUCKET)
-      // Crea un nuovo bucket
-      return this.createNewBucket(newComment, contentId, lastBucket.page + 1);
+      // Incrementa il contatore di commenti del footprint
+      try {
+        await this.footprintService.increaseCommentsCounter(contentId, 1);
+      } catch (err) {
+        console.error(err);
+        throw new InternalServerErrorException();
+      }
 
-    // Inserisce il nuovo commento nell'ultimo bucket
-    lastBucket.comments.unshift(newComment);
-    // Incrementa il contatore di commenti
-    lastBucket.commentsCount += 1;
-
-    // Salva il bucket
-    try {
-      await lastBucket.save();
-      return lastBucket.comments[0];
-    } catch (err) {
-      throw new BadRequestException(err);
+      return returnedComment;
     }
   }
 
@@ -157,6 +183,13 @@ export class CommentsService {
       throw new BadRequestException(
         'The comment does not exist, or you are not the owner of it',
       );
+
+    // Decrementa il contatore di commenti del footprint
+    try {
+      await this.footprintService.increaseCommentsCounter(contentId, -1);
+    } catch (err) {
+      throw new InternalServerErrorException();
+    }
 
     // Se il bucket è vuoto viene eliminato
     if (commentBucket.comments.length === 0) await commentBucket.deleteOne();

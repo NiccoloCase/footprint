@@ -3,13 +3,8 @@ import {TouchableOpacity} from "react-native";
 import Menu, {MenuItem, MenuDivider} from "react-native-material-menu";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import styles from "./styles";
-import {
-  useDeleteFootprintMutation,
-  GetNewsFeedDocument,
-  NewsFeedItem,
-} from "../../generated/graphql";
+import {useDeleteFootprintMutation} from "../../generated/graphql";
 import {DeletionConfirmationDialog} from "../../components/modals/";
-import gql from "graphql-tag";
 
 interface MoreMenuProps {
   /** Se il footprint appartiene all'utente loggato */

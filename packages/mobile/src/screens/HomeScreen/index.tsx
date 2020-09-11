@@ -162,6 +162,7 @@ export const HomeScreen: React.FC = () => {
         profilePicture={item.footprint!.author.profileImage}
         userHasLiked={!!item.footprint!.isLikedBy}
         likesCount={item.footprint!.likesCount}
+        commentsCount={item.footprint!.commentsCount}
         createdData={item.footprint!.created_at}
       />
     );

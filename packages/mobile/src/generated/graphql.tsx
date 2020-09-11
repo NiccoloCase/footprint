@@ -289,6 +289,7 @@ export type Footprint = {
   location: Location;
   created_at: Scalars['Date'];
   likesCount: Scalars['Int'];
+  commentsCount: Scalars['Int'];
   isLikedBy?: Maybe<Scalars['Boolean']>;
 };
 
@@ -509,7 +510,7 @@ export type GetNewsFeedQuery = (
     & Pick<NewsFeedItem, 'id' | 'isSeen'>
     & { footprint?: Maybe<(
       { __typename?: 'Footprint' }
-      & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId' | 'created_at' | 'likesCount' | 'isLikedBy'>
+      & Pick<Footprint, 'id' | 'title' | 'media' | 'authorId' | 'created_at' | 'likesCount' | 'commentsCount' | 'isLikedBy'>
       & { location: (
         { __typename?: 'Location' }
         & Pick<Location, 'coordinates' | 'locationName'>
@@ -530,8 +531,11 @@ export type GetFootprintsByUserQuery = (
   { __typename?: 'Query' }
   & { getFootprintsByUser: Array<(
     { __typename?: 'Footprint' }
-    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount' | 'created_at'>
-    & { location: (
+    & Pick<Footprint, 'id' | 'title' | 'media'>
+    & { author: (
+      { __typename?: 'User' }
+      & Pick<User, 'username' | 'profileImage'>
+    ), location: (
       { __typename?: 'Location' }
       & Pick<Location, 'coordinates' | 'locationName'>
     ) }
@@ -548,7 +552,7 @@ export type GetFootprintsByIdQuery = (
   { __typename?: 'Query' }
   & { getFootprintById: (
     { __typename?: 'Footprint' }
-    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount' | 'created_at' | 'isLikedBy'>
+    & Pick<Footprint, 'id' | 'title' | 'body' | 'media' | 'likesCount' | 'commentsCount' | 'created_at' | 'isLikedBy'>
     & { location: (
       { __typename?: 'Location' }
       & Pick<Location, 'coordinates' | 'locationName'>
@@ -1121,6 +1125,7 @@ export const GetNewsFeedDocument = gql`
       }
       created_at
       likesCount
+      commentsCount
       isLikedBy(userId: $isLikedBy)
     }
   }
@@ -1158,14 +1163,15 @@ export const GetFootprintsByUserDocument = gql`
   getFootprintsByUser(userId: $userId) {
     id
     title
-    body
     media
-    likesCount
+    author {
+      username
+      profileImage
+    }
     location {
       coordinates
       locationName
     }
-    created_at
   }
 }
     `;
@@ -1203,6 +1209,7 @@ export const GetFootprintsByIdDocument = gql`
     body
     media
     likesCount
+    commentsCount
     location {
       coordinates
       locationName

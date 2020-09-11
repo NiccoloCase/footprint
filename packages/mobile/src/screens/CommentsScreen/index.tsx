@@ -22,12 +22,14 @@ import {
   User,
   GetCommentsDocument,
   useDelateCommentMutation,
+  Footprint,
 } from "../../generated/graphql";
 import {useStoreState} from "../../store";
 import {StackScreenProps} from "@react-navigation/stack";
 import {AppStackParamList} from "../../navigation";
 import {Spinner, LogoSpinner} from "../../components/Spinner";
 import Snackbar from "react-native-snackbar";
+import gql from "graphql-tag";
 import {constants} from "@footprint/config";
 import {CommentCard} from "./CommentCard";
 import {usePostComment} from "../../utils/hooks";
@@ -131,6 +133,9 @@ export const CommentsScreen: React.FC<CommentsScreenProps> = ({route}) => {
         },
         // Aggiorna la cache
         update: (proxy, {data: newData}) => {
+          if (!newData || !newData.delateComment.success) return;
+
+          // 1) Elimina il commento dalla cache
           try {
             // Ottiene i commenti salvati nella cache
             const prevData = proxy.readQuery({
@@ -138,20 +143,50 @@ export const CommentsScreen: React.FC<CommentsScreenProps> = ({route}) => {
               variables: {contentId},
             }) as any;
 
-            if (!prevData || !newData || !newData.delateComment.success) return;
-
-            // Elimina il commento
-            prevData.getComments = (prevData.getComments as Comment[]).filter(
-              (comment) => comment.id !== id,
-            );
-
-            proxy.writeQuery({
-              query: GetCommentsDocument,
-              variables: {contentId},
-              data: prevData,
-            });
+            if (prevData) {
+              // Elimina il commento
+              prevData.getComments = (prevData.getComments as Comment[]).filter(
+                (comment) => comment.id !== id,
+              );
+              // Salva la cache
+              proxy.writeQuery({
+                query: GetCommentsDocument,
+                variables: {contentId},
+                data: prevData,
+              });
+            }
           } catch (error) {
             console.log(error);
+          }
+
+          // 2) Decrementa il numero di commenti
+          try {
+            const fragment = gql`
+              fragment MyFootprint on Footprint {
+                commentsCount
+                __typename
+              }
+            `;
+
+            const footprint: Pick<
+              Footprint,
+              "commentsCount"
+            > | null = proxy.readFragment({
+              id: contentId,
+              fragment,
+            });
+
+            if (footprint)
+              proxy.writeFragment({
+                id: contentId,
+                fragment,
+                data: {
+                  commentsCount: footprint.commentsCount - 1,
+                  __typename: "Footprint",
+                },
+              });
+          } catch (err) {
+            console.log(err);
           }
         },
       });
