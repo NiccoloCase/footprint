@@ -60,7 +60,8 @@ export const HomeScreen: React.FC = () => {
     else if (data) {
       // Segna come letto il primo elemento del feed
       const firstFeedItem = data.getNewsFeed[0];
-      if (!firstFeedItem.isSeen) markFeedItemAsSeen(firstFeedItem);
+      if (firstFeedItem && !firstFeedItem.isSeen)
+        markFeedItemAsSeen(firstFeedItem);
     }
   }, [loading]);
 
